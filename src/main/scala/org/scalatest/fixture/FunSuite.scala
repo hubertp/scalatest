@@ -398,7 +398,7 @@ trait FunSuite extends Suite { thisSuite =>
    * @throws NullPointerException if <code>testName</code> or any passed test tag is <code>null</code>
    */
   protected def test(testName: String, testTags: Tag*)(testFun: FixtureParam => Any) {
-    registerTest(testName, testFun, "testCannotAppearInsideAnotherTest", sourceFileName, "test", 1, None, None, testTags: _*)
+    registerTest(testName, testFun, "testCannotAppearInsideAnotherTest", sourceFileName, "test", 2, None, None, testTags: _*)
   }
 
   /**
