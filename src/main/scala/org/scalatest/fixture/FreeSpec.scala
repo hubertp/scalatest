@@ -420,7 +420,7 @@ trait FreeSpec extends Suite { thisSuite =>
    */
   private def registerTestToRun(specText: String, testTags: List[Tag], testFun: FixtureParam => Any) {
     // TODO: This is what was being used before but it is wrong
-    registerTest(specText, testFun, "itCannotAppearInsideAnotherIt", sourceFileName, "it", None, None, testTags: _*)
+    registerTest(specText, testFun, "itCannotAppearInsideAnotherIt", sourceFileName, "it", 1, None, None, testTags: _*)
   }
 
   /**
@@ -443,7 +443,7 @@ trait FreeSpec extends Suite { thisSuite =>
    */
   private def registerTestToIgnore(specText: String, testTags: List[Tag], testFun: FixtureParam => Any) {
     // TODO: This is how these were, but it needs attention. Mentions "it".
-    registerIgnoredTest(specText, testFun, "ignoreCannotAppearInsideAnIt", sourceFileName, "ignore", testTags: _*)
+    registerIgnoredTest(specText, testFun, "ignoreCannotAppearInsideAnIt", sourceFileName, "ignore", 1, testTags: _*)
   }
    /*
   private def registerBranch(description: String, childPrefix: Option[String], fun: () => Unit) {
@@ -586,7 +586,7 @@ trait FreeSpec extends Suite { thisSuite =>
     def - (fun: => Unit) {
       // registerBranch(string, None, testFun)
       // TODO: Fix the resource name and method name
-      registerNestedBranch(string, None, fun, "describeCannotAppearInsideAnIt", sourceFileName, "describe")
+      registerNestedBranch(string, None, fun, "describeCannotAppearInsideAnIt", sourceFileName, "describe", 1)
     }
 
     /**

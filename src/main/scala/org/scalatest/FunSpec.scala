@@ -1326,7 +1326,7 @@ trait FunSpec extends Suite { thisSuite =>
      * @throws NullPointerException if <code>specText</code> or any passed test tag is <code>null</code>
      */
     def apply(specText: String, testTags: Tag*)(testFun: => Unit) {
-      registerTest(specText, testFun _, "itCannotAppearInsideAnotherIt", sourceFileName, "apply", None, None, testTags: _*)
+      registerTest(specText, testFun _, "itCannotAppearInsideAnotherIt", sourceFileName, "apply", 1, None, None, testTags: _*)
     }
 
     /**
@@ -1438,7 +1438,7 @@ trait FunSpec extends Suite { thisSuite =>
      * @throws NullPointerException if <code>specText</code> or any passed test tag is <code>null</code>
      */
     def apply(specText: String, testTags: Tag*)(testFun: => Unit) {
-      registerTest(specText, testFun _, "theyCannotAppearInsideAnotherThey", sourceFileName, "apply", None, None, testTags: _*)
+      registerTest(specText, testFun _, "theyCannotAppearInsideAnotherThey", sourceFileName, "apply", 1, None, None, testTags: _*)
     }
 
     /**
@@ -1522,7 +1522,7 @@ trait FunSpec extends Suite { thisSuite =>
    * @throws NullPointerException if <code>specText</code> or any passed test tag is <code>null</code>
    */
   protected def ignore(testText: String, testTags: Tag*)(testFun: => Unit) {
-    registerIgnoredTest(testText, testFun _, "ignoreCannotAppearInsideAnIt", sourceFileName, "ignore", testTags: _*)
+    registerIgnoredTest(testText, testFun _, "ignoreCannotAppearInsideAnIt", sourceFileName, "ignore", 1, testTags: _*)
   }
 
   /**
@@ -1533,7 +1533,7 @@ trait FunSpec extends Suite { thisSuite =>
    */
   protected def describe(description: String)(fun: => Unit) {
 
-    registerNestedBranch(description, None, fun, "describeCannotAppearInsideAnIt", sourceFileName, "describe")
+    registerNestedBranch(description, None, fun, "describeCannotAppearInsideAnIt", sourceFileName, "describe", 1)
   }
 
   /**

@@ -724,7 +724,7 @@ trait FreeSpec extends org.scalatest.Suite with OneInstancePerTest { thisSuite =
    */
   private def registerTestToRun(specText: String, testTags: List[Tag], testFun: () => Unit) {
     // TODO: This is what was being used before but it is wrong
-    handleTest(thisSuite, specText, testFun, "itCannotAppearInsideAnotherIt", "FunSpec.scala", "apply", testTags: _*)
+    handleTest(thisSuite, specText, testFun, "itCannotAppearInsideAnotherIt", "FunSpec.scala", "apply", 1, testTags: _*)
     // registerTest(specText, testFun, "itCannotAppearInsideAnotherIt", "FreeSpec.scala", "it", None, testTags: _*)
   }
 
@@ -749,7 +749,7 @@ trait FreeSpec extends org.scalatest.Suite with OneInstancePerTest { thisSuite =
   private def registerTestToIgnore(specText: String, testTags: List[Tag], testFun: () => Unit) {
 
     // TODO: This is how these were, but it needs attention. Mentions "it".
-    handleIgnoredTest(specText, testFun, "ignoreCannotAppearInsideAnIt", "FreeSpec.scala", "ignore", testTags: _*)
+    handleIgnoredTest(specText, testFun, "ignoreCannotAppearInsideAnIt", "FreeSpec.scala", "ignore", 1, testTags: _*)
   }
 
   /**
