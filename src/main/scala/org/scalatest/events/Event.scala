@@ -17,6 +17,10 @@ package org.scalatest.events
 
 import org.scalatest._
 import java.util.Date
+import scala.xml.Elem
+import java.io.StringWriter
+import java.io.PrintWriter
+import java.io.BufferedWriter
 
 /**
  * A base class for the events that can be passed to the report function passed
@@ -71,6 +75,11 @@ sealed abstract class Event extends Ordered[Event] with java.io.Serializable {
    * the passed event
    */
   def compare(that: Event): Int = ordinal.compare(that.ordinal)
+  
+  /**
+   * 
+   */
+  def toXml: Elem
 }
 
 /**
@@ -160,6 +169,69 @@ final case class TestStarting (
     throw new NullPointerException("payload was null")
   if (threadName == null)
     throw new NullPointerException("threadName was null")
+  
+  def toXml = 
+    <TestStarting>
+      <ordinal>
+        <runStamp>{ ordinal.runStamp }</runStamp>
+      </ordinal>
+      <suiteName>{ suiteName }</suiteName>
+      <suiteId>{ suiteId }</suiteId>
+      <suiteClassName>{ if (suiteClassName.isDefined) suiteClassName.get else "" }</suiteClassName>
+      <decodedSuiteName>{ if (decodedSuiteName.isDefined) decodedSuiteName.get else "" }</decodedSuiteName>
+      <testName>{ testName }</testName>
+      <testText>{ testText }</testText>
+      <decodedTestName>{ if (decodedTestName.isDefined) decodedTestName.get else "" }</decodedTestName>
+      <formatter>
+        {
+          formatter match {
+            case Some(formatter) =>
+              formatter match {
+                case MotionToSuppress => 
+                  <MotionToSuppress/>
+                case indentedText: IndentedText => 
+                  <IndentedText>
+                    <formattedText>{ indentedText.formattedText }</formattedText>
+                    <rawText>{ indentedText.rawText }</rawText>
+                    <indentationLevel>{ indentedText.indentationLevel }</indentationLevel>
+                  </IndentedText>
+              }
+            case None => ""
+          }
+        }
+      </formatter>
+      <location>
+        {
+          location match {
+            case Some(location) =>
+              location match {
+                case topOfClass: TopOfClass =>
+                  <TopOfClass>
+                    <className>{ topOfClass.className }</className>
+                  </TopOfClass>
+                case topOfMethod: TopOfMethod => 
+                  <TopOfMethod>
+                    <className>{ topOfMethod.className }</className>
+                    <methodId>{ topOfMethod.methodId }</methodId>
+                  </TopOfMethod>
+                case lineInFile: LineInFile => 
+                  <LineInFile>
+                    <lineNumber>{ lineInFile.lineNumber }</lineNumber>
+                    <fileName>{ lineInFile.fileName }</fileName>
+                  </LineInFile>
+                case SeeStackDepthException => 
+                  <SeeStackDepthException />
+                case _ =>
+                  ""
+              } 
+            case None => ""
+          }
+        }
+      </location>
+      <rerunner>{ if (rerunner.isDefined) rerunner.get else "" }</rerunner>
+      <threadName>{ threadName }</threadName>
+      <timeStamp>{ timeStamp }</timeStamp>
+    </TestStarting>
 }
 
 /**
@@ -254,6 +326,70 @@ final case class TestSucceeded (
     throw new NullPointerException("payload was null")
   if (threadName == null)
     throw new NullPointerException("threadName was null")
+  
+  def toXml = 
+    <TestSucceeded>
+      <ordinal>
+        <runStamp>{ ordinal.runStamp }</runStamp>
+      </ordinal>
+      <suiteName>{ suiteName }</suiteName>
+      <suiteId>{ suiteId }</suiteId>
+      <suiteClassName>{ if (suiteClassName.isDefined) suiteClassName.get else "" }</suiteClassName>
+      <decodedSuiteName>{ if (decodedSuiteName.isDefined) decodedSuiteName.get else "" }</decodedSuiteName>
+      <duration>{ if (duration.isDefined) duration.get else "" }</duration>
+      <testName>{ testName }</testName>
+      <testText>{ testText }</testText>
+      <decodedTestName>{ if (decodedTestName.isDefined) decodedTestName.get else "" }</decodedTestName>
+      <formatter>
+        {
+          formatter match {
+            case Some(formatter) =>
+              formatter match {
+                case MotionToSuppress => 
+                  <MotionToSuppress/>
+                case indentedText: IndentedText => 
+                  <IndentedText>
+                    <formattedText>{ indentedText.formattedText }</formattedText>
+                    <rawText>{ indentedText.rawText }</rawText>
+                    <indentationLevel>{ indentedText.indentationLevel }</indentationLevel>
+                  </IndentedText>
+              }
+            case None => ""
+          }
+        }
+      </formatter>
+      <location>
+        {
+          location match {
+            case Some(location) =>
+              location match {
+                case topOfClass: TopOfClass =>
+                  <TopOfClass>
+                    <className>{ topOfClass.className }</className>
+                  </TopOfClass>
+                case topOfMethod: TopOfMethod => 
+                  <TopOfMethod>
+                    <className>{ topOfMethod.className }</className>
+                    <methodId>{ topOfMethod.methodId }</methodId>
+                  </TopOfMethod>
+                case lineInFile: LineInFile => 
+                  <LineInFile>
+                    <lineNumber>{ lineInFile.lineNumber }</lineNumber>
+                    <fileName>{ lineInFile.fileName }</fileName>
+                  </LineInFile>
+                case SeeStackDepthException => 
+                  <SeeStackDepthException />
+                case _ =>
+                  ""
+              } 
+            case None => ""
+          }
+        }
+      </location>
+      <rerunner>{ if (rerunner.isDefined) rerunner.get else "" }</rerunner>
+      <threadName>{ threadName }</threadName>
+      <timeStamp>{ timeStamp }</timeStamp>
+    </TestSucceeded>
 }
 
 /**
@@ -356,6 +492,89 @@ final case class TestFailed (
     throw new NullPointerException("payload was null")
   if (threadName == null)
     throw new NullPointerException("threadName was null")
+  
+  def toXml = 
+    <TestFailed>
+      <ordinal>
+        <runStamp>{ ordinal.runStamp }</runStamp>
+      </ordinal>
+      <message>{ message }</message>
+      <suiteName>{ suiteName }</suiteName>
+      <suiteId>{ suiteId }</suiteId>
+      <suiteClassName>{ if (suiteClassName.isDefined) suiteClassName.get else "" }</suiteClassName>
+      <decodedSuiteName>{ if (decodedSuiteName.isDefined) decodedSuiteName.get else "" }</decodedSuiteName>
+      <duration>{ if (duration.isDefined) duration.get else "" }</duration>
+      <testName>{ testName }</testName>
+      <testText>{ testText }</testText>
+      <decodedTestName>{ if (decodedTestName.isDefined) decodedTestName.get else "" }</decodedTestName>
+      <throwable>
+        {
+          throwable match {
+            case Some(throwable) => 
+              <message>throwable.getMessage</message>
+              <stackTraces>
+                {
+                  val stringWriter = new StringWriter()
+                  val writer = new PrintWriter(new BufferedWriter(stringWriter))
+                  writer.flush()
+                  throwable.printStackTrace(writer)
+                  writer.toString
+                }
+              </stackTraces>
+            case None => ""
+          }
+        }
+      </throwable>
+      <formatter>
+        {
+          formatter match {
+            case Some(formatter) =>
+              formatter match {
+                case MotionToSuppress => 
+                  <MotionToSuppress/>
+                case indentedText: IndentedText => 
+                  <IndentedText>
+                    <formattedText>{ indentedText.formattedText }</formattedText>
+                    <rawText>{ indentedText.rawText }</rawText>
+                    <indentationLevel>{ indentedText.indentationLevel }</indentationLevel>
+                  </IndentedText>
+              }
+            case None => ""
+          }
+        }
+      </formatter>
+      <location>
+        {
+          location match {
+            case Some(location) =>
+              location match {
+                case topOfClass: TopOfClass =>
+                  <TopOfClass>
+                    <className>{ topOfClass.className }</className>
+                  </TopOfClass>
+                case topOfMethod: TopOfMethod => 
+                  <TopOfMethod>
+                    <className>{ topOfMethod.className }</className>
+                    <methodId>{ topOfMethod.methodId }</methodId>
+                  </TopOfMethod>
+                case lineInFile: LineInFile => 
+                  <LineInFile>
+                    <lineNumber>{ lineInFile.lineNumber }</lineNumber>
+                    <fileName>{ lineInFile.fileName }</fileName>
+                  </LineInFile>
+                case SeeStackDepthException => 
+                  <SeeStackDepthException />
+                case _ =>
+                  ""
+              } 
+            case None => ""
+          }
+        }
+      </location>
+      <rerunner>{ if (rerunner.isDefined) rerunner.get else "" }</rerunner>
+      <threadName>{ threadName }</threadName>
+      <timeStamp>{ timeStamp }</timeStamp>
+    </TestFailed>
 }
 
 /**
@@ -441,6 +660,68 @@ final case class TestIgnored (
     throw new NullPointerException("payload was null")
   if (threadName == null)
     throw new NullPointerException("threadName was null")
+  
+  def toXml = 
+    <TestIgnored>
+      <ordinal>
+        <runStamp>{ ordinal.runStamp }</runStamp>
+      </ordinal>
+      <suiteName>{ suiteName }</suiteName>
+      <suiteId>{ suiteId }</suiteId>
+      <suiteClassName>{ if (suiteClassName.isDefined) suiteClassName.get else "" }</suiteClassName>
+      <decodedSuiteName>{ if (decodedSuiteName.isDefined) decodedSuiteName.get else "" }</decodedSuiteName>
+      <testName>{ testName }</testName>
+      <testText>{ testText }</testText>
+      <decodedTestName>{ if (decodedTestName.isDefined) decodedTestName.get else "" }</decodedTestName>
+      <formatter>
+        {
+          formatter match {
+            case Some(formatter) =>
+              formatter match {
+                case MotionToSuppress => 
+                  <MotionToSuppress/>
+                case indentedText: IndentedText => 
+                  <IndentedText>
+                    <formattedText>{ indentedText.formattedText }</formattedText>
+                    <rawText>{ indentedText.rawText }</rawText>
+                    <indentationLevel>{ indentedText.indentationLevel }</indentationLevel>
+                  </IndentedText>
+              }
+            case None => ""
+          }
+        }
+      </formatter>
+      <location>
+        {
+          location match {
+            case Some(location) =>
+              location match {
+                case topOfClass: TopOfClass =>
+                  <TopOfClass>
+                    <className>{ topOfClass.className }</className>
+                  </TopOfClass>
+                case topOfMethod: TopOfMethod => 
+                  <TopOfMethod>
+                    <className>{ topOfMethod.className }</className>
+                    <methodId>{ topOfMethod.methodId }</methodId>
+                  </TopOfMethod>
+                case lineInFile: LineInFile => 
+                  <LineInFile>
+                    <lineNumber>{ lineInFile.lineNumber }</lineNumber>
+                    <fileName>{ lineInFile.fileName }</fileName>
+                  </LineInFile>
+                case SeeStackDepthException => 
+                  <SeeStackDepthException />
+                case _ =>
+                  ""
+              } 
+            case None => ""
+          }
+        }
+      </location>
+      <threadName>{ threadName }</threadName>
+      <timeStamp>{ timeStamp }</timeStamp>
+    </TestIgnored>
 }
 
 /**
@@ -524,6 +805,69 @@ final case class TestPending (
     throw new NullPointerException("payload was null")
   if (threadName == null)
     throw new NullPointerException("threadName was null")
+  
+  def toXml = 
+    <TestPending>
+      <ordinal>
+        <runStamp>{ ordinal.runStamp }</runStamp>
+      </ordinal>
+      <suiteName>{ suiteName }</suiteName>
+      <suiteId>{ suiteId }</suiteId>
+      <suiteClassName>{ if (suiteClassName.isDefined) suiteClassName.get else "" }</suiteClassName>
+      <decodedSuiteName>{ if (decodedSuiteName.isDefined) decodedSuiteName.get else "" }</decodedSuiteName>
+      <duration>{ if (duration.isDefined) duration.get else "" }</duration>
+      <testName>{ testName }</testName>
+      <testText>{ testText }</testText>
+      <decodedTestName>{ if (decodedTestName.isDefined) decodedTestName.get else "" }</decodedTestName>
+      <formatter>
+        {
+          formatter match {
+            case Some(formatter) =>
+              formatter match {
+                case MotionToSuppress => 
+                  <MotionToSuppress/>
+                case indentedText: IndentedText => 
+                  <IndentedText>
+                    <formattedText>{ indentedText.formattedText }</formattedText>
+                    <rawText>{ indentedText.rawText }</rawText>
+                    <indentationLevel>{ indentedText.indentationLevel }</indentationLevel>
+                  </IndentedText>
+              }
+            case None => ""
+          }
+        }
+      </formatter>
+      <location>
+        {
+          location match {
+            case Some(location) =>
+              location match {
+                case topOfClass: TopOfClass =>
+                  <TopOfClass>
+                    <className>{ topOfClass.className }</className>
+                  </TopOfClass>
+                case topOfMethod: TopOfMethod => 
+                  <TopOfMethod>
+                    <className>{ topOfMethod.className }</className>
+                    <methodId>{ topOfMethod.methodId }</methodId>
+                  </TopOfMethod>
+                case lineInFile: LineInFile => 
+                  <LineInFile>
+                    <lineNumber>{ lineInFile.lineNumber }</lineNumber>
+                    <fileName>{ lineInFile.fileName }</fileName>
+                  </LineInFile>
+                case SeeStackDepthException => 
+                  <SeeStackDepthException />
+                case _ =>
+                  ""
+              } 
+            case None => ""
+          }
+        }
+      </location>
+      <threadName>{ threadName }</threadName>
+      <timeStamp>{ timeStamp }</timeStamp>
+    </TestPending>
 }
 
 /**
@@ -618,6 +962,88 @@ final case class TestCanceled (
     throw new NullPointerException("payload was null")
   if (threadName == null)
     throw new NullPointerException("threadName was null")
+  
+  def toXml = 
+    <TestCanceled>
+      <ordinal>
+        <runStamp>{ ordinal.runStamp }</runStamp>
+      </ordinal>
+      <message>{ message }</message>
+      <suiteName>{ suiteName }</suiteName>
+      <suiteId>{ suiteId }</suiteId>
+      <suiteClassName>{ if (suiteClassName.isDefined) suiteClassName.get else "" }</suiteClassName>
+      <decodedSuiteName>{ if (decodedSuiteName.isDefined) decodedSuiteName.get else "" }</decodedSuiteName>
+      <duration>{ if (duration.isDefined) duration.get else "" }</duration>
+      <testName>{ testName }</testName>
+      <testText>{ testText }</testText>
+      <decodedTestName>{ if (decodedTestName.isDefined) decodedTestName.get else "" }</decodedTestName>
+      <throwable>
+        {
+          throwable match {
+            case Some(throwable) => 
+              <message>throwable.getMessage</message>
+              <stackTraces>
+                {
+                  val stringWriter = new StringWriter()
+                  val writer = new PrintWriter(new BufferedWriter(stringWriter))
+                  writer.flush()
+                  throwable.printStackTrace(writer)
+                  writer.toString
+                }
+              </stackTraces>
+            case None => ""
+          }
+        }
+      </throwable>
+      <formatter>
+        {
+          formatter match {
+            case Some(formatter) =>
+              formatter match {
+                case MotionToSuppress => 
+                  <MotionToSuppress/>
+                case indentedText: IndentedText => 
+                  <IndentedText>
+                    <formattedText>{ indentedText.formattedText }</formattedText>
+                    <rawText>{ indentedText.rawText }</rawText>
+                    <indentationLevel>{ indentedText.indentationLevel }</indentationLevel>
+                  </IndentedText>
+              }
+            case None => ""
+          }
+        }
+      </formatter>
+      <location>
+        {
+          location match {
+            case Some(location) =>
+              location match {
+                case topOfClass: TopOfClass =>
+                  <TopOfClass>
+                    <className>{ topOfClass.className }</className>
+                  </TopOfClass>
+                case topOfMethod: TopOfMethod => 
+                  <TopOfMethod>
+                    <className>{ topOfMethod.className }</className>
+                    <methodId>{ topOfMethod.methodId }</methodId>
+                  </TopOfMethod>
+                case lineInFile: LineInFile => 
+                  <LineInFile>
+                    <lineNumber>{ lineInFile.lineNumber }</lineNumber>
+                    <fileName>{ lineInFile.fileName }</fileName>
+                  </LineInFile>
+                case SeeStackDepthException => 
+                  <SeeStackDepthException />
+                case _ =>
+                  ""
+              } 
+            case None => ""
+          }
+        }
+      </location>
+      <threadName>{ threadName }</threadName>
+      <timeStamp>{ timeStamp }</timeStamp>
+    </TestCanceled>
 }
 
 /**
@@ -697,6 +1123,66 @@ final case class SuiteStarting (
     throw new NullPointerException("payload was null")
   if (threadName == null)
     throw new NullPointerException("threadName was null")
+  
+  def toXml = 
+    <SuiteStarting>
+      <ordinal>
+        <runStamp>{ ordinal.runStamp }</runStamp>
+      </ordinal>
+      <suiteName>{ suiteName }</suiteName>
+      <suiteId>{ suiteId }</suiteId>
+      <suiteClassName>{ if (suiteClassName.isDefined) suiteClassName.get else "" }</suiteClassName>
+      <decodedSuiteName>{ if (decodedSuiteName.isDefined) decodedSuiteName.get else "" }</decodedSuiteName>
+      <formatter>
+        {
+          formatter match {
+            case Some(formatter) =>
+              formatter match {
+                case MotionToSuppress => 
+                  <MotionToSuppress/>
+                case indentedText: IndentedText => 
+                  <IndentedText>
+                    <formattedText>{ indentedText.formattedText }</formattedText>
+                    <rawText>{ indentedText.rawText }</rawText>
+                    <indentationLevel>{ indentedText.indentationLevel }</indentationLevel>
+                  </IndentedText>
+              }
+            case None => ""
+          }
+        }
+      </formatter>
+      <location>
+        {
+          location match {
+            case Some(location) =>
+              location match {
+                case topOfClass: TopOfClass =>
+                  <TopOfClass>
+                    <className>{ topOfClass.className }</className>
+                  </TopOfClass>
+                case topOfMethod: TopOfMethod => 
+                  <TopOfMethod>
+                    <className>{ topOfMethod.className }</className>
+                    <methodId>{ topOfMethod.methodId }</methodId>
+                  </TopOfMethod>
+                case lineInFile: LineInFile => 
+                  <LineInFile>
+                    <lineNumber>{ lineInFile.lineNumber }</lineNumber>
+                    <fileName>{ lineInFile.fileName }</fileName>
+                  </LineInFile>
+                case SeeStackDepthException => 
+                  <SeeStackDepthException />
+                case _ =>
+                  ""
+              } 
+            case None => ""
+          }
+        }
+      </location>
+      <rerunner>{ if (rerunner.isDefined) rerunner.get else "" }</rerunner>
+      <threadName>{ threadName }</threadName>
+      <timeStamp>{ timeStamp }</timeStamp>
+    </SuiteStarting>
 }
 
 /**
@@ -781,6 +1267,67 @@ final case class SuiteCompleted (
     throw new NullPointerException("payload was null")
   if (threadName == null)
     throw new NullPointerException("threadName was null")
+  
+  def toXml = 
+    <SuiteCompleted>
+      <ordinal>
+        <runStamp>{ ordinal.runStamp }</runStamp>
+      </ordinal>
+      <suiteName>{ suiteName }</suiteName>
+      <suiteId>{ suiteId }</suiteId>
+      <suiteClassName>{ if (suiteClassName.isDefined) suiteClassName.get else "" }</suiteClassName>
+      <decodedSuiteName>{ if (decodedSuiteName.isDefined) decodedSuiteName.get else "" }</decodedSuiteName>
+      <duration>{ if (duration.isDefined) duration.get else "" }</duration>
+      <formatter>
+        {
+          formatter match {
+            case Some(formatter) =>
+              formatter match {
+                case MotionToSuppress => 
+                  <MotionToSuppress/>
+                case indentedText: IndentedText => 
+                  <IndentedText>
+                    <formattedText>{ indentedText.formattedText }</formattedText>
+                    <rawText>{ indentedText.rawText }</rawText>
+                    <indentationLevel>{ indentedText.indentationLevel }</indentationLevel>
+                  </IndentedText>
+              }
+            case None => ""
+          }
+        }
+      </formatter>
+      <location>
+        {
+          location match {
+            case Some(location) =>
+              location match {
+                case topOfClass: TopOfClass =>
+                  <TopOfClass>
+                    <className>{ topOfClass.className }</className>
+                  </TopOfClass>
+                case topOfMethod: TopOfMethod => 
+                  <TopOfMethod>
+                    <className>{ topOfMethod.className }</className>
+                    <methodId>{ topOfMethod.methodId }</methodId>
+                  </TopOfMethod>
+                case lineInFile: LineInFile => 
+                  <LineInFile>
+                    <lineNumber>{ lineInFile.lineNumber }</lineNumber>
+                    <fileName>{ lineInFile.fileName }</fileName>
+                  </LineInFile>
+                case SeeStackDepthException => 
+                  <SeeStackDepthException />
+                case _ =>
+                  ""
+              } 
+            case None => ""
+          }
+        }
+      </location>
+      <rerunner>{ if (rerunner.isDefined) rerunner.get else "" }</rerunner>
+      <threadName>{ threadName }</threadName>
+      <timeStamp>{ timeStamp }</timeStamp>
+    </SuiteCompleted>
 }
 
 /**
@@ -877,6 +1424,86 @@ final case class SuiteAborted (
     throw new NullPointerException("payload was null")
   if (threadName == null)
     throw new NullPointerException("threadName was null")
+  
+  def toXml = 
+    <SuiteAborted>
+      <ordinal>
+        <runStamp>{ ordinal.runStamp }</runStamp>
+      </ordinal>
+      <message>{ message }</message>
+      <suiteName>{ suiteName }</suiteName>
+      <suiteId>{ suiteId }</suiteId>
+      <suiteClassName>{ if (suiteClassName.isDefined) suiteClassName.get else "" }</suiteClassName>
+      <decodedSuiteName>{ if (decodedSuiteName.isDefined) decodedSuiteName.get else "" }</decodedSuiteName>
+      <duration>{ if (duration.isDefined) duration.get else "" }</duration>
+      <throwable>
+        {
+          throwable match {
+            case Some(throwable) => 
+              <message>throwable.getMessage</message>
+              <stackTraces>
+                {
+                  val stringWriter = new StringWriter()
+                  val writer = new PrintWriter(new BufferedWriter(stringWriter))
+                  writer.flush()
+                  throwable.printStackTrace(writer)
+                  writer.toString
+                }
+              </stackTraces>
+            case None => ""
+          }
+        }
+      </throwable>
+      <formatter>
+        {
+          formatter match {
+            case Some(formatter) =>
+              formatter match {
+                case MotionToSuppress => 
+                  <MotionToSuppress/>
+                case indentedText: IndentedText => 
+                  <IndentedText>
+                    <formattedText>{ indentedText.formattedText }</formattedText>
+                    <rawText>{ indentedText.rawText }</rawText>
+                    <indentationLevel>{ indentedText.indentationLevel }</indentationLevel>
+                  </IndentedText>
+              }
+            case None => ""
+          }
+        }
+      </formatter>
+      <location>
+        {
+          location match {
+            case Some(location) =>
+              location match {
+                case topOfClass: TopOfClass =>
+                  <TopOfClass>
+                    <className>{ topOfClass.className }</className>
+                  </TopOfClass>
+                case topOfMethod: TopOfMethod => 
+                  <TopOfMethod>
+                    <className>{ topOfMethod.className }</className>
+                    <methodId>{ topOfMethod.methodId }</methodId>
+                  </TopOfMethod>
+                case lineInFile: LineInFile => 
+                  <LineInFile>
+                    <lineNumber>{ lineInFile.lineNumber }</lineNumber>
+                    <fileName>{ lineInFile.fileName }</fileName>
+                  </LineInFile>
+                case SeeStackDepthException => 
+                  <SeeStackDepthException />
+                case _ =>
+                  ""
+              } 
+            case None => ""
+          }
+        }
+      </location>
+      <rerunner>{ if (rerunner.isDefined) rerunner.get else "" }</rerunner>
+      <threadName>{ threadName }</threadName>
+      <timeStamp>{ timeStamp }</timeStamp>
+    </SuiteAborted>
 }
 
 // TODO: Put location as a val set to None
@@ -940,6 +1567,72 @@ final case class RunStarting (
     throw new NullPointerException("payload was null")
   if (threadName == null)
     throw new NullPointerException("threadName was null")
+  
+  def toXml = 
+    <RunStarting>
+      <ordinal>
+        <runStamp>{ ordinal.runStamp }</runStamp>
+      </ordinal>
+      <testCount>testCount</testCount>
+      <configMap>
+        { 
+          for (config <- configMap) {
+            <entry>
+              <key>config._1.toString</key>
+              <value>config._2.toString</value>
+            </entry>
+          }
+        }
+      </configMap>
+      <formatter>
+        {
+          formatter match {
+            case Some(formatter) =>
+              formatter match {
+                case MotionToSuppress => 
+                  <MotionToSuppress/>
+                case indentedText: IndentedText => 
+                  <IndentedText>
+                    <formattedText>{ indentedText.formattedText }</formattedText>
+                    <rawText>{ indentedText.rawText }</rawText>
+                    <indentationLevel>{ indentedText.indentationLevel }</indentationLevel>
+                  </IndentedText>
+              }
+            case None => ""
+          }
+        }
+      </formatter>
+      <location>
+        {
+          location match {
+            case Some(location) =>
+              location match {
+                case topOfClass: TopOfClass =>
+                  <TopOfClass>
+                    <className>{ topOfClass.className }</className>
+                  </TopOfClass>
+                case topOfMethod: TopOfMethod => 
+                  <TopOfMethod>
+                    <className>{ topOfMethod.className }</className>
+                    <methodId>{ topOfMethod.methodId }</methodId>
+                  </TopOfMethod>
+                case lineInFile: LineInFile => 
+                  <LineInFile>
+                    <lineNumber>{ lineInFile.lineNumber }</lineNumber>
+                    <fileName>{ lineInFile.fileName }</fileName>
+                  </LineInFile>
+                case SeeStackDepthException => 
+                  <SeeStackDepthException />
+                case _ =>
+                  ""
+              } 
+            case None => ""
+          }
+        }
+      </location>
+      <threadName>{ threadName }</threadName>
+      <timeStamp>{ timeStamp }</timeStamp>
+    </RunStarting>
 }
 
 /**
@@ -1016,6 +1709,77 @@ final case class RunCompleted (
     throw new NullPointerException("payload was null")
   if (threadName == null)
     throw new NullPointerException("threadName was null")
+  
+  def toXml = 
+    <RunCompleted>
+      <ordinal>
+        <runStamp>{ ordinal.runStamp }</runStamp>
+      </ordinal>
+      <duration>{ if (duration.isDefined) duration.get else "" }</duration>
+      <summary>
+        {
+          summary match {
+            case Some(summary) =>
+              <testsSucceededCount>{ summary.testsSucceededCount }</testsSucceededCount>
+              <testsFailedCount>{ summary.testsFailedCount }</testsFailedCount>
+              <testsIgnoredCount>{ summary.testsIgnoredCount }</testsIgnoredCount>
+              <testsPendingCount>{ summary.testsPendingCount }</testsPendingCount>
+              <testsCanceledCount>{ summary.testsCanceledCount }</testsCanceledCount>
+              <suitesCompletedCount>{ summary.testsCanceledCount }</suitesCompletedCount>
+              <suitesAbortedCount>{ summary.testsCanceledCount }</suitesAbortedCount>
+            case None => ""
+          }
+        }
+      </summary>
+      <formatter>
+        {
+          formatter match {
+            case Some(formatter) =>
+              formatter match {
+                case MotionToSuppress => 
+                  <MotionToSuppress/>
+                case indentedText: IndentedText => 
+                  <IndentedText>
+                    <formattedText>{ indentedText.formattedText }</formattedText>
+                    <rawText>{ indentedText.rawText }</rawText>
+                    <indentationLevel>{ indentedText.indentationLevel }</indentationLevel>
+                  </IndentedText>
+              }
+            case None => ""
+          }
+        }
+      </formatter>
+      <location>
+        {
+          location match {
+            case Some(location) =>
+              location match {
+                case topOfClass: TopOfClass =>
+                  <TopOfClass>
+                    <className>{ topOfClass.className }</className>
+                  </TopOfClass>
+                case topOfMethod: TopOfMethod => 
+                  <TopOfMethod>
+                    <className>{ topOfMethod.className }</className>
+                    <methodId>{ topOfMethod.methodId }</methodId>
+                  </TopOfMethod>
+                case lineInFile: LineInFile => 
+                  <LineInFile>
+                    <lineNumber>{ lineInFile.lineNumber }</lineNumber>
+                    <fileName>{ lineInFile.fileName }</fileName>
+                  </LineInFile>
+                case SeeStackDepthException => 
+                  <SeeStackDepthException />
+                case _ =>
+                  ""
+              } 
+            case None => ""
+          }
+        }
+      </location>
+      <threadName>{ threadName }</threadName>
+      <timeStamp>{ timeStamp }</timeStamp>
+    </RunCompleted>
 }
 
 /**
@@ -1093,6 +1857,77 @@ final case class RunStopped (
     throw new NullPointerException("payload was null")
   if (threadName == null)
     throw new NullPointerException("threadName was null")
+  
+  def toXml = 
+    <RunStopped>
+      <ordinal>
+        <runStamp>{ ordinal.runStamp }</runStamp>
+      </ordinal>
+      <duration>{ if (duration.isDefined) duration.get else "" }</duration>
+      <summary>
+        {
+          summary match {
+            case Some(summary) =>
+              <testsSucceededCount>{ summary.testsSucceededCount }</testsSucceededCount>
+              <testsFailedCount>{ summary.testsFailedCount }</testsFailedCount>
+              <testsIgnoredCount>{ summary.testsIgnoredCount }</testsIgnoredCount>
+              <testsPendingCount>{ summary.testsPendingCount }</testsPendingCount>
+              <testsCanceledCount>{ summary.testsCanceledCount }</testsCanceledCount>
+              <suitesCompletedCount>{ summary.testsCanceledCount }</suitesCompletedCount>
+              <suitesAbortedCount>{ summary.testsCanceledCount }</suitesAbortedCount>
+            case None => ""
+          }
+        }
+      </summary>
+      <formatter>
+        {
+          formatter match {
+            case Some(formatter) =>
+              formatter match {
+                case MotionToSuppress => 
+                  <MotionToSuppress/>
+                case indentedText: IndentedText => 
+                  <IndentedText>
+                    <formattedText>{ indentedText.formattedText }</formattedText>
+                    <rawText>{ indentedText.rawText }</rawText>
+                    <indentationLevel>{ indentedText.indentationLevel }</indentationLevel>
+                  </IndentedText>
+              }
+            case None => ""
+          }
+        }
+      </formatter>
+      <location>
+        {
+          location match {
+            case Some(location) =>
+              location match {
+                case topOfClass: TopOfClass =>
+                  <TopOfClass>
+                    <className>{ topOfClass.className }</className>
+                  </TopOfClass>
+                case topOfMethod: TopOfMethod => 
+                  <TopOfMethod>
+                    <className>{ topOfMethod.className }</className>
+                    <methodId>{ topOfMethod.methodId }</methodId>
+                  </TopOfMethod>
+                case lineInFile: LineInFile => 
+                  <LineInFile>
+                    <lineNumber>{ lineInFile.lineNumber }</lineNumber>
+                    <fileName>{ lineInFile.fileName }</fileName>
+                  </LineInFile>
+                case SeeStackDepthException => 
+                  <SeeStackDepthException />
+                case _ =>
+                  ""
+              } 
+            case None => ""
+          }
+        }
+      </location>
+      <threadName>{ threadName }</threadName>
+      <timeStamp>{ timeStamp }</timeStamp>
+    </RunStopped>
 }
 
 /**
@@ -1169,6 +2004,96 @@ final case class RunAborted (
     throw new NullPointerException("payload was null")
   if (threadName == null)
     throw new NullPointerException("threadName was null")
+  
+  def toXml = 
+    <RunAborted>
+      <ordinal>
+        <runStamp>{ ordinal.runStamp }</runStamp>
+      </ordinal>
+      <message>{ message }</message>
+      <throwable>
+        {
+          throwable match {
+            case Some(throwable) => 
+              <message>throwable.getMessage</message>
+              <stackTraces>
+                {
+                  val stringWriter = new StringWriter()
+                  val writer = new PrintWriter(new BufferedWriter(stringWriter))
+                  writer.flush()
+                  throwable.printStackTrace(writer)
+                  writer.toString
+                }
+              </stackTraces>
+            case None => ""
+          }
+        }
+      </throwable>
+      <duration>{ if (duration.isDefined) duration.get else "" }</duration>
+      <summary>
+        {
+          summary match {
+            case Some(summary) =>
+              <testsSucceededCount>{ summary.testsSucceededCount }</testsSucceededCount>
+              <testsFailedCount>{ summary.testsFailedCount }</testsFailedCount>
+              <testsIgnoredCount>{ summary.testsIgnoredCount }</testsIgnoredCount>
+              <testsPendingCount>{ summary.testsPendingCount }</testsPendingCount>
+              <testsCanceledCount>{ summary.testsCanceledCount }</testsCanceledCount>
+              <suitesCompletedCount>{ summary.testsCanceledCount }</suitesCompletedCount>
+              <suitesAbortedCount>{ summary.testsCanceledCount }</suitesAbortedCount>
+            case None => ""
+          }
+        }
+      </summary>
+      <formatter>
+        {
+          formatter match {
+            case Some(formatter) =>
+              formatter match {
+                case MotionToSuppress => 
+                  <MotionToSuppress/>
+                case indentedText: IndentedText => 
+                  <IndentedText>
+                    <formattedText>{ indentedText.formattedText }</formattedText>
+                    <rawText>{ indentedText.rawText }</rawText>
+                    <indentationLevel>{ indentedText.indentationLevel }</indentationLevel>
+                  </IndentedText>
+              }
+            case None => ""
+          }
+        }
+      </formatter>
+      <location>
+        {
+          location match {
+            case Some(location) =>
+              location match {
+                case topOfClass: TopOfClass =>
+                  <TopOfClass>
+                    <className>{ topOfClass.className }</className>
+                  </TopOfClass>
+                case topOfMethod: TopOfMethod => 
+                  <TopOfMethod>
+                    <className>{ topOfMethod.className }</className>
+                    <methodId>{ topOfMethod.methodId }</methodId>
+                  </TopOfMethod>
+                case lineInFile: LineInFile => 
+                  <LineInFile>
+                    <lineNumber>{ lineInFile.lineNumber }</lineNumber>
+                    <fileName>{ lineInFile.fileName }</fileName>
+                  </LineInFile>
+                case SeeStackDepthException => 
+                  <SeeStackDepthException />
+                case _ =>
+                  ""
+              } 
+            case None => ""
+          }
+        }
+      </location>
+      <threadName>{ threadName }</threadName>
+      <timeStamp>{ timeStamp }</timeStamp>
+    </RunAborted>
 }
 
 /**
@@ -1245,6 +2170,97 @@ final case class InfoProvided (
     throw new NullPointerException("payload was null")
   if (threadName == null)
     throw new NullPointerException("threadName was null")
+  
+  def toXml = 
+    <InfoProvided>
+      <ordinal>
+        <runStamp>{ ordinal.runStamp }</runStamp>
+      </ordinal>
+      <message>{ message }</message>
+      <nameInfo>
+        {
+          nameInfo match {
+            case Some(nameInfo) => 
+              <suiteName>{ nameInfo.suiteName }</suiteName>
+              <suiteId>{ nameInfo.suiteID }</suiteId>
+              <suiteClassName>{ if (nameInfo.suiteClassName.isDefined) nameInfo.suiteClassName.get else "" }</suiteClassName>
+              <decodedSuiteName>{ if (nameInfo.decodedSuiteName.isDefined) nameInfo.decodedSuiteName.get else "" }</decodedSuiteName>
+              <testName>{ if (nameInfo.testName.isDefined) nameInfo.testName.get else "" }</testName>
+            case None => 
+              ""
+          }
+        }
+        
+      </nameInfo>
+      <aboutAPendingTest>{ if (aboutAPendingTest.isDefined) aboutAPendingTest.get else "" }</aboutAPendingTest>
+      <aboutACanceledTest>{ if (aboutACanceledTest.isDefined) aboutACanceledTest.get else "" }</aboutACanceledTest>
+      <throwable>
+        {
+          throwable match {
+            case Some(throwable) => 
+              <message>throwable.getMessage</message>
+              <stackTraces>
+                {
+                  val stringWriter = new StringWriter()
+                  val writer = new PrintWriter(new BufferedWriter(stringWriter))
+                  writer.flush()
+                  throwable.printStackTrace(writer)
+                  writer.toString
+                }
+              </stackTraces>
+            case None => ""
+          }
+        }
+      </throwable>
+      <formatter>
+        {
+          formatter match {
+            case Some(formatter) =>
+              formatter match {
+                case MotionToSuppress => 
+                  <MotionToSuppress/>
+                case indentedText: IndentedText => 
+                  <IndentedText>
+                    <formattedText>{ indentedText.formattedText }</formattedText>
+                    <rawText>{ indentedText.rawText }</rawText>
+                    <indentationLevel>{ indentedText.indentationLevel }</indentationLevel>
+                  </IndentedText>
+              }
+            case None => ""
+          }
+        }
+      </formatter>
+      <location>
+        {
+          location match {
+            case Some(location) =>
+              location match {
+                case topOfClass: TopOfClass =>
+                  <TopOfClass>
+                    <className>{ topOfClass.className }</className>
+                  </TopOfClass>
+                case topOfMethod: TopOfMethod => 
+                  <TopOfMethod>
+                    <className>{ topOfMethod.className }</className>
+                    <methodId>{ topOfMethod.methodId }</methodId>
+                  </TopOfMethod>
+                case lineInFile: LineInFile => 
+                  <LineInFile>
+                    <lineNumber>{ lineInFile.lineNumber }</lineNumber>
+                    <fileName>{ lineInFile.fileName }</fileName>
+                  </LineInFile>
+                case SeeStackDepthException => 
+                  <SeeStackDepthException />
+                case _ =>
+                  ""
+              } 
+            case None => ""
+          }
+        }
+      </location>
+      <threadName>{ threadName }</threadName>
+      <timeStamp>{ timeStamp }</timeStamp>
+    </InfoProvided>
 }
 
 /**
@@ -1317,6 +2333,79 @@ final case class MarkupProvided (
     throw new NullPointerException("payload was null")
   if (threadName == null)
     throw new NullPointerException("threadName was null")
+  
+  def toXml = 
+    <MarkupProvided>
+      <ordinal>
+        <runStamp>{ ordinal.runStamp }</runStamp>
+      </ordinal>
+      <text>{ text }</text>
+      <nameInfo>
+        {
+          nameInfo match {
+            case Some(nameInfo) => 
+              <suiteName>{ nameInfo.suiteName }</suiteName>
+              <suiteId>{ nameInfo.suiteID }</suiteId>
+              <suiteClassName>{ if (nameInfo.suiteClassName.isDefined) nameInfo.suiteClassName.get else "" }</suiteClassName>
+              <decodedSuiteName>{ if (nameInfo.decodedSuiteName.isDefined) nameInfo.decodedSuiteName.get else "" }</decodedSuiteName>
+              <testName>{ if (nameInfo.testName.isDefined) nameInfo.testName.get else "" }</testName>
+            case None => 
+              ""
+          }
+        }
+        
+      </nameInfo>
+      <aboutAPendingTest>{ if (aboutAPendingTest.isDefined) aboutAPendingTest.get else "" }</aboutAPendingTest>
+      <aboutACanceledTest>{ if (aboutACanceledTest.isDefined) aboutACanceledTest.get else "" }</aboutACanceledTest>
+      <formatter>
+        {
+          formatter match {
+            case Some(formatter) =>
+              formatter match {
+                case MotionToSuppress => 
+                  <MotionToSuppress/>
+                case indentedText: IndentedText => 
+                  <IndentedText>
+                    <formattedText>{ indentedText.formattedText }</formattedText>
+                    <rawText>{ indentedText.rawText }</rawText>
+                    <indentationLevel>{ indentedText.indentationLevel }</indentationLevel>
+                  </IndentedText>
+              }
+            case None => ""
+          }
+        }
+      </formatter>
+      <location>
+        {
+          location match {
+            case Some(location) =>
+              location match {
+                case topOfClass: TopOfClass =>
+                  <TopOfClass>
+                    <className>{ topOfClass.className }</className>
+                  </TopOfClass>
+                case topOfMethod: TopOfMethod => 
+                  <TopOfMethod>
+                    <className>{ topOfMethod.className }</className>
+                    <methodId>{ topOfMethod.methodId }</methodId>
+                  </TopOfMethod>
+                case lineInFile: LineInFile => 
+                  <LineInFile>
+                    <lineNumber>{ lineInFile.lineNumber }</lineNumber>
+                    <fileName>{ lineInFile.fileName }</fileName>
+                  </LineInFile>
+                case SeeStackDepthException => 
+                  <SeeStackDepthException />
+                case _ =>
+                  ""
+              } 
+            case None => ""
+          }
+        }
+      </location>
+      <threadName>{ threadName }</threadName>
+      <timeStamp>{ timeStamp }</timeStamp>
+    </MarkupProvided>
 }
 
 /**
@@ -1387,6 +2476,71 @@ final case class ScopeOpened (
     throw new NullPointerException("payload was null")
   if (threadName == null)
     throw new NullPointerException("threadName was null")
+  
+  def toXml = 
+    <ScopeOpened>
+      <ordinal>
+        <runStamp>{ ordinal.runStamp }</runStamp>
+      </ordinal>
+      <message>{ message }</message>
+      <nameInfo>
+        <suiteName>{ nameInfo.suiteName }</suiteName>
+        <suiteId>{ nameInfo.suiteID }</suiteId>
+        <suiteClassName>{ if (nameInfo.suiteClassName.isDefined) nameInfo.suiteClassName.get else "" }</suiteClassName>
+        <decodedSuiteName>{ if (nameInfo.decodedSuiteName.isDefined) nameInfo.decodedSuiteName.get else "" }</decodedSuiteName>
+        <testName>{ if (nameInfo.testName.isDefined) nameInfo.testName.get else "" }</testName>
+      </nameInfo>
+      <aboutAPendingTest>{ if (aboutAPendingTest.isDefined) aboutAPendingTest.get else "" }</aboutAPendingTest>
+      <aboutACanceledTest>{ if (aboutACanceledTest.isDefined) aboutACanceledTest.get else "" }</aboutACanceledTest>
+      <formatter>
+        {
+          formatter match {
+            case Some(formatter) =>
+              formatter match {
+                case MotionToSuppress => 
+                  <MotionToSuppress/>
+                case indentedText: IndentedText => 
+                  <IndentedText>
+                    <formattedText>{ indentedText.formattedText }</formattedText>
+                    <rawText>{ indentedText.rawText }</rawText>
+                    <indentationLevel>{ indentedText.indentationLevel }</indentationLevel>
+                  </IndentedText>
+              }
+            case None => ""
+          }
+        }
+      </formatter>
+      <location>
+        {
+          location match {
+            case Some(location) =>
+              location match {
+                case topOfClass: TopOfClass =>
+                  <TopOfClass>
+                    <className>{ topOfClass.className }</className>
+                  </TopOfClass>
+                case topOfMethod: TopOfMethod => 
+                  <TopOfMethod>
+                    <className>{ topOfMethod.className }</className>
+                    <methodId>{ topOfMethod.methodId }</methodId>
+                  </TopOfMethod>
+                case lineInFile: LineInFile => 
+                  <LineInFile>
+                    <lineNumber>{ lineInFile.lineNumber }</lineNumber>
+                    <fileName>{ lineInFile.fileName }</fileName>
+                  </LineInFile>
+                case SeeStackDepthException => 
+                  <SeeStackDepthException />
+                case _ =>
+                  ""
+              } 
+            case None => ""
+          }
+        }
+      </location>
+      <threadName>{ threadName }</threadName>
+      <timeStamp>{ timeStamp }</timeStamp>
+    </ScopeOpened>
 }
 
 /**
@@ -1457,6 +2611,71 @@ final case class ScopeClosed (
     throw new NullPointerException("payload was null")
   if (threadName == null)
     throw new NullPointerException("threadName was null")
+  
+  def toXml = 
+    <ScopeClosed>
+      <ordinal>
+        <runStamp>{ ordinal.runStamp }</runStamp>
+      </ordinal>
+      <message>{ message }</message>
+      <nameInfo>
+        <suiteName>{ nameInfo.suiteName }</suiteName>
+        <suiteId>{ nameInfo.suiteID }</suiteId>
+        <suiteClassName>{ if (nameInfo.suiteClassName.isDefined) nameInfo.suiteClassName.get else "" }</suiteClassName>
+        <decodedSuiteName>{ if (nameInfo.decodedSuiteName.isDefined) nameInfo.decodedSuiteName.get else "" }</decodedSuiteName>
+        <testName>{ if (nameInfo.testName.isDefined) nameInfo.testName.get else "" }</testName>
+      </nameInfo>
+      <aboutAPendingTest>{ if (aboutAPendingTest.isDefined) aboutAPendingTest.get else "" }</aboutAPendingTest>
+      <aboutACanceledTest>{ if (aboutACanceledTest.isDefined) aboutACanceledTest.get else "" }</aboutACanceledTest>
+      <formatter>
+        {
+          formatter match {
+            case Some(formatter) =>
+              formatter match {
+                case MotionToSuppress => 
+                  <MotionToSuppress/>
+                case indentedText: IndentedText => 
+                  <IndentedText>
+                    <formattedText>{ indentedText.formattedText }</formattedText>
+                    <rawText>{ indentedText.rawText }</rawText>
+                    <indentationLevel>{ indentedText.indentationLevel }</indentationLevel>
+                  </IndentedText>
+              }
+            case None => ""
+          }
+        }
+      </formatter>
+      <location>
+        {
+          location match {
+            case Some(location) =>
+              location match {
+                case topOfClass: TopOfClass =>
+                  <TopOfClass>
+                    <className>{ topOfClass.className }</className>
+                  </TopOfClass>
+                case topOfMethod: TopOfMethod => 
+                  <TopOfMethod>
+                    <className>{ topOfMethod.className }</className>
+                    <methodId>{ topOfMethod.methodId }</methodId>
+                  </TopOfMethod>
+                case lineInFile: LineInFile => 
+                  <LineInFile>
+                    <lineNumber>{ lineInFile.lineNumber }</lineNumber>
+                    <fileName>{ lineInFile.fileName }</fileName>
+                  </LineInFile>
+                case SeeStackDepthException => 
+                  <SeeStackDepthException />
+                case _ =>
+                  ""
+              } 
+            case None => ""
+          }
+        }
+      </location>
+      <threadName>{ threadName }</threadName>
+      <timeStamp>{ timeStamp }</timeStamp>
+    </ScopeClosed>
 }
 
 /*

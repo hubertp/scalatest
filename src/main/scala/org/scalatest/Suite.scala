@@ -2005,7 +2005,7 @@ trait Suite extends Assertions with AbstractSuite with Serializable { thisSuite 
 
     val rerunnable =
       if (hasPublicNoArgConstructor)
-        Some(new TestRerunner(getClass.getName, testName))
+        Some(getClass.getName)
       else
         None
 
@@ -2331,7 +2331,7 @@ trait Suite extends Assertions with AbstractSuite with Serializable { thisSuite 
 
   // TODO see if I can take away the [scalatest] from the private
   private[scalatest] def handleFailedTest(throwable: Throwable, hasPublicNoArgConstructor: Boolean, testName: String,
-      rerunnable: Option[Rerunner], report: Reporter, tracker: Tracker, duration: Long) {
+      rerunnable: Option[String], report: Reporter, tracker: Tracker, duration: Long) {
 
     val message = getMessageForException(throwable)
     val formatter = getIndentedText(testName, 1, true)
@@ -2929,7 +2929,7 @@ used for test events like succeeded/failed, etc.
   }
 
   def reportTestFailed(theSuite: Suite, report: Reporter, throwable: Throwable, testName: String, testText: String,
-      decodedTestName:Option[String], rerunnable: Option[Rerunner], tracker: Tracker, duration: Long, level: Int, includeIcon: Boolean, location: Option[Location]) {
+      decodedTestName:Option[String], rerunnable: Option[String], tracker: Tracker, duration: Long, level: Int, includeIcon: Boolean, location: Option[Location]) {
 
     val message = getMessageForException(throwable)
     val formatter = getIndentedText(testText, level, includeIcon)
@@ -2938,7 +2938,7 @@ used for test events like succeeded/failed, etc.
 
   // TODO: Possibly separate these out from method tests and function tests, because locations are different
   // Update: Doesn't seems to need separation, to be confirmed with Bill.
-  def reportTestStarting(theSuite: Suite, report: Reporter, tracker: Tracker, testName: String, testText: String, decodedTestName:Option[String], rerunnable: Option[Rerunner], location: Option[Location]) {
+  def reportTestStarting(theSuite: Suite, report: Reporter, tracker: Tracker, testName: String, testText: String, decodedTestName:Option[String], rerunnable: Option[String], location: Option[Location]) {
     report(TestStarting(tracker.nextOrdinal(), theSuite.suiteName, theSuite.suiteId, Some(theSuite.getClass.getName), theSuite.decodedSuiteName, testName, testText, decodedTestName, Some(MotionToSuppress),
       location, theSuite.rerunner))
   }
@@ -2957,14 +2957,14 @@ used for test events like succeeded/failed, etc.
 */
 
   def reportTestCanceled(theSuite: Suite, report: Reporter, throwable: Throwable, testName: String, testText: String,
-      decodedTestName:Option[String], rerunnable: Option[Rerunner], tracker: Tracker, duration: Long, level: Int, includeIcon: Boolean, location: Option[Location]) {
+      decodedTestName:Option[String], rerunnable: Option[String], tracker: Tracker, duration: Long, level: Int, includeIcon: Boolean, location: Option[Location]) {
 
     val message = getMessageForException(throwable)
     val formatter = getIndentedText(testText, level, includeIcon)
     report(TestCanceled(tracker.nextOrdinal(), message, theSuite.suiteName, theSuite.suiteId, Some(theSuite.getClass.getName), theSuite.decodedSuiteName, testName, testText, decodedTestName, Some(throwable), Some(duration), Some(formatter), location, rerunnable))
   }
 
-  def reportTestSucceeded(theSuite: Suite, report: Reporter, tracker: Tracker, testName: String, testText: String, decodedTestName:Option[String], duration: Long, formatter: Formatter, rerunnable: Option[Rerunner], location: Option[Location]) {
+  def reportTestSucceeded(theSuite: Suite, report: Reporter, tracker: Tracker, testName: String, testText: String, decodedTestName:Option[String], duration: Long, formatter: Formatter, rerunnable: Option[String], location: Option[Location]) {
     report(TestSucceeded(tracker.nextOrdinal(), theSuite.suiteName, theSuite.suiteId, Some(theSuite.getClass.getName), theSuite.decodedSuiteName, testName, testText, decodedTestName, Some(duration), Some(formatter),
       location, theSuite.rerunner))
   }
