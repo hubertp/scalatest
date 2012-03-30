@@ -2940,7 +2940,7 @@ used for test events like succeeded/failed, etc.
   // Update: Doesn't seems to need separation, to be confirmed with Bill.
   def reportTestStarting(theSuite: Suite, report: Reporter, tracker: Tracker, testName: String, testText: String, decodedTestName:Option[String], rerunnable: Option[String], location: Option[Location]) {
     report(TestStarting(tracker.nextOrdinal(), theSuite.suiteName, theSuite.suiteId, Some(theSuite.getClass.getName), theSuite.decodedSuiteName, testName, testText, decodedTestName, Some(MotionToSuppress),
-      location, theSuite.rerunner))
+      location, rerunnable))
   }
 
   def reportTestPending(theSuite: Suite, report: Reporter, tracker: Tracker, testName: String, testText: String, decodedTestName:Option[String], duration: Long, formatter: Formatter, location: Option[Location]) {
@@ -2966,7 +2966,7 @@ used for test events like succeeded/failed, etc.
 
   def reportTestSucceeded(theSuite: Suite, report: Reporter, tracker: Tracker, testName: String, testText: String, decodedTestName:Option[String], duration: Long, formatter: Formatter, rerunnable: Option[String], location: Option[Location]) {
     report(TestSucceeded(tracker.nextOrdinal(), theSuite.suiteName, theSuite.suiteId, Some(theSuite.getClass.getName), theSuite.decodedSuiteName, testName, testText, decodedTestName, Some(duration), Some(formatter),
-      location, theSuite.rerunner))
+      location, rerunnable))
   }
 
   def reportTestIgnored(theSuite: Suite, report: Reporter, tracker: Tracker, testName: String, testText: String, decodedTestName:Option[String], level: Int, location: Option[Location]) {
