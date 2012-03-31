@@ -28,8 +28,9 @@ import org.scalatest.events.NameInfo
 import org.scalatest.events.TestNameInfo
 import org.scalatest.events.LineInFile
 import org.scalatest.events.MarkupProvided
+import org.scalatest.concurrent.Eventually
 
-class SocketReporterSpec extends FunSpec with SharedHelpers {
+class SocketReporterSpec extends FunSpec with SharedHelpers with Eventually {
   
   class SocketEventRecorder(socket: ServerSocket) extends Runnable {
     @volatile
@@ -107,11 +108,11 @@ class SocketReporterSpec extends FunSpec with SharedHelpers {
               }
               catch {
                 case e: SAXException => 
-                  Thread.sleep(1)
+                  Thread.sleep(10)
               }
             }
             else
-              Thread.sleep(1)
+              Thread.sleep(10)
           }
           if (eventXml != null) {
             eventXml.label match {
@@ -135,7 +136,7 @@ class SocketReporterSpec extends FunSpec with SharedHelpers {
             }
           }
           
-          Thread.sleep(1)
+          Thread.sleep(10)
         }
       }
       finally {
@@ -323,8 +324,8 @@ class SocketReporterSpec extends FunSpec with SharedHelpers {
       spec.run(None, rep, new Stopper {}, Filter(), Map(), None, new Tracker())
       eventRecorder.stopped = true
       rep.dispose()
-      while (!eventRecorder.ready) // Wait until the receiver is ready
-        Thread.sleep(100)
+      eventually(timeout(10000)) { assert(eventRecorder.ready) } // Wait until the receiver is ready
+      
         
       assert(eventRecorder.scopeOpenedEvents.length === 1)
       checkScopeEvents(eventRecorder.scopeOpenedEvents(0), "A Feature", spec.suiteName, spec.suiteId, 
@@ -387,8 +388,8 @@ class SocketReporterSpec extends FunSpec with SharedHelpers {
                        Some(1000L), None, Some(TopOfClass("another class name")), Some("another rerunner"), None, Thread.currentThread.getName, timeStamp))
       rep.dispose()
       eventRecorder.stopped = true
-      while (!eventRecorder.ready) // Wait until the receiver is ready
-        Thread.sleep(100)
+      eventually(timeout(10000)) { assert(eventRecorder.ready) } // Wait until the receiver is ready
+      
       
       assert(eventRecorder.suiteStartingEvents.length === 2)
       checkSuiteStarting(eventRecorder.suiteStartingEvents(0), "a suite name", "a suite Id", Some("a class name"), None, "a class name", Some("a rerunner"), Thread.currentThread.getName, timeStamp)
@@ -418,9 +419,9 @@ class SocketReporterSpec extends FunSpec with SharedHelpers {
                      None, None, Thread.currentThread.getName, timeStamp))
       rep.dispose()
       eventRecorder.stopped = true
-      while (!eventRecorder.ready) // Wait until the receiver is ready
-        Thread.sleep(100)
-        
+      eventually(timeout(10000)) { assert(eventRecorder.ready) } // Wait until the receiver is ready
+      
+      
       assert(eventRecorder.runStartingEvents.length === 1)
       assert((eventRecorder.runStartingEvents(0) \ "testCount").text === "10")
       assert((eventRecorder.runStartingEvents(0) \ "configMap" \ "entry" \ "key").text === "key 1")
@@ -481,9 +482,9 @@ class SocketReporterSpec extends FunSpec with SharedHelpers {
           Some(false), Some(true), None, Some(LineInFile(188, "SocketReporterSpec.scala")), None, Thread.currentThread.getName, timeStamp))
       rep.dispose()
       eventRecorder.stopped = true
-      while (!eventRecorder.ready) // Wait until the receiver is ready
-        Thread.sleep(100)
+      eventually(timeout(10000)) { assert(eventRecorder.ready) } // Wait until the receiver is ready
         
+      
       assert(eventRecorder.infoProvidedEvents.length === 1)
       assert((eventRecorder.infoProvidedEvents(0) \ "message").text === "some info")
       assert((eventRecorder.infoProvidedEvents(0) \ "nameInfo" \ "suiteName").text === "a suite name")
