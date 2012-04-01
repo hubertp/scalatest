@@ -411,14 +411,14 @@ trait WordSpec extends Suite with ShouldVerb with MustVerb with CanVerb { thisSu
    * @param specText the specification text, which will be combined with the descText of any surrounding describers
    * to form the test name
    * @param testTags the optional list of tags for this test
+   * @param methodName Caller's method name
    * @param testFun the test function
    * @throws DuplicateTestNameException if a test with the same name has been registered previously
    * @throws TestRegistrationClosedException if invoked after <code>run</code> has been invoked on this suite
    * @throws NullPointerException if <code>specText</code> or any passed test tag is <code>null</code>
    */
-  private def registerTestToRun(specText: String, testTags: List[Tag], testFun: FixtureParam => Any) {
-    // TODO: This is what was being used before but it is wrong
-    registerTest(specText, testFun, "itCannotAppearInsideAnotherIt", sourceFileName, "it", None, None, testTags: _*)
+  private def registerTestToRun(specText: String, testTags: List[Tag], methodName: String, testFun: FixtureParam => Any) {
+    registerTest(specText, testFun, "itCannotAppearInsideAnotherIt", sourceFileName, methodName, 1, None, None, testTags: _*)
   }
 
   /**
@@ -434,20 +434,21 @@ trait WordSpec extends Suite with ShouldVerb with MustVerb with CanVerb { thisSu
    * @param specText the specification text, which will be combined with the descText of any surrounding describers
    * to form the test name
    * @param testTags the optional list of tags for this test
+   * @param methodName Caller's method name
    * @param testFun the test function
    * @throws DuplicateTestNameException if a test with the same name has been registered previously
    * @throws TestRegistrationClosedException if invoked after <code>run</code> has been invoked on this suite
    * @throws NullPointerException if <code>specText</code> or any passed test tag is <code>null</code>
    */
-  private def registerTestToIgnore(specText: String, testTags: List[Tag], testFun: FixtureParam => Any) {
+  private def registerTestToIgnore(specText: String, testTags: List[Tag], methodName: String, testFun: FixtureParam => Any) {
     // TODO: This is how these were, but it needs attention. Mentions "it".
-    registerIgnoredTest(specText, testFun, "ignoreCannotAppearInsideAnIt", sourceFileName, "ignore", testTags: _*)
+    registerIgnoredTest(specText, testFun, "ignoreCannotAppearInsideAnIt", sourceFileName, methodName, 1, testTags: _*)
   }
 
-  private def registerBranch(description: String, childPrefix: Option[String], fun: () => Unit) {
+  private def registerBranch(description: String, childPrefix: Option[String], methodName: String, fun: () => Unit) {
 
     // TODO: Fix the resource name and method name
-    registerNestedBranch(description, childPrefix, fun(), "describeCannotAppearInsideAnIt", sourceFileName, "describe")
+    registerNestedBranch(description, childPrefix, fun(), "describeCannotAppearInsideAnIt", sourceFileName, methodName, 1)
   }
 
   /**
@@ -479,7 +480,7 @@ trait WordSpec extends Suite with ShouldVerb with MustVerb with CanVerb { thisSu
      * </p>
      */
     def in(testFun: FixtureParam => Any) {
-      registerTestToRun(specText, tags, testFun)
+      registerTestToRun(specText, tags, "in", testFun)
     }
 
     /**
@@ -499,7 +500,7 @@ trait WordSpec extends Suite with ShouldVerb with MustVerb with CanVerb { thisSu
      * </p>
      */
     def in(testFun: () => Any) {
-      registerTestToRun(specText, tags, new NoArgTestWrapper(testFun))
+      registerTestToRun(specText, tags, "in", new NoArgTestWrapper(testFun))
     }
 
     /**
@@ -519,7 +520,7 @@ trait WordSpec extends Suite with ShouldVerb with MustVerb with CanVerb { thisSu
      * </p>
      */
     def is(testFun: => PendingNothing) {
-      registerTestToRun(specText, tags, unusedFixtureParam => testFun)
+      registerTestToRun(specText, tags, "is", unusedFixtureParam => testFun)
     }
 
     /**
@@ -539,7 +540,7 @@ trait WordSpec extends Suite with ShouldVerb with MustVerb with CanVerb { thisSu
      * </p>
      */
     def ignore(testFun: FixtureParam => Any) {
-      registerTestToIgnore(specText, tags, testFun)
+      registerTestToIgnore(specText, tags, "ignore", testFun)
     }
 
     /**
@@ -559,7 +560,7 @@ trait WordSpec extends Suite with ShouldVerb with MustVerb with CanVerb { thisSu
      * </p>
      */
     def ignore(testFun: () => Any) {
-      registerTestToIgnore(specText, tags, new NoArgTestWrapper(testFun))
+      registerTestToIgnore(specText, tags, "ignore", new NoArgTestWrapper(testFun))
     }
   }
 
@@ -597,7 +598,7 @@ trait WordSpec extends Suite with ShouldVerb with MustVerb with CanVerb { thisSu
      * </p>
      */
     def in(testFun: FixtureParam => Any) {
-      registerTestToRun(string, List(), testFun)
+      registerTestToRun(string, List(), "in", testFun)
     }
 
     /**
@@ -617,7 +618,7 @@ trait WordSpec extends Suite with ShouldVerb with MustVerb with CanVerb { thisSu
      * </p>
      */
     def in(testFun: () => Any) {
-      registerTestToRun(string, List(), new NoArgTestWrapper(testFun))
+      registerTestToRun(string, List(), "in", new NoArgTestWrapper(testFun))
     }
 
     /**
@@ -637,7 +638,7 @@ trait WordSpec extends Suite with ShouldVerb with MustVerb with CanVerb { thisSu
      * </p>
      */
     def is(testFun: => PendingNothing) {
-      registerTestToRun(string, List(), unusedFixtureParam => testFun)
+      registerTestToRun(string, List(), "is", unusedFixtureParam => testFun)
     }
 
     /**
@@ -657,7 +658,7 @@ trait WordSpec extends Suite with ShouldVerb with MustVerb with CanVerb { thisSu
      * </p>
      */
     def ignore(testFun: FixtureParam => Any) {
-      registerTestToIgnore(string, List(), testFun)
+      registerTestToIgnore(string, List(), "ignore", testFun)
     }
 
     /**
@@ -677,7 +678,7 @@ trait WordSpec extends Suite with ShouldVerb with MustVerb with CanVerb { thisSu
      * </p>
      */
     def ignore(testFun: () => Any) {
-      registerTestToIgnore(string, List(), new NoArgTestWrapper(testFun))
+      registerTestToIgnore(string, List(), "ignore", new NoArgTestWrapper(testFun))
     
     }
 
@@ -719,7 +720,7 @@ trait WordSpec extends Suite with ShouldVerb with MustVerb with CanVerb { thisSu
      * </p>
      */
     def when(f: => Unit) {
-      registerBranch(string, Some("when"), f _)
+      registerBranch(string, Some("when"), "when", f _)
     }
 
     /**
@@ -741,7 +742,7 @@ trait WordSpec extends Suite with ShouldVerb with MustVerb with CanVerb { thisSu
      * </p>
      */
     def when(resultOfAfterWordApplication: ResultOfAfterWordApplication) {
-      registerBranch(string, Some("when " + resultOfAfterWordApplication.text), resultOfAfterWordApplication.f)
+      registerBranch(string, Some("when " + resultOfAfterWordApplication.text), "when", resultOfAfterWordApplication.f)
     }
 
     /**
@@ -750,7 +751,7 @@ trait WordSpec extends Suite with ShouldVerb with MustVerb with CanVerb { thisSu
      */
     @deprecated("Please use \"which\" instead of \"that\".")
     def that(f: => Unit) {
-      registerBranch(string + " that", None, f _)
+      registerBranch(string + " that", None, "that", f _)
     }
     
     /**
@@ -770,7 +771,7 @@ trait WordSpec extends Suite with ShouldVerb with MustVerb with CanVerb { thisSu
      * </p>
      */
     def which(f: => Unit) {
-      registerBranch(string + " which", None, f _)
+      registerBranch(string + " which", None, "which", f _)
     }
 
     /**
@@ -779,7 +780,7 @@ trait WordSpec extends Suite with ShouldVerb with MustVerb with CanVerb { thisSu
      */
     @deprecated("Please use \"which\" instead of \"that\".")
     def that(resultOfAfterWordApplication: ResultOfAfterWordApplication) {
-      registerBranch(string + " that " + resultOfAfterWordApplication.text, None, resultOfAfterWordApplication.f)
+      registerBranch(string + " that " + resultOfAfterWordApplication.text, None, "that", resultOfAfterWordApplication.f)
     }
     
     /**
@@ -799,7 +800,7 @@ trait WordSpec extends Suite with ShouldVerb with MustVerb with CanVerb { thisSu
      * </p>
      */
     def which(resultOfAfterWordApplication: ResultOfAfterWordApplication) {
-      registerBranch(string + " which " + resultOfAfterWordApplication.text, None, resultOfAfterWordApplication.f)
+      registerBranch(string + " which " + resultOfAfterWordApplication.text, None, "which", resultOfAfterWordApplication.f)
     }
   }
 
@@ -948,7 +949,7 @@ trait WordSpec extends Suite with ShouldVerb with MustVerb with CanVerb { thisSu
    */
   protected implicit val subjectRegistrationFunction: StringVerbBlockRegistration =
     new StringVerbBlockRegistration {
-      def apply(left: String, verb: String, f: () => Unit) = registerBranch(left, Some(verb), f)
+      def apply(left: String, verb: String, f: () => Unit) = registerBranch(left, Some(verb), "subjectRegistrationFunction", f)
     }
 
   /**
@@ -977,9 +978,9 @@ trait WordSpec extends Suite with ShouldVerb with MustVerb with CanVerb { thisSu
     (left, verb, resultOfAfterWordApplication) => {
       val afterWordFunction =
         () => {
-          registerBranch(resultOfAfterWordApplication.text, None, resultOfAfterWordApplication.f)
+          registerBranch(resultOfAfterWordApplication.text, None, "subjectWithAfterWordRegistrationFunction", resultOfAfterWordApplication.f)
         }
-      registerBranch(left, Some(verb), afterWordFunction)
+      registerBranch(left, Some(verb), "subjectWithAfterWordRegistrationFunction", afterWordFunction)
     }
   }
 
@@ -1124,4 +1125,9 @@ trait WordSpec extends Suite with ShouldVerb with MustVerb with CanVerb { thisSu
    * </p>
    */
   protected val behave = new BehaveWord
+  
+  /**
+   * Suite style name.
+   */
+  final override def styleName: String = "WordSpec"
 }

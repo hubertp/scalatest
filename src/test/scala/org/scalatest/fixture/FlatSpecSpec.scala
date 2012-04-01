@@ -1125,5 +1125,147 @@ class FlatSpecSpec extends org.scalatest.FunSpec with PrivateMethodTester with S
         ensureTestFailedEventReceived(spec, "should blow up")
       }
     }
+
+    describe("when using 'they should' in place of 'it should'") {
+      
+      it("A fixture.Spec should return the test names in order of registration from testNames") {
+        val a = new FlatSpec {
+          type FixtureParam = String
+          def withFixture(test: OneArgTest) {}
+          "Something" should "do that" in { fixture =>
+          }
+          they should "do this" in { fixture =>
+          }
+        }
+
+        expect(List("Something should do that", "Something should do this")) {
+          a.testNames.iterator.toList
+        }
+
+        val b = new FlatSpec {
+          type FixtureParam = String
+          def withFixture(test: OneArgTest) {}
+        }
+
+        expect(List[String]()) {
+          b.testNames.iterator.toList
+        }
+
+        val c = new FlatSpec {
+          type FixtureParam = String
+          def withFixture(test: OneArgTest) {}
+          "Something" should "do this" in { fixture =>
+          }
+          they should "do that" in { fixture =>
+          }
+        }
+
+        expect(List("Something should do this", "Something should do that")) {
+          c.testNames.iterator.toList
+        }
+      }
+      
+      it("should throw DuplicateTestNameException if a duplicate test name registration is attempted") {
+
+        intercept[DuplicateTestNameException] {
+          new FlatSpec {
+            type FixtureParam = String
+            def withFixture(test: OneArgTest) {}
+            they should "test this" in { fixture => }
+            they should "test this" in { fixture => }
+          }
+        }
+        intercept[DuplicateTestNameException] {
+          new FlatSpec {
+            type FixtureParam = String
+            def withFixture(test: OneArgTest) {}
+            they should "test this" in { fixture => }
+            they should "test this" taggedAs(SlowTest) ignore { fixture => }
+          }
+        }
+        intercept[DuplicateTestNameException] {
+          new FlatSpec {
+            type FixtureParam = String
+            def withFixture(test: OneArgTest) {}
+            they should "test this" in { fixture => }
+            they should "test this" taggedAs(Tag("SlowTest")) ignore { fixture => }
+          }
+        }
+        intercept[DuplicateTestNameException] {
+          new FlatSpec {
+            type FixtureParam = String
+            def withFixture(test: OneArgTest) {}
+            ignore should "test this" in { fixture => }
+            they should "test this" ignore { fixture => }
+          }
+        }
+        intercept[DuplicateTestNameException] {
+          new FlatSpec {
+            type FixtureParam = String
+            def withFixture(test: OneArgTest) {}
+            ignore should "test this" in { fixture => }
+            they should "test this" in { fixture => }
+          }
+        }
+      }
+    }
+  }
+  
+  describe("when failure happens") {
+    
+    it("should fire TestFailed event with correct stack depth info when test failed") {
+      class TestSpec extends FlatSpec {
+        type FixtureParam = String
+        def withFixture(test: OneArgTest) { test("hi") }
+        it should "fail"  in { fixture =>
+          assert(1 === 2)
+        }
+        behavior of "scenario"
+        it should "fail" in { fixture =>
+          assert(1 === 2)
+        }
+      }
+      val rep = new EventRecordingReporter
+      val s1 = new TestSpec
+      s1.run(None, rep, new Stopper {}, Filter(), Map(), None, new Tracker)
+      assert(rep.testFailedEventsReceived.size === 2)
+      assert(rep.testFailedEventsReceived(0).throwable.get.asInstanceOf[TestFailedException].failedCodeFileName.get === "FlatSpecSpec.scala")
+      assert(rep.testFailedEventsReceived(0).throwable.get.asInstanceOf[TestFailedException].failedCodeLineNumber.get === thisLineNumber - 12)
+      assert(rep.testFailedEventsReceived(1).throwable.get.asInstanceOf[TestFailedException].failedCodeFileName.get === "FlatSpecSpec.scala")
+      assert(rep.testFailedEventsReceived(1).throwable.get.asInstanceOf[TestFailedException].failedCodeLineNumber.get === thisLineNumber - 10)
+    }
+    
+    it("should generate TestRegistrationClosedException with correct stack depth info when has an in nested inside an in") {
+      class TestSpec extends FlatSpec {
+        var registrationClosedThrown = false
+        type FixtureParam = String
+        behavior of "a feature"
+        it should "fail" in { fixture => 
+          it should "fail" in { fixture => 
+            assert(1 === 2)
+          }
+        }
+        override def withFixture(test: OneArgTest) {
+          try {
+            test.apply("hi")
+          }
+          catch {
+            case e: TestRegistrationClosedException => 
+              registrationClosedThrown = true
+              throw e
+          }
+        }
+      }
+      val rep = new EventRecordingReporter
+      val s = new TestSpec
+      s.run(None, rep, new Stopper {}, Filter(), Map(), None, new Tracker)
+      assert(s.registrationClosedThrown == true)
+      val testFailedEvents = rep.testFailedEventsReceived
+      assert(testFailedEvents.size === 1)
+      assert(testFailedEvents(0).throwable.get.getClass() === classOf[TestRegistrationClosedException])
+      val trce = testFailedEvents(0).throwable.get.asInstanceOf[TestRegistrationClosedException]
+      assert("FlatSpecSpec.scala" === trce.failedCodeFileName.get)
+      assert(trce.failedCodeLineNumber.get === thisLineNumber - 24)
+    }
   }
 }

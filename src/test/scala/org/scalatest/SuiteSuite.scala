@@ -328,5 +328,34 @@ class SuiteSuite extends Suite with PrivateMethodTester with SharedHelpers {
     assert(!s6.theTestThisConfigMapWasEmpty)
     assert(s6.theTestThatConfigMapWasEmpty)
   }
+  
+  def testCheckChosenStyles() {
+    class SimpleSuite extends Suite {
+      def testMethod1() {}
+      def testMethod2() {}
+      def testMethod3() {}
+    }
+    
+    val simpleSuite = new SimpleSuite()
+    simpleSuite.checkChosenStyles(Map.empty)
+    simpleSuite.checkChosenStyles(Map("org.scalatest.ChosenStyles" -> Set("Suite")))
+    intercept[NotAllowedException] {
+      simpleSuite.checkChosenStyles(Map("org.scalatest.ChosenStyles" -> Set("FunSpec")))
+    }
+  }
+  
+  def testStackDepth() {
+    class TestSpec extends Suite {
+      def testFailure() {
+        assert(1 === 2)
+      }
+    }
+    val rep = new EventRecordingReporter
+    val s1 = new TestSpec
+    s1.run(None, rep, new Stopper {}, Filter(), Map(), None, new Tracker)
+    assert(rep.testFailedEventsReceived.size === 1)
+    assert(rep.testFailedEventsReceived(0).throwable.get.asInstanceOf[TestFailedException].failedCodeFileName.get === "SuiteSuite.scala")
+    assert(rep.testFailedEventsReceived(0).throwable.get.asInstanceOf[TestFailedException].failedCodeLineNumber.get === thisLineNumber - 8)
+  }
 }
 

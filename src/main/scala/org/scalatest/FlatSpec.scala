@@ -1461,7 +1461,7 @@ trait FlatSpec extends Suite with ShouldVerb with MustVerb with CanVerb { thisSu
   private def registerTestToRun(specText: String, testTags: List[Tag], methodName: String, testFun: () => Unit) {
 
     // TODO: This is what was being used before but it is wrong
-    registerTest(specText, testFun, "itCannotAppearInsideAnotherIt", "FlatSpec.scala", methodName, None, None, testTags: _*)
+    registerTest(specText, testFun, "itCannotAppearInsideAnotherIt", "FlatSpec.scala", methodName, 1, None, None, testTags: _*)
   }
 
   /**
@@ -1505,7 +1505,7 @@ trait FlatSpec extends Suite with ShouldVerb with MustVerb with CanVerb { thisSu
     def of(description: String) {
 
       // TODO: This is what was here, but it needs fixing.
-      registerFlatBranch(description, "describeCannotAppearInsideAnIt", "FlatSpec.scala", "describe")
+      registerFlatBranch(description, "describeCannotAppearInsideAnIt", "FlatSpec.scala", "of", 1)
     }
   }
 
@@ -1630,7 +1630,7 @@ trait FlatSpec extends Suite with ShouldVerb with MustVerb with CanVerb { thisSu
      * </p>
      */
     def ignore(testFun: => Unit) {
-      registerTestToIgnore(verb + " " + name, tags, testFun _)
+      registerTestToIgnore(verb + " " + name, tags, "ignore", testFun _)
     }
   }
 
@@ -1740,7 +1740,7 @@ trait FlatSpec extends Suite with ShouldVerb with MustVerb with CanVerb { thisSu
      * </p>
      */
     def ignore(testFun: => Unit) {
-      registerTestToIgnore(verb + " " + name, List(), testFun _)
+      registerTestToIgnore(verb + " " + name, List(), "ignore", testFun _)
     }
 
     /**
@@ -1992,7 +1992,7 @@ trait FlatSpec extends Suite with ShouldVerb with MustVerb with CanVerb { thisSu
      * </p>
      */
     def in(testFun: => Unit) {
-      registerTestToIgnore(verb + " " + name, tags, testFun _)
+      registerTestToIgnore(verb + " " + name, tags, "in", testFun _)
     }
 
     /**
@@ -2022,7 +2022,7 @@ trait FlatSpec extends Suite with ShouldVerb with MustVerb with CanVerb { thisSu
      * </p>
      */
     def is(testFun: => PendingNothing) {
-      registerTestToIgnore(verb + " " + name, tags, testFun _)
+      registerTestToIgnore(verb + " " + name, tags, "is", testFun _)
     }
     // Note: no def ignore here, so you can't put two ignores in the same line
   }
@@ -2089,7 +2089,7 @@ trait FlatSpec extends Suite with ShouldVerb with MustVerb with CanVerb { thisSu
      * </p>
      */
     def in(testFun: => Unit) {
-      registerTestToIgnore(verb + " " + name, List(), testFun _)
+      registerTestToIgnore(verb + " " + name, List(), "in", testFun _)
     }
 
     /**
@@ -2118,7 +2118,7 @@ trait FlatSpec extends Suite with ShouldVerb with MustVerb with CanVerb { thisSu
      * </p>
      */
     def is(testFun: => PendingNothing) {
-      registerTestToIgnore(verb + " " + name, List(), testFun _)
+      registerTestToIgnore(verb + " " + name, List(), "is", testFun _)
     }
 
     /**
@@ -2242,6 +2242,415 @@ trait FlatSpec extends Suite with ShouldVerb with MustVerb with CanVerb { thisSu
    * </p>
    */
   protected val ignore = new IgnoreWord
+  
+  /**
+   * Class that supports the registration of tagged tests via the <code>TheyWord</code> instance
+   * referenced from <code>FlatSpec</code>'s <code>they</code> field.
+   *
+   * <p>
+   * This class enables syntax such as the following tagged test registration:
+   * </p>
+   *
+   * <pre class="stHighlight">
+   * they should "pop values in last-in-first-out order" taggedAs(SlowTest) in { ... }
+   *                                                                        ^
+   * </pre>
+   *
+   * <p>
+   * It also enables syntax such as the following registration of an ignored, tagged test:
+   * </p>
+   *
+   * <pre class="stHighlight">
+   * they should "pop values in last-in-first-out order" taggedAs(SlowTest) ignore { ... }
+   *                                                                        ^
+   * </pre>
+   *
+   * <p>
+   * In addition, it enables syntax such as the following registration of a pending, tagged test:
+   * </p>
+   *
+   * <pre class="stHighlight">
+   * they should "pop values in last-in-first-out order" taggedAs(SlowTest) is (pending)
+   *                                                                        ^
+   * </pre>
+   *
+   * <p>
+   * For more information and examples of the use of the <code>they</code> field to register tagged tests, see
+   * the <a href="FlatSpec.html#TaggingTests">Tagging tests section</a> in the main documentation for trait <code>FlatSpec</code>.
+   * For examples of tagged test registration, see
+   * the <a href="FlatSpec.html#TaggingTests">Tagging tests section</a> in the main documentation for trait <code>FlatSpec</code>.
+   * </p>
+   */
+  protected final class TheyVerbStringTaggedAs(verb: String, name: String, tags: List[Tag]) {
+
+    /**
+     * Supports the registration of tagged tests in a <code>FlatSpec</code>.
+     *
+     * <p>
+     * This method supports syntax such as the following:
+     * </p>
+     *
+     * <pre class="stHighlight">
+     * they must "pop values in last-in-first-out order" taggedAs(SlowTest) in { ... }
+     *                                                                      ^
+     * </pre>
+     *
+     * <p>
+     * For examples of tagged test registration, see
+     * the <a href="FlatSpec.html#TaggingTests">Tagging tests section</a> in the main documentation for trait <code>FlatSpec</code>.
+     * </p>
+     */
+    def in(testFun: => Unit) {
+      registerTestToRun(verb + " " + name, tags, "in", testFun _)
+    }
+
+    /**
+     * Supports the registration of pending, tagged tests in a <code>FlatSpec</code>.
+     *
+     * <p>
+     * This method supports syntax such as the following:
+     * </p>
+     *
+     * <pre class="stHighlight">
+     * they must "pop values in last-in-first-out order" taggedAs(SlowTest) is (pending)
+     *                                                                      ^
+     * </pre>
+     *
+     * <p>
+     * For examples of pending test registration, see the <a href="FlatSpec.html#PendingTests">Pending tests section</a> in the main documentation
+     * for trait <code>FlatSpec</code>.  And for examples of tagged test registration, see
+     * the <a href="FlatSpec.html#TaggingTests">Tagging tests section</a> in the main documentation for trait <code>FlatSpec</code>.
+     * </p>
+     */
+    def is(testFun: => PendingNothing) {
+      registerTestToRun(verb + " " + name, tags, "is", testFun _)
+    }
+
+    /**
+     * Supports the registration of ignored, tagged tests in a <code>FlatSpec</code>.
+     *
+     * <p>
+     * This method supports syntax such as the following:
+     * </p>
+     *
+     * <pre class="stHighlight">
+     * they must "pop values in last-in-first-out order" taggedAs(SlowTest) ignore { ... }
+     *                                                                      ^
+     * </pre>
+     *
+     * <p>
+     * For examples of ignored test registration, see the <a href="FlatSpec.html#IgnoredTests">Ignored tests section</a> in the main documentation
+     * for trait <code>FlatSpec</code>.  And for examples of tagged test registration, see
+     * the <a href="FlatSpec.html#TaggingTests">Tagging tests section</a> in the main documentation for trait <code>FlatSpec</code>.
+     * </p>
+     */
+    def ignore(testFun: => Unit) {
+      registerTestToIgnore(verb + " " + name, tags, "ignore", testFun _)
+    }
+  }
+
+  /**
+   * Class that supports test registration via the <code>TheyWord</code> instance referenced from <code>FlatSpec</code>'s <code>they</code> field.
+   *
+   * <p>
+   * This class enables syntax such as the following test registration:
+   * </p>
+   *
+   * <pre class="stHighlight">
+   * they should "pop values in last-in-first-out order" in { ... }
+   *                                                     ^
+   * </pre>
+   *
+   * <p>
+   * It also enables syntax such as the following registration of an ignored test:
+   * </p>
+   *
+   * <pre class="stHighlight">
+   * they should "pop values in last-in-first-out order" ignore { ... }
+   *                                                     ^
+   * </pre>
+   *
+   * <p>
+   * In addition, it enables syntax such as the following registration of a pending test:
+   * </p>
+   *
+   * <pre class="stHighlight">
+   * they should "pop values in last-in-first-out order" is (pending)
+   *                                                     ^
+   * </pre>
+   *
+   * <p>
+   * And finally, it also enables syntax such as the following tagged test registration:
+   * </p>
+   *
+   * <pre class="stHighlight">
+   * they should "pop values in last-in-first-out order" taggedAs(SlowTest) in { ... }
+   *                                                     ^
+   * </pre>
+   *
+   * <p>
+   * For more information and examples of the use of the <code>it</code> field, see the <a href="FlatSpec.html">main documentation</a>
+   * for trait <code>FlatSpec</code>.
+   * </p>
+   */
+  protected final class TheyVerbString(verb: String, name: String) {
+
+    /**
+     * Supports the registration of tests in a <code>FlatSpec</code>.
+     *
+     * <p>
+     * This method supports syntax such as the following:
+     * </p>
+     *
+     * <pre class="stHighlight">
+     * they must "pop values in last-in-first-out order" in { ... }
+     *                                                   ^
+     * </pre>
+     *
+     * <p>
+     * For examples of test registration, see the <a href="FlatSpec.html">main documentation</a>
+     * for trait <code>FlatSpec</code>.
+     * </p>
+     */
+    def in(testFun: => Unit) {
+      registerTestToRun(verb + " " + name, List(), "in", testFun _)
+    }
+
+    /**
+     * Supports the registration of pending tests in a <code>FlatSpec</code>.
+     *
+     * <p>
+     * This method supports syntax such as the following:
+     * </p>
+     *
+     * <pre class="stHighlight">
+     * they must "pop values in last-in-first-out order" is (pending)
+     *                                                   ^
+     * </pre>
+     *
+     * <p>
+     * For examples of pending test registration, see the <a href="FlatSpec.html#PendingTests">Pending tests section</a> in the main documentation
+     * for trait <code>FlatSpec</code>.
+     * </p>
+     */
+    def is(testFun: => PendingNothing) {
+      registerTestToRun(verb + " " + name, List(), "is", testFun _)
+    }
+
+    /**
+     * Supports the registration of ignored tests in a <code>FlatSpec</code>.
+     *
+     * <p>
+     * This method supports syntax such as the following:
+     * </p>
+     *
+     * <pre class="stHighlight">
+     * they must "pop values in last-in-first-out order" ignore { ... }
+     *                                                   ^
+     * </pre>
+     *
+     * <p>
+     * For examples of ignored test registration, see the <a href="FlatSpec.html#IgnoredTests">Ignored tests section</a> in the main documentation
+     * for trait <code>FlatSpec</code>.
+     * </p>
+     */
+    def ignore(testFun: => Unit) {
+      registerTestToIgnore(verb + " " + name, List(), "ignore", testFun _)
+    }
+
+    /**
+     * Supports the registration of tagged tests in a <code>FlatSpec</code>.
+     *
+     * <p>
+     * This method supports syntax such as the following:
+     * </p>
+     *
+     * <pre class="stHighlight">
+     * they must "pop values in last-in-first-out order" taggedAs(SlowTest) in { ... }
+     *                                                   ^
+     * </pre>
+     *
+     * <p>
+     * For examples of tagged test registration, see the <a href="FlatSpec.html#TaggingTests">Tagging tests section</a> in the main documentation
+     * for trait <code>FlatSpec</code>.
+     * </p>
+     */
+    def taggedAs(firstTestTag: Tag, otherTestTags: Tag*) = {
+      val tagList = firstTestTag :: otherTestTags.toList
+      new ItVerbStringTaggedAs(verb, name, tagList)
+    }
+  }
+
+  /**
+   * Class that supports test (and shared test) registration via the instance referenced from <code>FlatSpec</code>'s <code>it</code> field.
+   *
+   * <p>
+   * This class enables syntax such as the following test registration:
+   * </p>
+   *
+   * <pre class="stHighlight">
+   * they should "pop values in last-in-first-out order" in { ... }
+   * ^
+   * </pre>
+   *
+   * <p>
+   * It also enables syntax such as the following shared test registration:
+   * </p>
+   *
+   * <pre class="stHighlight">
+   * they should behave like nonEmptyStack(lastItemPushed)
+   * ^
+   * </pre>
+   *
+   * <p>
+   * For more information and examples of the use of the <code>it</code> field, see the main documentation 
+   * for this trait.
+   * </p>
+   */
+  protected final class TheyWord {
+
+    /**
+     * Supports the registration of tests with <code>should</code> in a <code>FlatSpec</code>.
+     *
+     * <p>
+     * This method supports syntax such as the following:
+     * </p>
+     *
+     * <pre class="stHighlight">
+     * they should "pop values in last-in-first-out order" in { ... }
+     *      ^
+     * </pre>
+     *
+     * <p>
+     * For examples of test registration, see the <a href="FlatSpec.html">main documentation</a>
+     * for trait <code>FlatSpec</code>.
+     * </p>
+     */
+    def should(string: String) = new ItVerbString("should", string)
+
+    /**
+     * Supports the registration of tests with <code>must</code> in a <code>FlatSpec</code>.
+     *
+     * <p>
+     * This method supports syntax such as the following:
+     * </p>
+     *
+     * <pre class="stHighlight">
+     * they must "pop values in last-in-first-out order" in { ... }
+     *      ^
+     * </pre>
+     *
+     * <p>
+     * For examples of test registration, see the <a href="FlatSpec.html">main documentation</a>
+     * for trait <code>FlatSpec</code>.
+     * </p>
+     */
+    def must(string: String) = new ItVerbString("must", string)
+
+    /**
+     * Supports the registration of tests with <code>can</code> in a <code>FlatSpec</code>.
+     *
+     * <p>
+     * This method supports syntax such as the following:
+     * </p>
+     *
+     * <pre class="stHighlight">
+     * they can "pop values in last-in-first-out order" in { ... }
+     *      ^
+     * </pre>
+     *
+     * <p>
+     * For examples of test registration, see the <a href="FlatSpec.html">main documentation</a>
+     * for trait <code>FlatSpec</code>.
+     * </p>
+     */
+    def can(string: String) = new ItVerbString("can", string)
+
+    /**
+     * Supports the registration of shared tests with <code>should</code> in a <code>FlatSpec</code>.
+     *
+     * <p>
+     * This method supports syntax such as the following:
+     * </p>
+     *
+     * <pre class="stHighlight">
+     * they should behave like nonFullStack(stackWithOneItem)
+     *      ^
+     * </pre>
+     *
+     * <p>
+     * For examples of shared tests, see the <a href="FlatSpec.html#SharedTests">Shared tests section</a>
+     * in the main documentation for trait <code>FlatSpec</code>.
+     * </p>
+     */
+    def should(behaveWord: BehaveWord) = behaveWord
+
+    /**
+     * Supports the registration of shared tests with <code>must</code> in a <code>FlatSpec</code>.
+     *
+     * <p>
+     * This method supports syntax such as the following:
+     * </p>
+     *
+     * <pre class="stHighlight">
+     * they must behave like nonFullStack(stackWithOneItem)
+     *      ^
+     * </pre>
+     *
+     * <p>
+     * For examples of shared tests, see the <a href="FlatSpec.html#SharedTests">Shared tests section</a>
+     * in the main documentation for trait <code>FlatSpec</code>.
+     * </p>
+     */
+    def must(behaveWord: BehaveWord) = behaveWord
+
+    /**
+     * Supports the registration of shared tests with <code>can</code> in a <code>FlatSpec</code>.
+     *
+     * <p>
+     * This method supports syntax such as the following:
+     * </p>
+     *
+     * <pre class="stHighlight">
+     * they can behave like nonFullStack(stackWithOneItem)
+     *      ^
+     * </pre>
+     *
+     * <p>
+     * For examples of shared tests, see the <a href="FlatSpec.html#SharedTests">Shared tests section</a>
+     * in the main documentation for trait <code>FlatSpec</code>.
+     * </p>
+     */
+    def can(behaveWord: BehaveWord) = behaveWord
+  }
+
+  /**
+   * Supports test (and shared test) registration in <code>FlatSpec</code>s.
+   *
+   * <p>
+   * This field enables syntax such as the following test registration:
+   * </p>
+   *
+   * <pre class="stHighlight">
+   * they should "pop values in last-in-first-out order" in { ... }
+   * ^
+   * </pre>
+   *
+   * <p>
+   * It also enables syntax such as the following shared test registration:
+   * </p>
+   *
+   * <pre class="stHighlight">
+   * they should behave like nonEmptyStack(lastItemPushed)
+   * ^
+   * </pre>
+   *
+   * <p>
+   * For more information and examples of the use of the <code>it</code> field, see the main documentation 
+   * for this trait.
+   * </p>
+   */
+  protected val they = new TheyWord
 
   /**
    * Class that supports test registration in shorthand form.
@@ -2326,7 +2735,7 @@ trait FlatSpec extends Suite with ShouldVerb with MustVerb with CanVerb { thisSu
      * </p>
      */
     def ignore(testFun: => Unit) {
-      registerTestToIgnore(verb + " " + rest, List(), testFun _)
+      registerTestToIgnore(verb + " " + rest, List(), "ignore", testFun _)
     }
   }
 
@@ -2424,7 +2833,7 @@ trait FlatSpec extends Suite with ShouldVerb with MustVerb with CanVerb { thisSu
      * </p>
      */
     def ignore(testFun: => Unit) {
-      registerTestToIgnore(verb + " " + rest, tagsList, testFun _)
+      registerTestToIgnore(verb + " " + rest, tagsList, "ignore", testFun _)
     }
   }
 
@@ -2522,15 +2931,16 @@ trait FlatSpec extends Suite with ShouldVerb with MustVerb with CanVerb { thisSu
    * @param specText the specification text, which will be combined with the descText of any surrounding describers
    * to form the test name
    * @param testTags the optional list of tags for this test
+   * @param methodName caller's method name
    * @param testFun the test function
    * @throws DuplicateTestNameException if a test with the same name has been registered previously
    * @throws TestRegistrationClosedException if invoked after <code>run</code> has been invoked on this suite
    * @throws NullPointerException if <code>specText</code> or any passed test tag is <code>null</code>
    */
-  private def registerTestToIgnore(specText: String, testTags: List[Tag], testFun: () => Unit) {
+  private def registerTestToIgnore(specText: String, testTags: List[Tag], methodName: String, testFun: () => Unit) {
 
     // TODO: This is how these were, but it needs attention. Mentions "it".
-    registerIgnoredTest(specText, testFun, "ignoreCannotAppearInsideAnIt", "FlatSpec.scala", "ignore", testTags: _*)
+    registerIgnoredTest(specText, testFun, "ignoreCannotAppearInsideAnIt", "FlatSpec.scala", methodName, 1, testTags: _*)
   }
 
   /**
@@ -2700,4 +3110,9 @@ trait FlatSpec extends Suite with ShouldVerb with MustVerb with CanVerb { thisSu
    * </p>
    */
   protected val behave = new BehaveWord
+  
+  /**
+   * Suite style name.
+   */
+  final override def styleName: String = "FlatSpec"
 }

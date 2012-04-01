@@ -495,7 +495,15 @@ object Runner {
    * Runs a suite of tests, with optional GUI. See the main documentation for this singleton object for the details.
    */
   def main(args: Array[String]) {
-    val result = runOptionallyWithPassFailReporter(args, true)
+    val result = 
+      if (args.contains("-v") || args.contains("--version")) {
+        val version = Resources("AppVersion")
+        val scalaVersion = Resources("ScalaVersion")
+        println("ScalaTest " + version + " (Built for Scala " + scalaVersion + ")")
+        runOptionallyWithPassFailReporter(args.filter(arg => arg != "-v" && arg != "--version"), true)
+      }
+      else
+        runOptionallyWithPassFailReporter(args, true)
 
     if (result)
       exit(0)
@@ -539,7 +547,8 @@ object Runner {
       membersOnlyArgsList,
       wildcardArgsList,
       testNGArgsList,
-      suffixes
+      suffixes, 
+      chosenStyles
     ) = parseArgs(args)
 
     val fullReporterConfigurations: ReporterConfigurations =
@@ -552,14 +561,15 @@ object Runner {
     val suitesList: List[String] = parseSuiteArgsIntoNameStrings(suiteArgsList, "-s")
     val junitsList: List[String] = parseSuiteArgsIntoNameStrings(junitArgsList, "-j")
     val runpathList: List[String] = parseRunpathArgIntoList(runpathArgsList)
-    val propertiesMap: Map[String, String] = parsePropertiesArgsIntoMap(propertiesArgsList)
+    val propertiesMap: Map[String, Object] = parsePropertiesArgsIntoMap(propertiesArgsList)
     val tagsToInclude: Set[String] = parseCompoundArgIntoSet(includesArgsList, "-n")
     val tagsToExclude: Set[String] = parseCompoundArgIntoSet(excludesArgsList, "-l")
     val concurrent: Boolean = !concurrentList.isEmpty
     val numThreads: Int = parseConcurrentNumArg(concurrentList)
     val membersOnlyList: List[String] = parseSuiteArgsIntoNameStrings(membersOnlyArgsList, "-m")
     val wildcardList: List[String] = parseSuiteArgsIntoNameStrings(wildcardArgsList, "-w")
-    val testNGList: List[String] = parseSuiteArgsIntoNameStrings(testNGArgsList, "-b") ::: parseSuiteArgsIntoNameStrings(testNGArgsList, "-t")
+    val testNGList: List[String] = parseSuiteArgsIntoNameStrings(testNGArgsList, "-b")
+    val chosenStyleSet: Set[String] = parseChosenStylesIntoChosenStyleSet(chosenStyles, "-y")
 
     val filter = Filter(if (tagsToInclude.isEmpty) None else Some(tagsToInclude), tagsToExclude)
 
@@ -584,6 +594,10 @@ object Runner {
       }
 
     val passFailReporter = if (runWithPassFailReporter) Some(new PassFailReporter) else None
+    
+    if (propertiesMap.isDefinedAt("org.scalatest.ChosenStyles"))
+      throw new IllegalArgumentException("Property name 'org.scalatest.ChosenStyles' is used by ScalaTest, please choose other property name.")
+    val configMap = propertiesMap + ("org.scalatest.ChosenStyles" -> chosenStyleSet)
 
     fullReporterConfigurations.graphicReporterConfiguration match {
       case Some(GraphicReporterConfiguration(configSet)) => {
@@ -599,7 +613,7 @@ object Runner {
         val abq = new ArrayBlockingQueue[RunnerJFrame](1)
         usingEventDispatchThread {
           val rjf = new RunnerJFrame(graphicEventsToPresent, reporterConfigs, suitesList, junitsList, runpathList,
-            filter, propertiesMap, concurrent, membersOnlyList, wildcardList, testNGList, passFailReporter, numThreads,
+            filter, configMap, concurrent, membersOnlyList, wildcardList, testNGList, passFailReporter, numThreads,
             suffixes)
           rjf.setLocation(RUNNER_JFRAME_START_X, RUNNER_JFRAME_START_Y)
           rjf.setVisible(true)
@@ -616,7 +630,7 @@ object Runner {
         withClassLoaderAndDispatchReporter(runpathList, reporterConfigs, None, passFailReporter) {
           (loader, dispatchReporter) => {
             doRunRunRunDaDoRunRun(dispatchReporter, suitesList, junitsList, new Stopper {}, filter,
-                propertiesMap, concurrent, membersOnlyList, wildcardList, testNGList, runpathList, loader, new RunDoneListener {}, 1, numThreads, suffixes) 
+                configMap, concurrent, membersOnlyList, wildcardList, testNGList, runpathList, loader, new RunDoneListener {}, 1, numThreads, suffixes) 
           }
         }
       }
@@ -638,11 +652,11 @@ object Runner {
       // Style advice
       // If it is multiple else ifs, then make it symetrical. If one needs an open curly brace, put it on all
       // If an if just has another if, a compound statement, go ahead and put the open curly brace's around the outer one
-      if (s.startsWith("-p") || s.startsWith("-f") || s.startsWith("-u") || s.startsWith("-h") || s.startsWith("-r") || s.startsWith("-n") || s.startsWith("-x") || s.startsWith("-l") || s.startsWith("-q") || s.startsWith("-Q") || s.startsWith("-s") || s.startsWith("-j") || s.startsWith("-m") || s.startsWith("-w") || s.startsWith("-b") || s.startsWith("-t")) {
+      if (s.startsWith("-p") || s.startsWith("-R") || s.startsWith("-f") || s.startsWith("-u") || s.startsWith("-h") || s.startsWith("-r") || s.startsWith("-C") || s.startsWith("-n") || s.startsWith("-x") || s.startsWith("-l") || s.startsWith("-q") || s.startsWith("-Q") || s.startsWith("-s") || s.startsWith("-j") || s.startsWith("-m") || s.startsWith("-w") || s.startsWith("-b") || s.startsWith("-y")) {
         if (it.hasNext)
           it.next
       }
-      else if (!s.startsWith("-D") && !s.startsWith("-g") && !s.startsWith("-o") && !s.startsWith("-e") && !s.startsWith("-c")) {
+      else if (!s.startsWith("-D") && !s.startsWith("-g") && !s.startsWith("-o") && !s.startsWith("-e") && !s.startsWith("-c") && !s.startsWith("-P")) {
         lb += s
       }
     }
@@ -697,6 +711,7 @@ object Runner {
     val wildcard = new ListBuffer[String]()
     val testNGXMLFiles = new ListBuffer[String]()
     val suffixes = new ListBuffer[String]()
+    val chosenStyles = new ListBuffer[String]()
 
     val it = args.iterator
     while (it.hasNext) {
@@ -707,7 +722,13 @@ object Runner {
          props += s
       }
       else if (s.startsWith("-p")) {
+        println("WARNING: -p has been deprecated and will be reused for a different (but still very cool) purpose in ScalaTest 2.0. Please change all uses of -p to -R.")
         runpath += s
+        if (it.hasNext)
+          runpath += it.next
+      }
+      else if (s.startsWith("-R")) {
+        runpath += "-p" + s.substring(2)
         if (it.hasNext)
           runpath += it.next
       }
@@ -752,8 +773,14 @@ object Runner {
           excludes += it.next
       }
       else if (s.startsWith("-r")) {
-
+        println("WARNING: -r has been deprecated and will be reused for a different (but still very cool) purpose in ScalaTest 2.0. Please change all uses of -r to -C.")
         reporters += s
+        if (it.hasNext)
+          reporters += it.next
+      }
+      else if (s.startsWith("-C")) {
+
+        reporters += "-r" + s.substring(2)
         if (it.hasNext)
           reporters += it.next
       }
@@ -782,13 +809,14 @@ object Runner {
           wildcard += it.next
       }
       else if (s.startsWith("-c")) {
-
+        println("WARNING: -c has been deprecated and will be reused for a different (but still very cool) purpose in ScalaTest 2.0. Please change all uses of -c to -P.")
         concurrent += s
       }
-      else if (s.startsWith("-b") || s.startsWith("-t")) {
+      else if (s.startsWith("-P")) {
 
-        if (s.startsWith("-t"))
-          println("WARNING: -t has been deprecated and will be reused for a different (but still very cool) purpose in ScalaTest 2.0. Please change all uses of -t to -b.")
+        concurrent += "-c" + s.substring(2)
+      }
+      else if (s.startsWith("-b")) {
 
         testNGXMLFiles += s
         if (it.hasNext)
@@ -800,6 +828,10 @@ object Runner {
       }
       else if (s.startsWith("-Q")) {
         suffixes += "Spec|Suite"
+      }
+      else if (s.startsWith("-y")) {
+        chosenStyles += s
+        chosenStyles += it.next()
       }
       else {
         throw new IllegalArgumentException("Unrecognized argument: " + s)
@@ -818,7 +850,8 @@ object Runner {
       membersOnly.toList,
       wildcard.toList,
       testNGXMLFiles.toList,
-      genSuffixesPattern(suffixes.toList)
+      genSuffixesPattern(suffixes.toList), 
+      chosenStyles.toList
     )
   }
 
@@ -1073,7 +1106,7 @@ object Runner {
     if (args.exists(_ == null))
       throw new NullPointerException("an arg String was null")
 
-    if (dashArg != "-j" && dashArg != "-s" && dashArg != "-w" && dashArg != "-m" && dashArg != "-b" && dashArg != "-t")
+    if (dashArg != "-j" && dashArg != "-s" && dashArg != "-w" && dashArg != "-m" && dashArg != "-b")
       throw new NullPointerException("dashArg invalid: " + dashArg)
 
     val lb = new ListBuffer[String]
@@ -1081,16 +1114,16 @@ object Runner {
     while (it.hasNext) {
       val dashS = it.next
       if (dashS != dashArg)
-        throw new IllegalArgumentException("Every other element, starting with the first, must be -s")
+        throw new IllegalArgumentException("Every other element, starting with the first, must be " + dashArg)
       if (it.hasNext) {
         val suiteName = it.next
         if (!suiteName.startsWith("-"))
           lb += suiteName
         else
-          throw new IllegalArgumentException("Expecting a Suite class name to follow -s, but got: " + suiteName)
+          throw new IllegalArgumentException("Expecting a Suite class name or package name to follow " + dashArg + ", but got: " + suiteName)
       }
       else
-        throw new IllegalArgumentException("Last element must be a Suite class name, not a -s.")
+        throw new IllegalArgumentException("Last element must be a Suite class name or package name, not a " + dashArg + ".")
     }
     lb.toList
   }
@@ -1126,6 +1159,22 @@ object Runner {
     else {
       throw new IllegalArgumentException("Runpath must be either zero or two args: " + args)
     }
+  }
+  
+  private[scalatest] def parseChosenStylesIntoChosenStyleSet(args: List[String], dashArg: String) = {
+    val it = args.iterator
+    val lb = new ListBuffer[String]()
+    while (it.hasNext) {
+      val dash = it.next
+      if (dash != dashArg) 
+        throw new IllegalArgumentException("Every other element, starting with the first, must be " + dashArg)
+      if (it.hasNext) {
+        lb += it.next
+      }
+      else
+        throw new IllegalArgumentException("Last element must be a style name, not a " + dashArg + ".")
+    }
+    lb.toSet
   }
 
   //
@@ -1252,7 +1301,7 @@ object Runner {
     junitsList: List[String],
     stopRequested: Stopper,
     filter: Filter,
-    configMap: Map[String, String],
+    configMap: Map[String, Object],
     concurrent: Boolean,
     membersOnlyList: List[String],
     wildcardList: List[String],
@@ -1401,7 +1450,7 @@ object Runner {
           val expectedTestCount = sumInts(testCountList)
 
           dispatch(RunStarting(tracker.nextOrdinal(), expectedTestCount, configMap))
-
+          
           if (concurrent) {
 
             // Because some tests may do IO, will create a pool of 2 times the number of processors reported

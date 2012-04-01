@@ -246,6 +246,7 @@ class ScalaTestAntTask extends Task {
   private val membersonlys = new ListBuffer[String]
   private val wildcards    = new ListBuffer[String]
   private val testNGSuites = new ListBuffer[String]
+  private val chosenStyles = new ListBuffer[String]
 
   private val reporters  = new ListBuffer[ReporterElement]
   private val properties = new ListBuffer[NameValuePair]
@@ -265,6 +266,7 @@ class ScalaTestAntTask extends Task {
     addTestNGSuiteArgs(args)
     addParallelArg(args)
     addSuffixesArg(args)
+    addChosenStyles(args)
 
     val argsArray = args.toArray
 
@@ -300,30 +302,37 @@ class ScalaTestAntTask extends Task {
   }
 
   //
-  // Adds '-p runpath' arg pair to args list if a runpath
+  // Adds '-R runpath' arg pair to args list if a runpath
   // element or attribute was specified for task.
   //
   private def addRunpathArgs(args: ListBuffer[String]) {
     if (runpath.size > 0) {
-      args += "-p"
+      args += "-R"
       args += getSpacedOutPathStr(runpath.toList)
     }
   }
 
   private def addTestNGSuiteArgs(args: ListBuffer[String]) {
     if (testNGSuites.size > 0) {
-      args += "-t"
+      args += "-b"
       args += getSpacedOutPathStr(testNGSuites.toList)
     }
   }
   
+  private def addChosenStyles(args: ListBuffer[String]) {
+    chosenStyles.foreach { style => 
+      args += "-y"
+      args += style
+    }
+  }
+  
   //
-  // Adds '-c' arg to args list if 'parallel' attribute was
+  // Adds '-P' arg to args list if 'parallel' attribute was
   // specified true for task.
   //
   private def addParallelArg(args: ListBuffer[String]) {
     if (parallel) {
-      args += "-c" + (if (numthreads > 0) ("" + numthreads) else "")
+      args += "-P" + (if (numthreads > 0) ("" + numthreads) else "")
     }
   }
 
@@ -496,15 +505,15 @@ class ScalaTestAntTask extends Task {
   }
 
   //
-  // Adds '-r' reporter class option to args.  Appends
+  // Adds '-C' reporter class option to args.  Appends
   // reporter config string to option if specified.  Adds
-  // reporter's classname as additional argument, e.g. "-rFAB",
+  // reporter's classname as additional argument, e.g. "-RFAB",
   // "my.ReporterClass".
   //
   private def addReporterClass(args: ListBuffer[String],
                                reporter: ReporterElement)
   {
-    addReporterOption(args, reporter, "-r")
+    addReporterOption(args, reporter, "-C")
 
     if (reporter.getClassName == null)
       throw new BuildException(
@@ -654,6 +663,13 @@ class ScalaTestAntTask extends Task {
   def setWildcard(packageName: String) {
     wildcards += packageName
   }
+  
+  /**
+   * Sets value of <code>style</code> attribute.
+   */
+  def setStyle(style: String) {
+    chosenStyles += style
+  }
 
   /**
    * Sets value from nested element <code>suite</code>.
@@ -688,6 +704,10 @@ class ScalaTestAntTask extends Task {
    */
   def addConfiguredTagsToInclude(tagsToInclude: TextElement) {
     this.includes = tagsToInclude.getText
+  }
+  
+  def addConfiguredStyle(style: StyleElement) {
+    this.chosenStyles += style.getName
   }
 
   /**
@@ -743,6 +763,19 @@ class ScalaTestAntTask extends Task {
     str.trim.replaceAll("\\s+", " ")
   }
 }
+
+  //
+  // Class to hold data from <style> elements.
+  //
+  private class StyleElement {
+    private var name: String = null
+    
+    def setName(name: String) {
+      this.name = name
+    }
+    
+    def getName = name
+  }
 
   //
   // Class to hold data from <membersonly> and <wildcard> elements.
