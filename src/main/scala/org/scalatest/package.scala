@@ -82,4 +82,6 @@ package object scalatest {
     defaultShell.run(suite, testName, configMap)
   }
 */
+  type ShouldMatchers = matchers.ShouldMatchers
+  // type MustMatchers = matchers.MustMatchers
 }
