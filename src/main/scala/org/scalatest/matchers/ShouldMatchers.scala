@@ -921,21 +921,6 @@ trait ShouldMatchers extends Matchers with ShouldVerb {
      * </pre>
      */
     def should(notWord: NotWord) = new ResultOfNotWord[T](left, false)
-
-    /**
-     * This method enables syntax such as the following:
-     *
-     * <pre class="stHighlight">
-     * result shouldBe 3
-     *        ^
-     * </pre>
-     */
-    def shouldBe(right: Any) {
-      if (!areEqualComparingArraysStructurally(left, right)) {
-        val (leftee, rightee) = Suite.getObjectsForFailureMessage(left, right)
-        throw newTestFailedException(FailureMessages("wasNotEqualTo", leftee, rightee))
-      }
-    }
   }
 
   // I think the type hasn't been converted yet here. It is just a pass-through. It finally gets
