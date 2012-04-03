@@ -18,12 +18,12 @@ package org.scalatest
  * The config map is accessible inside a <code>Suite</code> in many ways. It is passed to <code>run</code>,
  * <code>runNestedSuites</code>, <code>runTests</code>, and <code>runTest</code>. It is also passed to
  * <code>withFixture</code>, accessible via a method on <a href="Suite$NoArgTest.html"><code>NoArgTest</code></a> and
- * <a href="fixture.Suite$OneArgTest.html"><code>OneArgTest</code></a>.
+ * <a href="fixture/Suite$OneArgTest.html"><code>OneArgTest</code></a>.
  * It is passed to an overloaded forms of the <code>beforeEach</code> and <code>afterEach</code> methods of trait
  * <a href="BeforeAndAfterEach.html"><code>BeforeAndAfterEach</code></a>, as well as overloaded forms of the <code>beforeAll</code> and
  * <code>afterAll</code> methods of trait <a href="BeforeAndAfterAll.html"><code>BeforeAndAfterAll</code></a>. Tests themselves can have information
  * taken from the config map, or the entire config map, through various means. The config map may be passed into
- * the test via a <a href="fixture.ConfigMapFixture.html"><code>ConfigMapFixture</code></a>, for example. Class <code>ConfigMapWrapperSuite</code>
+ * the test via a <a href="fixture/ConfigMapFixture.html"><code>ConfigMapFixture</code></a>, for example. Class <code>ConfigMapWrapperSuite</code>
  * represents one more way to get at the config map inside a suite of test: <code>ConfigMapWrapperSuite</code> will
  * pass the config map to the constructor of your suite class, bringing it easily into scope for tests and
  * helper methods alike.
@@ -33,14 +33,14 @@ package org.scalatest
  * Having the config map passed to the suite constructor might be more convenient in some cases, but in the case
  * of the <a href="path/package.html"><code>org.scalatest.path</code></a> traits, it is necessary if a test needs
  * information from a config map. The reason is that in a path trait, the test code is executed eagerly,
- * <em>before <code>run</code> is invoked</em>. The results of the tests are registered at this time, and those
- * results are reported once <code>run</code> is invoked. Thus by the time <code>run</code> has been invoked, it
- * is too late to pass the config map to the tests. Using a <code>ConfigMapWrapperSuite</code> solves that problem
- * by passing the config map to the constructor, so it is available early enough for the running tests to use it.
+ * <em>before <code>run</code> is invoked</em>. The results of the tests are registered when the tests are executed, and those
+ * results are merely <em>reported</em> once <code>run</code> is invoked. Thus by the time <code>run</code> has been invoked, it
+ * is too late to get the config map to the tests, which have already been executed. Using a <code>ConfigMapWrapperSuite</code> solves that problem.
+ * By passing the config map to the constructor, it is available early enough for the running tests to use it.
  * Here's an example:
  * </p>
  *
- * <pre>
+ * <pre class="stHighlight">
  * import org.scalatest._
  *
  * @WrapWith(classOf[ConfigMapWrapperSuite])
