@@ -2316,7 +2316,14 @@ trait Suite extends Assertions with AbstractSuite with Serializable { thisSuite 
 
     val message = getMessageForException(throwable)
     val formatter = getIndentedText(testName, 1, true)
-    report(TestFailed(tracker.nextOrdinal(), message, thisSuite.suiteName, Some(thisSuite.getClass.getName), testName, Some(throwable), Some(duration), Some(formatter), rerunnable))
+    val payload = 
+      throwable match {
+        case modPayload: ModifiablePayload[_] => 
+          modPayload.payload
+        case _ => 
+          None
+      }
+    report(TestFailed(tracker.nextOrdinal(), message, thisSuite.suiteName, Some(thisSuite.getClass.getName), testName, Some(throwable), Some(duration), Some(formatter), rerunnable, payload))
   }
 
   /**
@@ -2868,7 +2875,14 @@ used for test events like succeeded/failed, etc.
 
     val message = getMessageForException(throwable)
     val formatter = getIndentedText(testText, level, includeIcon)
-    report(TestFailed(tracker.nextOrdinal(), message, theSuite.suiteName, Some(theSuite.getClass.getName), testName, Some(throwable), Some(duration), Some(formatter), rerunnable))
+    val payload = 
+      throwable match {
+        case modPayload: ModifiablePayload[_] => 
+          modPayload.payload
+        case _ => 
+          None
+      }
+    report(TestFailed(tracker.nextOrdinal(), message, theSuite.suiteName, Some(theSuite.getClass.getName), testName, Some(throwable), Some(duration), Some(formatter), rerunnable, payload))
   }
 
   def reportTestStarting(theSuite: Suite, report: Reporter, tracker: Tracker, testName: String, rerunnable: Option[Rerunner]) {

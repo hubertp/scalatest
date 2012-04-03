@@ -52,7 +52,14 @@ import Suite.getIndentedText
           Resources("jUnitTestFailed")
 
       val formatter = getIndentedText(testName, 1, true)
-      report(TestFailed(theTracker.nextOrdinal(), message, testClassName, Some(testClass), testName, throwable, None, Some(formatter), None))
+      val payload = 
+        throwable match {
+          case modPayload: ModifiablePayload[_] => 
+            modPayload.payload
+          case _ => 
+            None
+        }
+      report(TestFailed(theTracker.nextOrdinal(), message, testClassName, Some(testClass), testName, throwable, None, Some(formatter), None, payload))
       // TODO: can I add a duration?
     }
 

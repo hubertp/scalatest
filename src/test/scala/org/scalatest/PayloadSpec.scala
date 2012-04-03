@@ -1,7 +1,7 @@
 package org.scalatest
 import org.scalatest.matchers.ShouldMatchers
 
-class PayloadSpec extends FlatSpec with ShouldMatchers with Payloads {
+class PayloadSpec extends FlatSpec with SharedHelpers with ShouldMatchers with Payloads {
 
   "The modifyPayload method on TFE" should "return the an exception with an equal message option if passed a function that returns the same option passed to it" in {
     val tfe = new TestFailedException("before", 3)
@@ -44,4 +44,18 @@ class PayloadSpec extends FlatSpec with ShouldMatchers with Payloads {
     caught.payload should be (Some("a payload"))
   }
   
+  it should "forward the payload to be carried in TestFailed event" in {
+    val a = 
+      new Spec {
+        it("should do something") {
+          withPayload("a payload") {
+            throw new TestFailedException("message", 3)
+          }
+        }
+      }
+    val rep = new EventRecordingReporter()
+    a.run(None, rep, new Stopper {}, Filter(), Map(), None, new Tracker())
+    rep.testFailedEventsReceived.length should be (1)
+    rep.testFailedEventsReceived(0).payload should be (Some("a payload"))
+  }
 }

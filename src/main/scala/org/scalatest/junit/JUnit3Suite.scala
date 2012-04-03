@@ -364,7 +364,14 @@ private[scalatest] class MyTestListener(report: Reporter, tracker: Tracker) exte
       throw new NullPointerException("throwable was null")
 
     val formatter = getIndentedText(testCase.toString, 1, true)
-    report(TestFailed(tracker.nextOrdinal(), getMessageGivenThrowable(throwable, false), getSuiteNameForTestCase(testCase), Some(testCase.getClass.getName), testCase.toString, Some(throwable), None, Some(formatter), None))
+    val payload = 
+      throwable match {
+        case modPayload: ModifiablePayload[_] => 
+          modPayload.payload
+        case _ => 
+          None
+      }
+    report(TestFailed(tracker.nextOrdinal(), getMessageGivenThrowable(throwable, false), getSuiteNameForTestCase(testCase), Some(testCase.getClass.getName), testCase.toString, Some(throwable), None, Some(formatter), None, payload))
 
     failedTestsSet += testCase
   }
@@ -377,6 +384,7 @@ private[scalatest] class MyTestListener(report: Reporter, tracker: Tracker) exte
       throw new NullPointerException("throwable was null")
 
     val formatter = getIndentedText(testCase.toString, 1, true)
+    
     report(TestFailed(tracker.nextOrdinal(), getMessageGivenThrowable(assertionFailedError, true), getSuiteNameForTestCase(testCase), Some(testCase.getClass.getName), testCase.toString, Some(assertionFailedError), None, Some(formatter), None))
 
     failedTestsSet += testCase
