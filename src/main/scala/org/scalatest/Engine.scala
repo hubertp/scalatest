@@ -61,7 +61,7 @@ private[scalatest] sealed abstract class SuperEngine[T](concurrentBundleModResou
   ) extends Node(Some(parent))
 
 
-  case class InfoLeaf(parent: Branch, message: String) extends Node(Some(parent))
+  case class InfoLeaf(parent: Branch, message: String, payload: Option[Any]) extends Node(Some(parent))
 
   case class DescriptionBranch(
     parent: Branch,
@@ -113,7 +113,17 @@ private[scalatest] sealed abstract class SuperEngine[T](concurrentBundleModResou
         throw new NullPointerException
       val oldBundle = atomic.get
       var (currentBranch, testNamesList, testsMap, tagsMap, registrationClosed) = oldBundle.unpack
-      currentBranch.subNodes ::= InfoLeaf(currentBranch, message)
+      currentBranch.subNodes ::= InfoLeaf(currentBranch, message, None)
+      updateAtomic(oldBundle, Bundle(currentBranch, testNamesList, testsMap, tagsMap, registrationClosed))
+    }
+    def apply(message: String, payload: Any) {
+      if (message == null)
+        throw new NullPointerException
+      if (payload == null)
+        throw new NullPointerException
+      val oldBundle = atomic.get
+      var (currentBranch, testNamesList, testsMap, tagsMap, registrationClosed) = oldBundle.unpack
+      currentBranch.subNodes ::= InfoLeaf(currentBranch, message, Some(payload))
       updateAtomic(oldBundle, Bundle(currentBranch, testNamesList, testsMap, tagsMap, registrationClosed))
     }
   }
@@ -127,6 +137,13 @@ private[scalatest] sealed abstract class SuperEngine[T](concurrentBundleModResou
       private val complaint = Resources("cantCallInfoNow", simpleClassName)
       def apply(message: String) {
         if (message == null)
+          throw new NullPointerException
+        throw new IllegalStateException(complaint)
+      }
+      def apply(message: String, payload: Any) {
+        if (message == null)
+          throw new NullPointerException
+        if (payload == null)
           throw new NullPointerException
         throw new IllegalStateException(complaint)
       }
@@ -167,7 +184,7 @@ private[scalatest] sealed abstract class SuperEngine[T](concurrentBundleModResou
 
     val informerForThisTest =
       MessageRecordingInformer2(
-        (message, isConstructingThread, testWasPending) => reportInfoProvided(theSuite, report, tracker, Some(testName), message, theTest.indentationLevel + 1, isConstructingThread, includeIcon, Some(testWasPending))
+        (message, payload, isConstructingThread, testWasPending) => reportInfoProvided(theSuite, report, tracker, Some(testName), message, payload, theTest.indentationLevel + 1, isConstructingThread, includeIcon, Some(testWasPending))
       )
 
     val oldInformer = atomicInformer.getAndSet(informerForThisTest)
@@ -220,7 +237,7 @@ private[scalatest] sealed abstract class SuperEngine[T](concurrentBundleModResou
 
         val descriptionTextWithOptionalPrefix = prependChildPrefix(parent, descriptionText)
         val indentationLevel = desc.indentationLevel
-        reportInfoProvided(theSuite, report, tracker, None, descriptionTextWithOptionalPrefix, indentationLevel, true, false)
+        reportInfoProvided(theSuite, report, tracker, None, descriptionTextWithOptionalPrefix, None, indentationLevel, true, false)
 
       case Trunk =>
     }
@@ -239,8 +256,8 @@ private[scalatest] sealed abstract class SuperEngine[T](concurrentBundleModResou
               else
                 runTest(testName, report, stopRequested, configMap, tracker)
 
-          case infoLeaf @ InfoLeaf(_, message) =>
-            reportInfoProvided(theSuite, report, tracker, None, message, infoLeaf.indentationLevel, true, includeIcon)
+          case infoLeaf @ InfoLeaf(_, message, payload) =>
+            reportInfoProvided(theSuite, report, tracker, None, message, payload, infoLeaf.indentationLevel, true, includeIcon)
 
           case branch: Branch => runTestsInBranch(theSuite, branch, report, stopRequested, filter, configMap, tracker, includeIcon, runTest)
         }
@@ -343,7 +360,7 @@ private[scalatest] sealed abstract class SuperEngine[T](concurrentBundleModResou
 
     val informerForThisSuite =
       ConcurrentInformer2(
-        (message, isConstructingThread) => reportInfoProvided(theSuite, report, tracker, None, message, 1, isConstructingThread)
+        (message, payload, isConstructingThread) => reportInfoProvided(theSuite, report, tracker, None, message, payload, 1, isConstructingThread)
       )
 
     atomicInformer.set(informerForThisSuite)
@@ -628,8 +645,8 @@ private[scalatest] class PathEngine(concurrentBundleModResourceName: String, sim
           //theTest.indentationLevel + 1
         val informerForThisTest =
           PathMessageRecordingInformer(
-            (message, wasConstructingThread, testWasPending, theSuite, report, tracker, testName, indentation, includeIcon, thread) =>
-              reportInfoProvided(theSuite, report, tracker, Some(testName), message, indentation, wasConstructingThread, includeIcon, Some(testWasPending))
+            (message, payload, wasConstructingThread, testWasPending, theSuite, report, tracker, testName, indentation, includeIcon, thread) =>
+              reportInfoProvided(theSuite, report, tracker, Some(testName), message, payload, indentation, wasConstructingThread, includeIcon, Some(testWasPending))
           )
 
         val oldInformer = atomicInformer.getAndSet(informerForThisTest)
@@ -775,7 +792,7 @@ private[scalatest] class PathEngine(concurrentBundleModResourceName: String, sim
 
     val informerForThisSuite =
       ConcurrentInformer2(
-        (message, isConstructingThread) => reportInfoProvided(theSuite, report, tracker, None, message, 1, isConstructingThread)
+        (message, payload, isConstructingThread) => reportInfoProvided(theSuite, report, tracker, None, message, payload, 1, isConstructingThread)
       )
 
     atomicInformer.set(informerForThisSuite)

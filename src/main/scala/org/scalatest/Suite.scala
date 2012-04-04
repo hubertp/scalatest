@@ -2034,7 +2034,7 @@ trait Suite extends Assertions with AbstractSuite with Serializable { thisSuite 
 
     val informerForThisTest =
       MessageRecordingInformer2(
-        (message, isConstructingThread, testWasPending) => reportInfoProvided(thisSuite, report, tracker, Some(testName), message, 2, isConstructingThread, true, Some(testWasPending))
+        (message, payload, isConstructingThread, testWasPending) => reportInfoProvided(thisSuite, report, tracker, Some(testName), message, payload, 2, isConstructingThread, true, Some(testWasPending))
       )
 
     val args: Array[Object] =
@@ -2896,6 +2896,7 @@ used for test events like succeeded/failed, etc.
     tracker: Tracker,
     testName: Option[String],
     message: String,
+    payload: Option[Any], 
     level: Int,
     includeNameInfo: Boolean,
     includeIcon: Boolean = true,
@@ -2911,7 +2912,8 @@ used for test events like succeeded/failed, etc.
           None,
         aboutAPendingTest,
         None,
-        Some(getIndentedTextForInfo(message, level, includeIcon, testName.isDefined))
+        Some(getIndentedTextForInfo(message, level, includeIcon, testName.isDefined)), 
+        payload
       )
     )
   }

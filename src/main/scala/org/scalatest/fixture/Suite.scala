@@ -519,7 +519,7 @@ trait Suite extends org.scalatest.Suite { thisSuite =>
 
     val informerForThisTest =
       MessageRecordingInformer2(
-      (message, isConstructingThread, testWasPending) => reportInfoProvided(thisSuite, report, tracker, Some(testName), message, 2, isConstructingThread, true, Some(testWasPending))
+      (message, payload, isConstructingThread, testWasPending) => reportInfoProvided(thisSuite, report, tracker, Some(testName), message, payload, 2, isConstructingThread, true, Some(testWasPending))
     )
 
     var testWasPending = false
@@ -559,7 +559,14 @@ trait Suite extends org.scalatest.Suite { thisSuite =>
                     def apply(message: String) {
                       if (message == null)
                         throw new NullPointerException
-                      reportInfoProvided(thisSuite, report, tracker, Some(testName), message, 2, true)
+                      reportInfoProvided(thisSuite, report, tracker, Some(testName), message, None, 2, true)
+                    }
+                    def apply(message: String, payload: Any) {
+                      if (message == null)
+                        throw new NullPointerException
+                      if (payload == null)
+                        throw new NullPointerException
+                      reportInfoProvided(thisSuite, report, tracker, Some(testName), message, Some(payload), 2, true)
                     }
                   }
                 Array(informer)
