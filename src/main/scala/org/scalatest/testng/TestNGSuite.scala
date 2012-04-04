@@ -33,10 +33,6 @@ import org.testng.TestListenerAdapter
  * method as a test using TestNG's <code>@Test</code> annotation, and supports all other TestNG annotations.
  * Here's an example:
  *
- * <p><b>BECAUSE OF A SCALADOC BUG IN SCALA 2.8, I HAD TO PUT A SPACE AFTER THE AT SIGN IN ANNOTATION EXAMPLES. IF YOU
- * WANT TO COPY AND PASTE FROM THESE EXAMPLES, YOU'LL NEED TO REMOVE THE SPACE BY HAND, OR COPY FROM
- * THE <a href="http://www.scalatest.org/scaladoc/doc-1.1/org/scalatest/testng/TestNGSuite.html">TESTNGSUITE SCALADOC FOR VERSION 1.1</a> INSTEAD, WHICH IS ALSO VALID FOR 1.3. - Bill Venners</b></p>
- *
  * <pre class="stHighlight">
  * import org.scalatest.testng.TestNGSuite
  * import org.testng.annotations.Test
@@ -48,13 +44,13 @@ import org.testng.TestListenerAdapter
  *   var sb: StringBuilder = _
  *   var lb: ListBuffer[String] = _
  * 
- *   @ Configuration(beforeTestMethod = true)
+ *   @Configuration(beforeTestMethod = true)
  *   def setUpFixture() {
  *     sb = new StringBuilder("ScalaTest is ")
  *     lb = new ListBuffer[String]
  *   }
  * 
- *   @ Test(invocationCount = 3)
+ *   @Test(invocationCount = 3)
  *   def easyTest() {
  *     sb.append("easy!")
  *     assert(sb.toString === "ScalaTest is easy!")
@@ -62,7 +58,7 @@ import org.testng.TestListenerAdapter
  *     lb += "sweet"
  *   }
  * 
- *   @ Test(groups = Array("com.mycompany.groups.SlowTest"))
+ *   @Test(groups = Array("com.mycompany.groups.SlowTest"))
  *   def funTest() {
  *     sb.append("fun!")
  *     assert(sb.toString === "ScalaTest is fun!")
@@ -73,7 +69,7 @@ import org.testng.TestListenerAdapter
  *
  * <p>
  * To execute <code>TestNGSuite</code>s with ScalaTest's <code>Runner</code>, you must include TestNG's jar file on the class path or runpath.
- * This version of <code>TestNGSuite</code> was tested with TestNG version 5.7.
+ * This version of <code>TestNGSuite</code> was tested with TestNG version 6.3.1.
  * </p>
  *
  * <p>
