@@ -287,8 +287,8 @@ trait TestNGSuite extends Suite { thisSuite =>
       val formatter = getIndentedText(testName, 1, true)
       val payload = 
       throwable match {
-        case modPayload: ModifiablePayload[_] => 
-          modPayload.payload
+        case optPayload: Payload => 
+          optPayload.payload
         case _ => 
           None
       }

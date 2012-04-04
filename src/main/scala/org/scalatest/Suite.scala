@@ -2318,8 +2318,8 @@ trait Suite extends Assertions with AbstractSuite with Serializable { thisSuite 
     val formatter = getIndentedText(testName, 1, true)
     val payload = 
       throwable match {
-        case modPayload: ModifiablePayload[_] => 
-          modPayload.payload
+        case optPayload: Payload => 
+          optPayload.payload
         case _ => 
           None
       }
@@ -2882,8 +2882,8 @@ used for test events like succeeded/failed, etc.
     val formatter = getIndentedText(testText, level, includeIcon)
     val payload = 
       throwable match {
-        case modPayload: ModifiablePayload[_] => 
-          modPayload.payload
+        case optPayload: Payload => 
+          optPayload.payload
         case _ => 
           None
       }

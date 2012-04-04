@@ -366,8 +366,8 @@ private[scalatest] class MyTestListener(report: Reporter, tracker: Tracker) exte
     val formatter = getIndentedText(testCase.toString, 1, true)
     val payload = 
       throwable match {
-        case modPayload: ModifiablePayload[_] => 
-          modPayload.payload
+        case optPayload: Payload => 
+          optPayload.payload
         case _ => 
           None
       }

@@ -41,10 +41,8 @@ package org.scalatest
  * as the lone <code>String</code> parameter.
  * </p>
  */
-trait ModifiablePayload[T <: Throwable] { this: Throwable =>
+trait ModifiablePayload[T <: Throwable] { this: Throwable with Payload =>
   
-  val payload: Option[Any]
-
   /**
    * Returns an instance of this exception's class, identical to this exception,
    * except with the payload option replaced with
