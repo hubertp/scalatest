@@ -220,8 +220,9 @@ class TestFailedException(
   /**
    * Returns a hash code value for this object.
    */
-  // Don't need to change it. Implementing it only so as to not freak out people who know
-  // that if you override equals you must override hashCode.
-  override def hashCode: Int = super.hashCode
+  override def hashCode: Int =
+    41 * (
+      super.hashCode
+    ) + payload.hashCode
 }
 
