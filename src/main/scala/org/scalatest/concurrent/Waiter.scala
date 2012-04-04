@@ -93,11 +93,11 @@ trait AsyncAssertions extends TimeoutConfiguration {
    *
    * <pre class="stHighlight">
    * import org.scalatest._
-   * import concurrent.AssyncAssertions
+   * import concurrent.AsyncAssertions
    * import matchers.ShouldMatchers
    * import scala.actors.Actor
    *
-   * class ExampleSuite extends FunSuite with ShouldMatchers with AssyncAssertions {
+   * class ExampleSuite extends FunSuite with ShouldMatchers with AsyncAssertions {
    *
    *   case class Message(text: String)
    *
