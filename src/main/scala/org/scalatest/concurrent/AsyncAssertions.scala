@@ -20,11 +20,16 @@ import Assertions.fail
 import time.{Second, Span}
 
 /**
- * Trait that facilitates performing assertions outside the main test thread, such as assertions in callback threads
+ * Trait that facilitates performing assertions outside the main test thread, such as assertions in callback methods
  * that are invoked asynchronously.
  *
  * <p>
- * To use <code>Waiter</code>, create an instance of it from the main test thread:
+ * Trait <code>AsyncAssertions</code> provides a <code>Waiter</code> class that you can use to orchestrate the inter-thread
+ * communication required to perform assertions outside the main test thread, and means to configure it.
+ * </p>
+ *
+ * <p>
+ * To use <code>Waiter</code>, create an instance of it in the main test thread:
  * </p>
  *
  * <pre class=stHighlight">
@@ -42,18 +47,28 @@ import time.{Second, Span}
  * <p>
  * The <code>await</code> call will block until it either receives a report of a failed assertion from a different thread, at which
  * point it will complete abruptly with the same exception, or until it is <em>dismissed</em> by a different thread (or threads), at
- * which point it will return normally. You an optionally specify a timeout and/or a number of dismissals to wait for:
+ * which point it will return normally. You an optionally specify a timeout, interval (the time <code>await</code> sleeps between checks), and/or a number
+ * of dismissals to wait for. Here's an example:
  * </p>
  *
  * <pre class="stHighlight">
- * w.await(timeout = 10, dismissals = 2)
+ * import org.scalatest.time.SpanSugar._
+ *
+ * w.await(timeout(10 millis), dismissals(2))
  * </pre>
  *
  * <p>
- * The default value for <code>timeout</code> is -1, which means wait until dismissed without a timeout. The default value for
+ * The default value for <code>timeout</code>, provided via an implicit <code>TimeoutConfig</code> parameter, is 1 second. The default value for
  * <code>dismissals</code> is 1. The <code>await</code> method will block until either it is dismissed a sufficient number of times by other threads or
  * an assertion fails in another thread. Thus if you just want to perform assertions in just one other thread, only that thread will be
  * performing a dismissal, so you can use the default value of 1 for <code>dismissals</code>.
+ * </p>
+ *
+ * <p>
+ * <code>Waiter</code> contains several overloaded forms of <code>await</code>, most of which take an implicit
+ * <code>TimeoutConfig</code> parameter. To change the default timeout configuration, override or hide
+ * (if you imported the members of <code>AsyncAssertions</code> companion object instead of mixing in the
+ * trait) <code>timeoutConfig</code> with a new one that returns your desired configuration.
  * </p>
  *
  * <p>
@@ -66,8 +81,7 @@ import time.{Second, Span}
  *
  * <p>
  * You may want to put <code>dismiss</code> invocations in a finally clause to ensure they happen even if an exception is thrown.
- * Otherwise if a dismissal is missed because of a thrown exception, an <code>await</code> call without a timeout will block forever.
- * If the <code>await</code> is called with a timeout, though, this won't be a problem.
+ * Otherwise if a dismissal is missed because of a thrown exception, an <code>await</code> call will wait until it times out.
  * </p>
  *
  * <p>
@@ -106,7 +120,7 @@ import time.{Second, Span}
  *     def act() {
  *       var done = false
  *       while (!done) {
- *         receive {
+ *         react {
  *           case msg: Message => handle(msg)
  *           case "Exit" => done = true
  *         }
@@ -134,13 +148,6 @@ import time.{Second, Span}
  * }
  * </pre>
  *
- * <p>
- * <code>Waiter</code> contains several overloaded forms of <code>await</code>, most of which take an implicit
- * <code>TimeoutConfig</code> parameter. To change the default timeout configuration, override or hide
- * (if you imported the members of <code>AsyncAssertions</code> companion object instead of mixing in the
- * trait) <code>timeoutConfig</code> with a new one that returns your desired configuration.
- * </p>
- *
  * @author Bill Venners
  */
 trait AsyncAssertions extends TimeoutConfiguration {
@@ -164,11 +171,11 @@ trait AsyncAssertions extends TimeoutConfiguration {
   def dismissals(value: Int) = Dismissals(value)
 
   /**
-   * Class that facilitates performing assertions outside the main test thread, such as assertions in callback threads
+   * Class that facilitates performing assertions outside the main test thread, such as assertions in callback methods
    * that are invoked asynchronously.
    *
    * <p>
-   * To use <code>Waiter</code>, create an instance of it from the main test thread:
+   * To use <code>Waiter</code>, create an instance of it in the main test thread:
    * </p>
    *
    * <pre class=stHighlight">
@@ -186,18 +193,28 @@ trait AsyncAssertions extends TimeoutConfiguration {
    * <p>
    * The <code>await</code> call will block until it either receives a report of a failed assertion from a different thread, at which
    * point it will complete abruptly with the same exception, or until it is <em>dismissed</em> by a different thread (or threads), at
-   * which point it will return normally. You an optionally specify a timeout and/or a number of dismissals to wait for:
+   * which point it will return normally. You an optionally specify a timeout, interval (the time <code>await</code> sleeps between checks), and/or a number
+   * of dismissals to wait for. Here's an example:
    * </p>
    *
    * <pre class="stHighlight">
-   * w.await(timeout = 10, dismissals = 2)
+   * import org.scalatest.time.SpanSugar._
+   *
+   * w.await(timeout(10 millis), dismissals(2))
    * </pre>
    *
    * <p>
-   * The default value for <code>timeout</code> is -1, which means wait until dismissed without a timeout. The default value for
+   * The default value for <code>timeout</code>, provided via an implicit <code>TimeoutConfig</code> parameter, is 1 second. The default value for
    * <code>dismissals</code> is 1. The <code>await</code> method will block until either it is dismissed a sufficient number of times by other threads or
    * an assertion fails in another thread. Thus if you just want to perform assertions in just one other thread, only that thread will be
    * performing a dismissal, so you can use the default value of 1 for <code>dismissals</code>.
+   * </p>
+   *
+   * <p>
+   * <code>Waiter</code> contains several overloaded forms of <code>await</code>, most of which take an implicit
+   * <code>TimeoutConfig</code> parameter. To change the default timeout configuration, override or hide
+   * (if you imported the members of <code>AsyncAssertions</code> companion object instead of mixing in the
+   * trait) <code>timeoutConfig</code> with a new one that returns your desired configuration.
    * </p>
    *
    * <p>
@@ -210,8 +227,7 @@ trait AsyncAssertions extends TimeoutConfiguration {
    *
    * <p>
    * You may want to put <code>dismiss</code> invocations in a finally clause to ensure they happen even if an exception is thrown.
-   * Otherwise if a dismissal is missed because of a thrown exception, an <code>await</code> call without a timeout will block forever.
-   * If the <code>await</code> is called with a timeout, though, this won't be a problem.
+   * Otherwise if a dismissal is missed because of a thrown exception, an <code>await</code> call will wait until it times out.
    * </p>
    *
    * <p>
@@ -250,7 +266,7 @@ trait AsyncAssertions extends TimeoutConfiguration {
    *     def act() {
    *       var done = false
    *       while (!done) {
-   *         receive {
+   *         react {
    *           case msg: Message => handle(msg)
    *           case "Exit" => done = true
    *         }
