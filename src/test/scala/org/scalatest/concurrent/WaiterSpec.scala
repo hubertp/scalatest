@@ -21,7 +21,7 @@ import SharedHelpers.thisLineNumber
 import time.{Span, Millis}
 
 class WaiterSpec extends fixture.FunSpec with ShouldMatchers with SharedHelpers with ConductorFixture with
-    OptionValues with AsynchAssertions {
+    OptionValues with AsyncAssertions {
 /*
   def withCause(cause: Throwable)(fun: => Unit) {
     try {

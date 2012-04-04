@@ -19,7 +19,7 @@ import org.scalatest._
 import Assertions.fail
 import time.{Second, Span}
 
-trait AsynchAssertions extends TimeoutConfiguration {
+trait AsyncAssertions extends TimeoutConfiguration {
 
   case class Dismissals(value: Int)
 
