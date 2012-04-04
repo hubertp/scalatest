@@ -289,7 +289,14 @@ trait TestNGSuite extends Suite { thisSuite =>
       val message = if (throwableOrNull != null && throwableOrNull.getMessage != null) throwableOrNull.getMessage else Resources("testNGConfigFailed")
       val testName = result.getName + params(result)
       val formatter = getIndentedText(testName, 1, true)
-      report(TestFailed(tracker.nextOrdinal(), message, thisSuite.suiteName, Some(thisSuite.getClass.getName), testName, throwable, None, Some(formatter), Some(new TestRerunner(className, result.getName)))) // Can I add a duration?
+      val payload = 
+      throwable match {
+        case modPayload: ModifiablePayload[_] => 
+          modPayload.payload
+        case _ => 
+          None
+      }
+      report(TestFailed(tracker.nextOrdinal(), message, thisSuite.suiteName, Some(thisSuite.getClass.getName), testName, throwable, None, Some(formatter), Some(new TestRerunner(className, result.getName)), payload)) // Can I add a duration?
     }
 
     /**
