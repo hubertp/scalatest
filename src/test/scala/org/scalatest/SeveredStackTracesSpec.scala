@@ -16,10 +16,11 @@
 package org.scalatest
 
 import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.exceptions._
 
 class SeveredStackTracesSpec extends FunSpec with ShouldMatchers with SeveredStackTraces {
 
-  val baseLineNumber = 22
+  val baseLineNumber = 23
 
   describe("A severed TestFailedException") {
 

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.scalatest
+package org.scalatest.exceptions
 
 /**
  * Exception class that encapsulates information about the stack depth at which the line of code that failed resides,

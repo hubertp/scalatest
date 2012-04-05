@@ -30,6 +30,7 @@ import org.scalatest.events.TestSucceeded
 import org.scalatest.events.TestFailed
 import org.scalatest.events.MotionToSuppress
 import Suite.getIndentedText
+import exceptions._
 
 /**
  * A <code>Suite</code> that is also a <code>junit.framework.TestCase</code>. 
@@ -366,7 +367,7 @@ private[scalatest] class MyTestListener(report: Reporter, tracker: Tracker) exte
     val formatter = getIndentedText(testCase.toString, 1, true)
     val payload = 
       throwable match {
-        case optPayload: Payload => 
+        case optPayload: PayloadField => 
           optPayload.payload
         case _ => 
           None

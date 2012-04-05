@@ -27,6 +27,7 @@ import java.util.Collections
 import java.util.HashSet
 import java.util.regex.Pattern
 import Suite.getIndentedText
+import exceptions._
 
   private[junit] class MyRunListener(report: Reporter,
                                      config: Map[String, Any],
@@ -54,7 +55,7 @@ import Suite.getIndentedText
       val formatter = getIndentedText(testName, 1, true)
       val payload = 
         throwable match {
-          case optPayload: Payload=> 
+          case optPayload: PayloadField => 
             optPayload.payload
           case _ => 
             None

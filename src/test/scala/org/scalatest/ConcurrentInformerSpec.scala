@@ -18,6 +18,7 @@ package org.scalatest
 
 import events.NameInfo
 import java.util.concurrent.atomic.AtomicBoolean
+import org.scalatest.exceptions._
 
 class ConcurrentInformerSpec extends fixture.FunSpec {
 

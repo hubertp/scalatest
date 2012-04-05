@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.scalatest
+package org.scalatest.exceptions
 
 /**
  * Exception that indicates a test failed.
@@ -46,7 +46,7 @@ class TestFailedException(
   cause: Option[Throwable],
   failedCodeStackDepthFun: StackDepthException => Int,
   val payload: Option[Any]
-) extends StackDepthException(messageFun, cause, failedCodeStackDepthFun) with ModifiableMessage[TestFailedException] with Payload with ModifiablePayload[TestFailedException] {
+) extends StackDepthException(messageFun, cause, failedCodeStackDepthFun) with ModifiableMessage[TestFailedException] with PayloadField with ModifiablePayload[TestFailedException] {
 
   // val payload: Option[Any] = None TODO Delete this if the parametric field works
 
