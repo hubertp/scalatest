@@ -22,7 +22,6 @@ import org.scalatest.events.SuiteAborted
 import org.scalatest.events.SuiteCompleted
 
 import java.io.File
-import org.scalatest.exceptions._
 
 class XmlReporterSuite extends FunSuite {
 

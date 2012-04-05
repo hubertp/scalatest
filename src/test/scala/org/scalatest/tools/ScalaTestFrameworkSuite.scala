@@ -17,7 +17,6 @@ package org.scalatest.tools
 
 import org.scalatest.FunSuite
 import org.scalatools.testing.Logger
-import org.scalatest.exceptions._
 
 class ScalaTestFrameworkSuite extends FunSuite{
 

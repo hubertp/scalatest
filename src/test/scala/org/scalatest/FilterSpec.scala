@@ -5,7 +5,6 @@ import scala.collection.immutable.TreeSet
 /*import org.scalacheck._
 import Arbitrary._
 import Prop._  */
-import org.scalatest.exceptions._
 
 class FilterSpec extends Spec {
 

@@ -17,7 +17,10 @@ package org.scalatest
 
 import scala.collection.immutable.TreeSet
 import org.scalatest.events._
-import org.scalatest.exceptions._
+/* Uncomment after remove type aliases in org.scalatest package object
+import org.scalatest.exceptions.NotAllowedException
+import org.scalatest.exceptions.TestFailedException
+*/
 
 class SuiteSuite extends Suite with PrivateMethodTester with SharedHelpers {
 

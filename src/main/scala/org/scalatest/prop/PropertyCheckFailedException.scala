@@ -16,8 +16,6 @@
 package org.scalatest
 package prop
 
-import org.scalatest.exceptions._
-
 /**
  * Exception that indicates a property check failed.
  *

@@ -25,7 +25,6 @@ import fixture.NoArgTestWrapper
 import scala.annotation.tailrec
 import org.scalatest.PathEngine.isInTargetPath
 import org.scalatest.events.SuiteAborted
-import org.scalatest.exceptions._
 
 // T will be () => Unit for FunSuite and FixtureParam => Any for fixture.FunSuite
 private[scalatest] sealed abstract class SuperEngine[T](concurrentBundleModResourceName: String, simpleClassName: String)  {

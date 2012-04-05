@@ -16,11 +16,10 @@
 package org.scalatest
 
 import org.scalatest.matchers.ShouldMatchers._
-import org.scalatest.exceptions._
 
 class TestFailedExceptionWithImportSpec extends FunSpec {
 
-  val baseLineNumber = 23
+  val baseLineNumber = 22
 
   describe("The TestFailedException") {
 
