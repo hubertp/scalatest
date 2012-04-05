@@ -17,7 +17,9 @@ package org.scalatest
 package prop
 
 import matchers.ShouldMatchers
+/* Uncomment this after removing the deprecated type aliases in the org.scalatest.prop package object
 import org.scalatest.exceptions.PropertyCheckFailedException
+*/
 
 class PropertyCheckFailedExceptionSuite extends FunSuite with ShouldMatchers {
 
