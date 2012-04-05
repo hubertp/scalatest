@@ -61,7 +61,7 @@ import java.awt.EventQueue
 import org.scalatest.prop.PropertyTestFailedException
 import org.scalatest.events._
 import EventToPresent.eventToEventToPresent
-import org.scalatest.exceptions._
+import org.scalatest.exceptions.StackDepth
 
 /**
  * The main class for Runner's GUI.

@@ -16,7 +16,7 @@
 package org.scalatest.prop
 
 import org.scalatest._
-import org.scalatest.exceptions._
+import org.scalatest.exceptions.StackDepthException
 
 /**
  * Exception that indicates a ScalaCheck property check failed.

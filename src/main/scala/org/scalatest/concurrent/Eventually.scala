@@ -24,7 +24,8 @@ import java.lang.annotation.AnnotationFormatError
 import org.scalatest.exceptions.StackDepthExceptionHelper.getStackDepthFun
 import org.scalatest.Suite.anErrorThatShouldCauseAnAbort
 import scala.annotation.tailrec
-import org.scalatest.exceptions._
+import org.scalatest.exceptions.TestFailedException
+import org.scalatest.exceptions.TestPendingException
 
 /**
  * Trait that provides the <code>eventually</code> construct, which periodically retries executing

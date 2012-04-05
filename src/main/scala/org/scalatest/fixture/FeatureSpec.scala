@@ -23,7 +23,7 @@ import java.util.concurrent.atomic.AtomicReference
 import java.util.ConcurrentModificationException
 import org.scalatest.events._
 import org.scalatest.Suite.anErrorThatShouldCauseAnAbort
-import org.scalatest.exceptions._
+import org.scalatest.exceptions.NotAllowedException
 
 /**
  * A sister trait to <code>org.scalatest.FeatureSpec</code> that can pass a fixture object into its tests.
