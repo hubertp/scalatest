@@ -17,6 +17,12 @@ package org.scalatest
 
 import scala.collection.immutable.TreeSet
 import org.scalatest.events._
+import java.lang.annotation.AnnotationFormatError
+import java.nio.charset.CoderMalfunctionError
+import javax.xml.parsers.FactoryConfigurationError
+import javax.xml.transform.TransformerFactoryConfigurationError
+import java.awt.AWTError
+
 /* Uncomment after remove type aliases in org.scalatest package object
 import org.scalatest.exceptions.NotAllowedException
 import org.scalatest.exceptions.TestFailedException
@@ -366,6 +372,22 @@ class SuiteSuite extends Suite with PrivateMethodTester with SharedHelpers {
     assert(rep.testFailedEventsReceived.size === 1)
     assert(rep.testFailedEventsReceived(0).throwable.get.asInstanceOf[TestFailedException].failedCodeFileName.get === "SuiteSuite.scala")
     assert(rep.testFailedEventsReceived(0).throwable.get.asInstanceOf[TestFailedException].failedCodeLineNumber.get === thisLineNumber - 8)
+  }
+
+  def testAnErrorThatShouldCauseAnAbort() {
+    expect(true) { Suite.anErrorThatShouldCauseAnAbort(new AnnotationFormatError("oops")) }
+    expect(true) { Suite.anErrorThatShouldCauseAnAbort(new AWTError("ouch")) }
+    expect(true) { Suite.anErrorThatShouldCauseAnAbort(new CoderMalfunctionError(new Exception)) }
+    expect(true) { Suite.anErrorThatShouldCauseAnAbort(new FactoryConfigurationError) }
+    expect(true) { Suite.anErrorThatShouldCauseAnAbort(new LinkageError) }
+    expect(true) { Suite.anErrorThatShouldCauseAnAbort(new ThreadDeath) }
+    expect(true) { Suite.anErrorThatShouldCauseAnAbort(new TransformerFactoryConfigurationError) }
+    expect(true) { Suite.anErrorThatShouldCauseAnAbort(new VirtualMachineError {}) }
+    expect(true) { Suite.anErrorThatShouldCauseAnAbort(new OutOfMemoryError) }
+    expect(false) { Suite.anErrorThatShouldCauseAnAbort(new AssertionError) }
+    expect(false) { Suite.anErrorThatShouldCauseAnAbort(new RuntimeException) }
+    expect(false) { Suite.anErrorThatShouldCauseAnAbort(new AssertionError) }
+    expect(false) { Suite.anErrorThatShouldCauseAnAbort(new AssertionError) }
   }
 }
 
