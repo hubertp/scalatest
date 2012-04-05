@@ -13,10 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.scalatest.prop
+package org.scalatest.exceptions
 
 import org.scalatest._
-import org.scalatest.exceptions.StackDepthException
 
 /**
  * Exception that indicates a ScalaCheck property check failed.

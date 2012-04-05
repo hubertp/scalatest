@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 package org.scalatest
-package prop
+package exceptions
 
 /**
  * Exception that indicates a property check failed.

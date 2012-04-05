@@ -22,6 +22,7 @@ import Prop._
 import org.scalatest.matchers.ShouldMatchers._
 import org.scalatest.SharedHelpers.thisLineNumber
 import org.scalatest.exceptions.TestFailedException
+import org.scalatest.exceptions.GeneratorDrivenPropertyCheckFailedException
 
 class CheckersSuite extends Suite with Checkers {
 
