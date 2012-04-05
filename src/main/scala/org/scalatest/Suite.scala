@@ -31,6 +31,7 @@ import Suite.stripDollars
 import Suite.formatterForSuiteStarting
 import Suite.formatterForSuiteCompleted
 import Suite.checkForPublicNoArgConstructor
+import Suite.checkChosenStyles
 import Suite.formatterForSuiteAborted
 import Suite.anErrorThatShouldCauseAnAbort
 import Suite.getSimpleNameOfAnObjectsClass
@@ -2089,17 +2090,6 @@ trait Suite extends Assertions with AbstractSuite with Serializable { thisSuite 
     }
   }
   
-  private[scalatest] def checkChosenStyles(configMap: Map[String, Any]) {
-    val chosenStyleSet = 
-        if (configMap.isDefinedAt("org.scalatest.ChosenStyles"))
-          configMap("org.scalatest.ChosenStyles").asInstanceOf[Set[String]]
-        else
-          Set.empty[String]
-    
-    if (chosenStyleSet.size > 0 && !chosenStyleSet.contains(styleName)) 
-      throw new NotAllowedException(Resources("suiteNotChosenAborted", styleName, chosenStyleSet.mkString(", ")), getStackDepthFun("Scala.scala", "checkChosenStyles"))
-  }
-
   /**
    * Run zero to many of this <code>Suite</code>'s tests.
    *
@@ -2188,8 +2178,10 @@ trait Suite extends Assertions with AbstractSuite with Serializable { thisSuite 
       throw new NullPointerException("distributor was null")
     if (tracker == null)
       throw new NullPointerException("tracker was null")
-    
-    checkChosenStyles(configMap)
+  
+    val theTestNames = testNames
+    if (testNames.size > 0)
+      checkChosenStyles(configMap, styleName)
 
     val stopRequested = stopper
 
@@ -2212,7 +2204,7 @@ trait Suite extends Assertions with AbstractSuite with Serializable { thisSuite 
         }
 
       case None =>
-        for ((tn, ignoreTest) <- filter(testNames, tags)) {
+        for ((tn, ignoreTest) <- filter(theTestNames, tags)) {
           if (!stopRequested()) {
             if (ignoreTest)
               reportTestIgnored(thisSuite, report, tracker, tn, tn, 1)
@@ -2582,7 +2574,7 @@ trait Suite extends Assertions with AbstractSuite with Serializable { thisSuite 
   /**
    * Suite style name.
    */
-  def styleName: String = "Suite"
+  val styleName: String = "Suite"
 }
 
 private[scalatest] object Suite {
@@ -2937,4 +2929,16 @@ used for test events like succeeded/failed, etc.
       )
     )
   }
+
+  def checkChosenStyles(configMap: Map[String, Any], styleName: String) {
+    val chosenStyleSet = 
+        if (configMap.isDefinedAt("org.scalatest.ChosenStyles"))
+          configMap("org.scalatest.ChosenStyles").asInstanceOf[Set[String]]
+        else
+          Set.empty[String]
+    
+    if (chosenStyleSet.size > 0 && !chosenStyleSet.contains(styleName)) 
+      throw new NotAllowedException(Resources("suiteNotChosenAborted", styleName, chosenStyleSet.mkString(", ")), getStackDepthFun("Scala.scala", "checkChosenStyles"))
+  }
 }
+

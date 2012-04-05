@@ -344,10 +344,10 @@ class SuiteSuite extends Suite with PrivateMethodTester with SharedHelpers {
     }
     
     val simpleSuite = new SimpleSuite()
-    simpleSuite.checkChosenStyles(Map.empty)
-    simpleSuite.checkChosenStyles(Map("org.scalatest.ChosenStyles" -> Set("Suite")))
+    simpleSuite.run(None, SilentReporter, new Stopper {}, Filter(), Map.empty, None, new Tracker)
+    simpleSuite.run(None, SilentReporter, new Stopper {}, Filter(), Map("org.scalatest.ChosenStyles" -> Set("Suite")), None, new Tracker)
     intercept[NotAllowedException] {
-      simpleSuite.checkChosenStyles(Map("org.scalatest.ChosenStyles" -> Set("FunSpec")))
+      simpleSuite.run(None, SilentReporter, new Stopper {}, Filter(), Map("org.scalatest.ChosenStyles" -> Set("FunSpec")), None, new Tracker)
     }
   }
   

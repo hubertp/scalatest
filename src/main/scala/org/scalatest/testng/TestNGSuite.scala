@@ -437,5 +437,5 @@ trait TestNGSuite extends Suite { thisSuite =>
   /**
    * Suite style name.
    */
-  final override def styleName: String = "TestNGSuite"
+  final override val styleName: String = "TestNGSuite"
 }

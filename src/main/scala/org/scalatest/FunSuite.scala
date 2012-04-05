@@ -1334,7 +1334,7 @@ trait FunSuite extends Suite { thisSuite =>
   /**
    * Suite style name.
    */
-  final override def styleName: String = "FunSuite"
+  final override val styleName: String = "FunSuite"
 }
 
 private[scalatest] object FunSuite {

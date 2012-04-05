@@ -522,5 +522,5 @@ trait PropSpec extends Suite { thisSuite =>
   /**
    * Suite style name.
    */
-  final override def styleName: String = "PropSpec"
+  final override val styleName: String = "PropSpec"
 }
