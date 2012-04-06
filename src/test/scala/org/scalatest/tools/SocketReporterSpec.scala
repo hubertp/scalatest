@@ -108,11 +108,13 @@ class SocketReporterSpec extends FunSpec with SharedHelpers with Eventually {
               }
               catch {
                 case e: SAXException => 
-                  Thread.sleep(10)
+                  if (!in.ready)
+                    Thread.sleep(10)
               }
             }
             else
-              Thread.sleep(10)
+              if (!in.ready)
+                Thread.sleep(10)
           }
           if (eventXml != null) {
             eventXml.label match {
@@ -135,8 +137,8 @@ class SocketReporterSpec extends FunSpec with SharedHelpers with Eventually {
               case "MarkupProvided" => markupProvidedList += eventXml
             }
           }
-          
-          Thread.sleep(10)
+          if (!in.ready)
+            Thread.sleep(10)
         }
       }
       finally {
@@ -324,7 +326,7 @@ class SocketReporterSpec extends FunSpec with SharedHelpers with Eventually {
       spec.run(None, rep, new Stopper {}, Filter(), Map(), None, new Tracker())
       eventRecorder.stopped = true
       rep.dispose()
-      eventually(timeout(10000)) { assert(eventRecorder.ready) } // Wait until the receiver is ready
+      eventually(timeout(30000)) { assert(eventRecorder.ready) } // Wait until the receiver is ready
       
         
       assert(eventRecorder.scopeOpenedEvents.length === 1)

@@ -127,17 +127,35 @@ sealed abstract class Event extends Ordered[Event] with java.io.Serializable {
         case None => ""
       }
     }
+    def getThrowableStackDepth(throwable: Throwable) = {
+      throwable match { 
+        case sde: StackDepthException => sde.failedCodeStackDepth 
+        case _ => -1
+      }
+    }
     def throwableOption(throwableOption: Option[Throwable]) = {
       throwableOption match {
         case Some(throwable) => 
           <message>{ throwable.getMessage }</message>
+          <depth>{ getThrowableStackDepth(throwable) }</depth>
           <stackTraces>
             {
-              val stringWriter = new StringWriter()
+              val stackTraces = throwable.getStackTrace
+              for (stackTrace <- stackTraces) yield {
+                <stackTrace>
+                  <className>{ stackTrace.getClassName }</className>
+                  <methodName>{ stackTrace.getMethodName }</methodName>
+                  <fileName>{ stackTrace.getFileName }</fileName>
+                  <lineNumber>{ stackTrace.getLineNumber }</lineNumber>
+                  <isNative>{ stackTrace.isNativeMethod }</isNative>
+                  <toString>{ stackTrace.toString }</toString>
+                </stackTrace>
+              }
+              /*val stringWriter = new StringWriter()
               val writer = new PrintWriter(new BufferedWriter(stringWriter))
               throwable.printStackTrace(writer)
               writer.flush()
-              stringWriter.toString
+              stringWriter.toString*/
             }
           </stackTraces>
         case None => ""
