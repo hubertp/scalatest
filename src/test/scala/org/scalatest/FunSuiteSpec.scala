@@ -700,6 +700,35 @@ class FunSuiteSpec extends FunSpec with SharedHelpers {
         suite.run(Some("three"), SilentReporter, new Stopper {}, Filter(), Map(), None, new Tracker)
       }
     }
+
+    it("should throw a NotAllowedException if chosenStyles is defined and does not include FunSuite") {
+
+      class SimpleSuite extends FunSuite {
+        test("one") {}
+        test("two") {}
+        test("three") {}
+      }
+
+      val simpleSuite = new SimpleSuite()
+      simpleSuite.run(None, SilentReporter, new Stopper {}, Filter(), Map.empty, None, new Tracker)
+      simpleSuite.run(None, SilentReporter, new Stopper {}, Filter(), Map("org.scalatest.ChosenStyles" -> Set("FunSuite")), None, new Tracker)
+      val caught =
+        intercept[NotAllowedException] {
+          simpleSuite.run(None, SilentReporter, new Stopper {}, Filter(), Map("org.scalatest.ChosenStyles" -> Set("FunSpec")), None, new Tracker)
+        }
+      import OptionValues._
+      assert(caught.message.value === Resources("notTheChosenStyle", "FunSuite", "FunSpec"))
+      val caught2 =
+        intercept[NotAllowedException] {
+          simpleSuite.run(None, SilentReporter, new Stopper {}, Filter(), Map("org.scalatest.ChosenStyles" -> Set("FunSpec", "FreeSpec")), None, new Tracker)
+        }
+      assert(caught2.message.value === Resources("notOneOfTheChosenStyles", "FunSuite", Suite.makeListForHumans(Vector("FunSpec", "FreeSpec"))))
+      val caught3 =
+        intercept[NotAllowedException] {
+          simpleSuite.run(None, SilentReporter, new Stopper {}, Filter(), Map("org.scalatest.ChosenStyles" -> Set("FunSpec", "FreeSpec", "FlatSpec")), None, new Tracker)
+        }
+      assert(caught3.message.value === Resources("notOneOfTheChosenStyles", "FunSuite", Suite.makeListForHumans(Vector("FunSpec", "FreeSpec", "FlatSpec"))))
+    }
   }
   
   describe("when failure happens") {

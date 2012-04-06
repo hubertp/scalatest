@@ -28,7 +28,7 @@ import org.scalatest.exceptions.NotAllowedException
 import org.scalatest.exceptions.TestFailedException
 */
 
-class SuiteSuite extends Suite with PrivateMethodTester with SharedHelpers {
+class SuiteSuite extends Suite with PrivateMethodTester with SharedHelpers with SeveredStackTraces {
 
   def testNamesAndGroupsMethodsDiscovered() {
 
@@ -355,11 +355,37 @@ class SuiteSuite extends Suite with PrivateMethodTester with SharedHelpers {
     val simpleSuite = new SimpleSuite()
     simpleSuite.run(None, SilentReporter, new Stopper {}, Filter(), Map.empty, None, new Tracker)
     simpleSuite.run(None, SilentReporter, new Stopper {}, Filter(), Map("org.scalatest.ChosenStyles" -> Set("Suite")), None, new Tracker)
-    intercept[NotAllowedException] {
-      simpleSuite.run(None, SilentReporter, new Stopper {}, Filter(), Map("org.scalatest.ChosenStyles" -> Set("FunSpec")), None, new Tracker)
-    }
+    val caught =
+      intercept[NotAllowedException] {
+        simpleSuite.run(None, SilentReporter, new Stopper {}, Filter(), Map("org.scalatest.ChosenStyles" -> Set("FunSpec")), None, new Tracker)
+      }
+    import OptionValues._
+    assert(caught.message.value === Resources("notTheChosenStyle", "Suite", "FunSpec"))
+    val caught2 =
+      intercept[NotAllowedException] {
+        simpleSuite.run(None, SilentReporter, new Stopper {}, Filter(), Map("org.scalatest.ChosenStyles" -> Set("FunSpec", "FreeSpec")), None, new Tracker)
+      }
+    assert(caught2.message.value === Resources("notOneOfTheChosenStyles", "Suite", Suite.makeListForHumans(Vector("FunSpec", "FreeSpec"))))
+    val caught3 =
+      intercept[NotAllowedException] {
+        simpleSuite.run(None, SilentReporter, new Stopper {}, Filter(), Map("org.scalatest.ChosenStyles" -> Set("FunSpec", "FreeSpec", "FlatSpec")), None, new Tracker)
+      }
+    assert(caught3.message.value === Resources("notOneOfTheChosenStyles", "Suite", Suite.makeListForHumans(Vector("FunSpec", "FreeSpec", "FlatSpec"))))
   }
-  
+
+  def testMakeListForHumans() {
+    assert(Suite.makeListForHumans(Vector.empty) === "<empty list>")
+    assert(Suite.makeListForHumans(Vector("")) === "\"\"")
+    assert(Suite.makeListForHumans(Vector("   ")) === "\"   \"")
+    assert(Suite.makeListForHumans(Vector("FunSuite FunSpec")) === "\"FunSuite FunSpec\"")
+    assert(Suite.makeListForHumans(Vector("hi")) === "hi")
+    assert(Suite.makeListForHumans(Vector("ho")) === "ho")
+    assert(Suite.makeListForHumans(Vector("hi", "ho")) === Resources("leftAndRight", "hi", "ho"))
+    assert(Suite.makeListForHumans(Vector("fee", "fie", "foe", "fum")) === "fee, fie, " + Resources("leftCommaAndRight", "foe", "fum"))
+    assert(Suite.makeListForHumans(Vector("A", "stitch", "in", "time", "saves", "nine")) === "A, stitch, in, time, " + Resources("leftCommaAndRight", "saves", "nine"))
+    assert(Suite.makeListForHumans(Vector("fee ", "fie", " foe", "fum")) === "\"fee \", fie, " + Resources("leftCommaAndRight", "\" foe\"", "fum"))
+  }
+
   def testStackDepth() {
     class TestSpec extends Suite {
       def testFailure() {

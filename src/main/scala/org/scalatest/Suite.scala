@@ -2179,7 +2179,7 @@ trait Suite extends Assertions with AbstractSuite with Serializable { thisSuite 
       throw new NullPointerException("tracker was null")
   
     val theTestNames = testNames
-    if (testNames.size > 0)
+    if (theTestNames.size > 0)
       checkChosenStyles(configMap, styleName)
 
     val stopRequested = stopper
@@ -2938,8 +2938,32 @@ used for test events like succeeded/failed, etc.
         else
           Set.empty[String]
     
-    if (chosenStyleSet.size > 0 && !chosenStyleSet.contains(styleName)) 
-      throw new NotAllowedException(Resources("suiteNotChosenAborted", styleName, chosenStyleSet.mkString(", ")), getStackDepthFun("Scala.scala", "checkChosenStyles"))
+    if (chosenStyleSet.size > 0 && !chosenStyleSet.contains(styleName)) {
+      val e =
+        if (chosenStyleSet.size == 1)
+          new NotAllowedException(Resources("notTheChosenStyle", styleName, chosenStyleSet.head), getStackDepthFun("Scala.scala", "checkChosenStyles"))
+        else
+          new NotAllowedException(Resources("notOneOfTheChosenStyles", styleName, Suite.makeListForHumans(Vector.empty ++ chosenStyleSet.iterator)), getStackDepthFun("Scala.scala", "checkChosenStyles"))
+      throw e
+    }
+  }
+
+  // If it contains a space, or is an empty string, put quotes around it. OTherwise people might
+  // get confused by the chosenStyles error message.
+  def makeListForHumans(words: Vector[String]): String = {
+    val quotedWords = words map { w =>
+      if (w.length == 0 || w.indexOf(' ') >= 0) "\"" + w + "\""
+      else w
+    }
+    quotedWords.length match {
+      case 0 => "<empty list>"
+      //case 1 if quotedWords(0).isEmpty => "\"\""
+      case 1 => quotedWords(0)
+      case 2 => Resources("leftAndRight", quotedWords(0), quotedWords(1))
+      case _ =>
+        val (leading, trailing) = quotedWords.splitAt(quotedWords.length - 2)
+        leading.mkString(", ") + ", " + Resources("leftCommaAndRight", trailing(0), trailing(1))
+    }
   }
 }
 
