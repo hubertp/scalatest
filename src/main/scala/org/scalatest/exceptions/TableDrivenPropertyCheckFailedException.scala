@@ -24,9 +24,10 @@ package exceptions
  * <a href="TableDrivenPropertyChecks.html">TableDrivenPropertyChecks</a>.
  * </p>
  *
- * @param messageFun a function that returns a detail message, not optional) for this <code>PropertyCheckFailedException</code>.
- * @param cause an optional cause, the <code>Throwable</code> that caused this <code>PropertyCheckFailedException</code> to be thrown.
+ * @param messageFun a function that returns a detail message, not optional) for this <code>TableDrivenPropertyCheckFailedException</code>.
+ * @param cause an optional cause, the <code>Throwable</code> that caused this <code>TableDrivenPropertyCheckFailedException</code> to be thrown.
  * @param failedCodeStackDepthFun a function that returns the depth in the stack trace of this exception at which the line of test code that failed resides.
+ * @param payload an optional payload, which ScalaTest will include in a resulting <code>TestFailed</code> event
  * @param undecoratedMessage just a short message that has no redundancy with args, labels, etc. The regular "message" has everything in it
  * @param args the argument values
  * @param namesOfArgs a list of string names for the arguments
@@ -40,8 +41,52 @@ class TableDrivenPropertyCheckFailedException(
   messageFun: StackDepthException => String,
   cause: Option[Throwable],
   failedCodeStackDepthFun: StackDepthException => Int,
+  payload: Option[Any],
   undecoratedMessage: String,
   args: List[Any],
   namesOfArgs: List[String],
   val row: Int
-) extends PropertyCheckFailedException(messageFun, cause, failedCodeStackDepthFun, undecoratedMessage, args, Some(namesOfArgs))
+) extends PropertyCheckFailedException(
+  messageFun, cause, failedCodeStackDepthFun, payload, undecoratedMessage, args, Some(namesOfArgs)
+) {
+
+  /**
+   * This constructor has been deprecated and will be removed in a future version of ScalaTest. Please
+   * use the primary constructor instead.
+   */
+  @deprecated("Please use the primary constructor instead.")
+  def this(
+    messageFun: StackDepthException => String,
+    cause: Option[Throwable],
+    failedCodeStackDepthFun: StackDepthException => Int,
+    undecoratedMessage: String,
+    args: List[Any],
+    namesOfArgs: List[String],
+    row: Int
+  ) = this(messageFun, cause, failedCodeStackDepthFun, None, undecoratedMessage, args, namesOfArgs, row)
+
+  /**
+   * Returns an instance of this exception's class, identical to this exception,
+   * except with the payload option replaced with the result of passing
+   * the current payload option to the passed function, <code>fun</code>.
+   *
+   * @param fun A function that, given the current optional payload, will produce
+   * the modified optional payload for the result instance of <code>TableDrivenPropertyCheckFailedException</code>.
+   */
+  override def modifyPayload(fun: Option[Any] => Option[Any]): TableDrivenPropertyCheckFailedException = {
+    val currentPayload = payload
+    val mod =
+      new TableDrivenPropertyCheckFailedException(
+        messageFun,
+        cause,
+        failedCodeStackDepthFun,
+        fun(currentPayload),
+        undecoratedMessage,
+        args,
+        namesOfArgs,
+        row
+      )
+    mod.setStackTrace(getStackTrace)
+    mod
+  }
+}

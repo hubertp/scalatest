@@ -24,14 +24,16 @@ import time.{Span, Second}
 import org.scalatest.exceptions.TestFailedException
 */
 
-class PayloadSpec extends FlatSpec with SharedHelpers with ShouldMatchers with TableDrivenPropertyChecks with Payloads {
+class PayloadSpec extends FlatSpec with SharedHelpers with ShouldMatchers with TableDrivenPropertyChecks with Payloads with SeveredStackTraces {
 
   def examples =
     Table(
       "exception",
       new TestFailedException("message", 3),
-      new TestFailedDueToTimeoutException(e => Some("message"), None, e => 3, None, Span(1, Second))
-    )
+      new TestFailedDueToTimeoutException(e => Some("message"), None, e => 3, None, Span(1, Second)),
+      new TableDrivenPropertyCheckFailedException(e => "message", None, e => 3, "undecMsg", List.empty, List.empty, 3),
+      new GeneratorDrivenPropertyCheckFailedException(e => "message", None, e => 3, "undecMsg", List.empty, Option(List.empty), List.empty)
+   )
 
   "The modifyPayload method on TFE" should "return the an exception with an equal message option if passed a function that returns the same option passed to it" in {
     forAll (examples) { e =>

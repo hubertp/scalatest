@@ -33,8 +33,8 @@ class ClueSpec extends FlatSpec with ShouldMatchers with TableDrivenPropertyChec
     Table(
       "exception",
       new TestFailedException("message", 3),
-      new JUnitTestFailedError("message", 3)//,
-      //new TestFailedDueToTimeoutException(e => Some("message"), None, e => 3, None, Span(1, Second))
+      new JUnitTestFailedError("message", 3),
+      new TestFailedDueToTimeoutException(e => Some("message"), None, e => 3, None, Span(1, Second))
     )
 
   // TOTEST: clue object with toString. clue object with null toString. all-whitespace clue string

@@ -24,6 +24,7 @@ import org.scalatest._
  * @param messageFun a function that returns a detail message (not optional) for this <code>GeneratorDrivenPropertyCheckFailedException</code>.
  * @param cause an optional cause, the <code>Throwable</code> that caused this <code>GeneratorDrivenPropertyCheckFailedException</code> to be thrown.
  * @param failedCodeStackDepthFun a function that returns the depth in the stack trace of this exception at which the line of test code that failed resides.
+ * @param payload an optional payload, which ScalaTest will include in a resulting <code>TestFailed</code> event
  * @param undecoratedMessage just a short message that has no redundancy with args, labels, etc. The regular "message" has everything in it.
  * @param args the argument values, if any, that caused the property check to fail.
  * @param namesOfArgs an optional list of string names for the arguments.
@@ -37,9 +38,52 @@ class GeneratorDrivenPropertyCheckFailedException(
   messageFun: StackDepthException => String,
   cause: Option[Throwable],
   failedCodeStackDepthFun: StackDepthException => Int,
+  payload: Option[Any],
   undecoratedMessage: String,
   args: List[Any],
   namesOfArgs: Option[List[String]],
   val labels: List[String]
-) extends PropertyCheckFailedException(messageFun, cause, failedCodeStackDepthFun, undecoratedMessage, args, namesOfArgs)
+) extends PropertyCheckFailedException(
+  messageFun, cause, failedCodeStackDepthFun, payload, undecoratedMessage, args, namesOfArgs
+) {
+  /**
+   * This constructor has been deprecated and will be removed in a future version of ScalaTest. Please
+   * use the primary constructor instead.
+   */
+  @deprecated("Please use the primary constructor instead.")
+  def this(
+    messageFun: StackDepthException => String,
+    cause: Option[Throwable],
+    failedCodeStackDepthFun: StackDepthException => Int,
+    undecoratedMessage: String,
+    args: List[Any],
+    namesOfArgs: Option[List[String]],
+    labels: List[String]
+ ) = this(messageFun, cause, failedCodeStackDepthFun, None, undecoratedMessage, args, namesOfArgs, labels)
+
+  /**
+   * Returns an instance of this exception's class, identical to this exception,
+   * except with the payload option replaced with the result of passing
+   * the current payload option to the passed function, <code>fun</code>.
+   *
+   * @param fun A function that, given the current optional payload, will produce
+   * the modified optional payload for the result instance of <code>TableDrivenPropertyCheckFailedException</code>.
+   */
+  override def modifyPayload(fun: Option[Any] => Option[Any]): GeneratorDrivenPropertyCheckFailedException = {
+    val currentPayload = payload
+    val mod =
+      new GeneratorDrivenPropertyCheckFailedException(
+        messageFun,
+        cause,
+        failedCodeStackDepthFun,
+        fun(currentPayload),
+        undecoratedMessage,
+        args,
+        namesOfArgs,
+        labels
+      )
+    mod.setStackTrace(getStackTrace)
+    mod
+  }
+}
 
