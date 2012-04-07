@@ -17,17 +17,19 @@ package org.scalatest.exceptions
 
 import org.scalatest._
 
+// TODO: A test and code for null labels throwing an NPE
 /**
  * Exception that indicates a ScalaCheck property check failed.
  *
- * @param message an detail message for this <code>ScalaCheckPropertyCheckFailedException</code>.
- * @param cause an optional cause, the <code>Throwable</code> that caused this <code>TestFailedException</code> to be thrown.
- * @param failedCodeStackDepth the depth in the stack trace of this exception at which the line of test code that failed resides.
- * @param undecoratedMessage just a short message that has no redundancy with args, labels, etc. The regular "message" has everything in it
- * @param args the argument values, if any
+ * @param messageFun a function that returns a detail message (not optional) for this <code>GeneratorDrivenPropertyCheckFailedException</code>.
+ * @param cause an optional cause, the <code>Throwable</code> that caused this <code>GeneratorDrivenPropertyCheckFailedException</code> to be thrown.
+ * @param failedCodeStackDepthFun a function that returns the depth in the stack trace of this exception at which the line of test code that failed resides.
+ * @param undecoratedMessage just a short message that has no redundancy with args, labels, etc. The regular "message" has everything in it.
+ * @param args the argument values, if any, that caused the property check to fail.
+ * @param namesOfArgs an optional list of string names for the arguments.
  * @param labels the labels, if any (see the ScalaCheck user guide for information on labels)
  *
- * @throws NullPointerException if either <code>message</code> or <code>cause</code> is <code>null</code>, or <code>Some(null)</code>.
+ * @throws NullPointerException if any parameter is <code>null</code> or <code>Some(null)</code>.
  *
  * @author Bill Venners
  */

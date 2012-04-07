@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 package org.scalatest
-package prop
+package exceptions
 
 import matchers.ShouldMatchers
+import org.scalatest.prop._
 /* Uncomment this after removing the deprecated type aliases in the org.scalatest.prop package object
 import org.scalatest.exceptions.PropertyCheckFailedException
 */
 
-class PropertyCheckFailedExceptionSuite extends FunSuite with ShouldMatchers {
+class GeneratorDrivenPropertyCheckFailedExceptionSuite extends FunSuite with ShouldMatchers {
 
   test("PropertyCheckFailedException's argNames method should return argN if no argument names are passed to the constructor") {
 

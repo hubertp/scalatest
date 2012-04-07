@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.scalatest.prop
+package org.scalatest.exceptions
 
 import org.scalatest.FunSpec
 import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.SharedHelpers.thisLineNumber
+import org.scalatest.prop._
 /* Uncomment this after removing the deprecated type aliases in the org.scalatest.prop package object
 import org.scalatest.exceptions.TableDrivenPropertyCheckFailedException
 */
