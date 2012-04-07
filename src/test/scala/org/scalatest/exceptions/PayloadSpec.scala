@@ -18,6 +18,8 @@ package exceptions
 
 import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.prop.TableDrivenPropertyChecks
+import time.{Span, Second}
+
 /* Uncomment after remove type aliases in org.scalatest package object
 import org.scalatest.exceptions.TestFailedException
 */
@@ -27,8 +29,8 @@ class PayloadSpec extends FlatSpec with SharedHelpers with ShouldMatchers with T
   def examples =
     Table(
       "exception",
-      new TestFailedException("before", 3),
-      new TestFailedException("message", 3)
+      new TestFailedException("message", 3),
+      new TestFailedDueToTimeoutException(e => Some("message"), None, e => 3, None, Span(1, Second))
     )
 
   "The modifyPayload method on TFE" should "return the an exception with an equal message option if passed a function that returns the same option passed to it" in {
@@ -67,7 +69,7 @@ class PayloadSpec extends FlatSpec with SharedHelpers with ShouldMatchers with T
     }
   }
   
-  it should "given a payload, should throw a new ModifiablePayload with the given payload" in {
+  it should "given a payload, should throw a new ModifiablePayload of the same class with the given payload" in {
     // val tfe = new TestFailedException("message", 3)
     forAll (examples) { e =>
       val caught = intercept[TestFailedException] {
@@ -77,9 +79,10 @@ class PayloadSpec extends FlatSpec with SharedHelpers with ShouldMatchers with T
       }
       caught should not be theSameInstanceAs (e)
       caught.payload should be (Some("a payload"))
+      caught.getClass should be theSameInstanceAs (e.getClass)
     }
   }
-  
+
   it should "forward the payload to be carried in TestFailed event" in {
     forAll (examples) { e =>
       val a = 
