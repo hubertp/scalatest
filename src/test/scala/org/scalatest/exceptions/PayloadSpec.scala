@@ -61,7 +61,7 @@ class PayloadSpec extends FlatSpec with SharedHelpers with ShouldMatchers with T
 
   it should "given a null payload, rethrow the same ModifiablePayload exception" in {
     forAll (examples) { e =>
-      val caught = intercept[TestFailedException] {
+      val caught = intercept[PayloadField] {
         withPayload(null) {
           throw e 
         }
@@ -72,7 +72,7 @@ class PayloadSpec extends FlatSpec with SharedHelpers with ShouldMatchers with T
   
   it should "given a payload, should throw a new ModifiablePayload of the same class with the given payload" in {
     forAll (examples) { e =>
-      val caught = intercept[TestFailedException] {
+      val caught = intercept[PayloadField] {
         withPayload("a payload") {
           throw e 
         }

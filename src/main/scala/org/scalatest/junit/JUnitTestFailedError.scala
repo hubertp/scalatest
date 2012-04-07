@@ -67,6 +67,11 @@ import org.scalatest.exceptions.{PayloadField, ModifiablePayload, StackDepth, Mo
 class JUnitTestFailedError(val message: Option[String], val cause: Option[Throwable], val failedCodeStackDepth: Int, val payload: Option[Any])
     extends AssertionFailedError(if (message.isDefined) message.get else "") with StackDepth with ModifiableMessage[JUnitTestFailedError]  with PayloadField with ModifiablePayload[JUnitTestFailedError] {
 
+  /**
+   * This constructor has been deprecated and will be removed in a future version of ScalaTest. Please
+   * use the primary constructor instead.
+   */
+  @deprecated("Please use the primary constructor instead.")
   def this(message: Option[String], cause: Option[Throwable], failedCodeStackDepth: Int) =
     this(message, cause, failedCodeStackDepth, None)
 
