@@ -34,14 +34,12 @@ class PayloadSpec extends FlatSpec with SharedHelpers with ShouldMatchers with T
     )
 
   "The modifyPayload method on TFE" should "return the an exception with an equal message option if passed a function that returns the same option passed to it" in {
-    // val tfe = new TestFailedException("before", 3)
     forAll (examples) { e =>
       e.modifyPayload(opt => opt) should equal (e)
     }
   }
 
   it should "return the new exception with the replaced payload" in {
-    // val tfe = new TestFailedException("message", 3)
     forAll (examples) { e =>
       e.modifyPayload(opt => Some("a payload")).payload.get should be ("a payload")
     }
@@ -59,7 +57,6 @@ class PayloadSpec extends FlatSpec with SharedHelpers with ShouldMatchers with T
 
   it should "given a null payload, rethrow the same ModifiablePayload exception" in {
     forAll (examples) { e =>
-      // val tfe = new TestFailedException("before", 3)
       val caught = intercept[TestFailedException] {
         withPayload(null) {
           throw e 
@@ -70,7 +67,6 @@ class PayloadSpec extends FlatSpec with SharedHelpers with ShouldMatchers with T
   }
   
   it should "given a payload, should throw a new ModifiablePayload of the same class with the given payload" in {
-    // val tfe = new TestFailedException("message", 3)
     forAll (examples) { e =>
       val caught = intercept[TestFailedException] {
         withPayload("a payload") {
