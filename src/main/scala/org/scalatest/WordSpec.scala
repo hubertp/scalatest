@@ -2319,5 +2319,5 @@ one error found
   /**
    * Suite style name.
    */
-  final override val styleName: String = "WordSpec"
+  final override val styleName: String = "org.scalatest.WordSpec"
 }

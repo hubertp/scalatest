@@ -711,23 +711,23 @@ class FunSuiteSpec extends FunSpec with SharedHelpers {
 
       val simpleSuite = new SimpleSuite()
       simpleSuite.run(None, SilentReporter, new Stopper {}, Filter(), Map.empty, None, new Tracker)
-      simpleSuite.run(None, SilentReporter, new Stopper {}, Filter(), Map("org.scalatest.ChosenStyles" -> Set("FunSuite")), None, new Tracker)
+      simpleSuite.run(None, SilentReporter, new Stopper {}, Filter(), Map("org.scalatest.ChosenStyles" -> Set("org.scalatest.FunSuite")), None, new Tracker)
       val caught =
         intercept[NotAllowedException] {
-          simpleSuite.run(None, SilentReporter, new Stopper {}, Filter(), Map("org.scalatest.ChosenStyles" -> Set("FunSpec")), None, new Tracker)
+          simpleSuite.run(None, SilentReporter, new Stopper {}, Filter(), Map("org.scalatest.ChosenStyles" -> Set("org.scalatest.FunSpec")), None, new Tracker)
         }
       import OptionValues._
-      assert(caught.message.value === Resources("notTheChosenStyle", "FunSuite", "FunSpec"))
+      assert(caught.message.value === Resources("notTheChosenStyle", "org.scalatest.FunSuite", "org.scalatest.FunSpec"))
       val caught2 =
         intercept[NotAllowedException] {
-          simpleSuite.run(None, SilentReporter, new Stopper {}, Filter(), Map("org.scalatest.ChosenStyles" -> Set("FunSpec", "FreeSpec")), None, new Tracker)
+          simpleSuite.run(None, SilentReporter, new Stopper {}, Filter(), Map("org.scalatest.ChosenStyles" -> Set("org.scalatest.FunSpec", "org.scalatest.FreeSpec")), None, new Tracker)
         }
-      assert(caught2.message.value === Resources("notOneOfTheChosenStyles", "FunSuite", Suite.makeListForHumans(Vector("FunSpec", "FreeSpec"))))
+      assert(caught2.message.value === Resources("notOneOfTheChosenStyles", "org.scalatest.FunSuite", Suite.makeListForHumans(Vector("org.scalatest.FunSpec", "org.scalatest.FreeSpec"))))
       val caught3 =
         intercept[NotAllowedException] {
-          simpleSuite.run(None, SilentReporter, new Stopper {}, Filter(), Map("org.scalatest.ChosenStyles" -> Set("FunSpec", "FreeSpec", "FlatSpec")), None, new Tracker)
+          simpleSuite.run(None, SilentReporter, new Stopper {}, Filter(), Map("org.scalatest.ChosenStyles" -> Set("org.scalatest.FunSpec", "org.scalatest.FreeSpec", "org.scalatest.FlatSpec")), None, new Tracker)
         }
-      assert(caught3.message.value === Resources("notOneOfTheChosenStyles", "FunSuite", Suite.makeListForHumans(Vector("FunSpec", "FreeSpec", "FlatSpec"))))
+      assert(caught3.message.value === Resources("notOneOfTheChosenStyles", "org.scalatest.FunSuite", Suite.makeListForHumans(Vector("org.scalatest.FunSpec", "org.scalatest.FreeSpec", "org.scalatest.FlatSpec"))))
     }
   }
   

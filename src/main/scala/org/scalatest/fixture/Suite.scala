@@ -640,6 +640,11 @@ trait Suite extends org.scalatest.Suite { thisSuite =>
          throw new IllegalArgumentException(Resources("testNotFound", testName))
      }
   }
+  
+  /**
+   * Suite style name.
+   */
+  override val styleName: String = "org.scalatest.fixture.Suite"
 }
 
 private object Suite {

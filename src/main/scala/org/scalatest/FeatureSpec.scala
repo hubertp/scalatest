@@ -1783,5 +1783,5 @@ trait FeatureSpec extends Suite { thisSuite =>
   /**
    * Suite style name.
    */
-  final override val styleName: String = "FeatureSpec"
+  final override val styleName: String = "org.scalatest.FeatureSpec"
 }
