@@ -15,7 +15,7 @@
  */
 package org.scalatest
 
-import exceptions.TestFailedDueToTimeoutException
+import exceptions.{GeneratorDrivenPropertyCheckFailedException, TableDrivenPropertyCheckFailedException, TestFailedDueToTimeoutException}
 import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.junit.JUnitTestFailedError
 import prop.TableDrivenPropertyChecks
@@ -34,8 +34,10 @@ class ClueSpec extends FlatSpec with ShouldMatchers with TableDrivenPropertyChec
       "exception",
       new TestFailedException("message", 3),
       new JUnitTestFailedError("message", 3),
-      new TestFailedDueToTimeoutException(e => Some("message"), None, e => 3, None, Span(1, Second))
-    )
+      new TestFailedDueToTimeoutException(e => Some("message"), None, e => 3, None, Span(1, Second)),
+      new TableDrivenPropertyCheckFailedException(e => "message", None, e => 3, None, "undecMsg", List.empty, List.empty, 3),
+      new GeneratorDrivenPropertyCheckFailedException(e => "message", None, e => 3, None, "undecMsg", List.empty, Option(List.empty), List.empty)
+   )
 
   // TOTEST: clue object with toString. clue object with null toString. all-whitespace clue string
   "The modifyMessage method" should "return the an exception with an equal message option if passed a function that returns the same option passed to it" in {

@@ -26,7 +26,7 @@ import org.scalatest.exceptions.TestFailedException
 
 class PayloadSpec extends FlatSpec with SharedHelpers with ShouldMatchers with TableDrivenPropertyChecks with Payloads with SeveredStackTraces {
 
-  def examples =
+  def examples =  // TODO, also support payloads in JUnit errors
     Table(
       "exception",
       new TestFailedException("message", 3),

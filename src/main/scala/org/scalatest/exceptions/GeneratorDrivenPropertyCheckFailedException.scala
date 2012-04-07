@@ -63,6 +63,30 @@ class GeneratorDrivenPropertyCheckFailedException(
 
   /**
    * Returns an instance of this exception's class, identical to this exception,
+   * except with the detail message option string replaced with the result of passing
+   * the current detail message to the passed function, <code>fun</code>.
+   *
+   * @param fun A function that, given the current optional detail message, will produce
+   * the modified optional detail message for the result instance of <code>GeneratorDrivenPropertyCheckFailedException</code>.
+   */
+  override def modifyMessage(fun: Option[String] => Option[String]): GeneratorDrivenPropertyCheckFailedException = {
+    val mod =
+      new GeneratorDrivenPropertyCheckFailedException(
+        sde => fun(message).getOrElse(messageFun(this)),
+        cause,
+        failedCodeStackDepthFun,
+        payload,
+        undecoratedMessage,
+        args,
+        namesOfArgs,
+        labels
+      )
+    mod.setStackTrace(getStackTrace)
+    mod
+  }
+
+  /**
+   * Returns an instance of this exception's class, identical to this exception,
    * except with the payload option replaced with the result of passing
    * the current payload option to the passed function, <code>fun</code>.
    *
