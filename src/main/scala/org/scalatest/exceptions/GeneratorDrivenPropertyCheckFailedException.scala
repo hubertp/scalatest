@@ -39,5 +39,5 @@ class GeneratorDrivenPropertyCheckFailedException(
   args: List[Any],
   namesOfArgs: Option[List[String]],
   val labels: List[String]
-) extends PropertyCheckFailedException(messageFun, cause, failedCodeStackDepthFun, undecoratedMessage, args, None)
+) extends PropertyCheckFailedException(messageFun, cause, failedCodeStackDepthFun, undecoratedMessage, args, namesOfArgs)
 

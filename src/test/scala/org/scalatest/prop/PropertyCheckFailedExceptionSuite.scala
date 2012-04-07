@@ -26,13 +26,14 @@ class PropertyCheckFailedExceptionSuite extends FunSuite with ShouldMatchers {
   test("PropertyCheckFailedException's argNames method should return argN if no argument names are passed to the constructor") {
 
     val e =
-      new PropertyCheckFailedException(
+      new GeneratorDrivenPropertyCheckFailedException(
         sde => "msg",
         None,
         sde => 7,
         "msg",
         List(1, 2, 3),
-        None
+        None,
+        List.empty
       )
 
     e.argNames should be (List("arg0", "arg1", "arg2"))
@@ -41,13 +42,14 @@ class PropertyCheckFailedExceptionSuite extends FunSuite with ShouldMatchers {
   test("PropertyCheckFailedException's argNames method should return the passed argument names if supplied to the constructor") {
 
     val e =
-      new PropertyCheckFailedException(
+      new GeneratorDrivenPropertyCheckFailedException(
         sde => "msg",
         None,
         sde => 7,
         "msg",
         List(1, 2, 3),
-        Some(List("a", "b", "c"))
+        Some(List("a", "b", "c")),
+        List.empty
       )
 
     e.argNames should be (List("a", "b", "c"))

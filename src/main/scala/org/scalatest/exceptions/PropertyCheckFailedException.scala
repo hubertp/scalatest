@@ -30,7 +30,7 @@ package exceptions
  *
  * @author Bill Venners
  */
-class PropertyCheckFailedException(
+abstract class PropertyCheckFailedException(
   messageFun: StackDepthException => String,
   cause: Option[Throwable],
   failedCodeStackDepthFun: StackDepthException => Int,
