@@ -337,6 +337,7 @@ $namesAndValues$
               "  )",
             Some(ex),
             getStackDepthFun("TableDrivenPropertyChecks.scala", "forAll", 2),
+            None,
             FailureMessages("undecoratedPropertyCheckFailureMessage"),
             List($alphaLower$),
             List($alphaName$),

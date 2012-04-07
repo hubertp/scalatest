@@ -45,7 +45,7 @@ abstract class PropertyCheckFailedException(
    * This constructor has been deprecated and will be removed in a future version of ScalaTest. Please
    * use the primary constructor instead.
    */
-/*  @deprecated("Please use the primary constructor instead.")
+  @deprecated("Please use the primary constructor instead.")
   def this(
     messageFun: StackDepthException => String,
     cause: Option[Throwable],
@@ -53,7 +53,7 @@ abstract class PropertyCheckFailedException(
     undecoratedMessage: String,
     args: List[Any],
     optionalArgNames: Option[List[String]]
-   ) = this(messageFun, cause, failedCodeStackDepthFun, None, args, optionalArgNames)   */
+   ) = this(messageFun, cause, failedCodeStackDepthFun, None, undecoratedMessage, args, optionalArgNames)
   
   if (messageFun == null) throw new NullPointerException("messageFun was null")
 
