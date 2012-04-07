@@ -19,6 +19,7 @@ package exceptions
 import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.prop.TableDrivenPropertyChecks
 import time.{Span, Second}
+import junit.JUnitTestFailedError
 
 /* Uncomment after remove type aliases in org.scalatest package object
 import org.scalatest.exceptions.TestFailedException
@@ -30,6 +31,7 @@ class PayloadSpec extends FlatSpec with SharedHelpers with ShouldMatchers with T
     Table(
       "exception",
       new TestFailedException("message", 3),
+      new JUnitTestFailedError("message", 3),
       new TestFailedDueToTimeoutException(e => Some("message"), None, e => 3, None, Span(1, Second)),
       new TableDrivenPropertyCheckFailedException(e => "message", None, e => 3, None, "undecMsg", List.empty, List.empty, 3),
       new GeneratorDrivenPropertyCheckFailedException(e => "message", None, e => 3, None, "undecMsg", List.empty, Option(List.empty), List.empty)
