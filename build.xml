@@ -194,7 +194,8 @@
 
         <!-- Compile the Scala code from ${scalasrc} into ${classes}. Scalac will parse the referenced .java files. -->
         <!-- Compile the Scala code from ${build.generated.src} into ${classes}. Scalac will parse any referenced .java files. -->
-        <scalac srcdir="${scalasrc}:${build.generated.src}:${javasrc}" destdir="${classes}" target="jvm-1.5" deprecation="yes" classpathref="build.class.path" addparams="-no-specialization" fork="true" jvmargs="${jvmargs}" />
+        <!-- turn off deprecation warnings <scalac srcdir="${scalasrc}:${build.generated.src}:${javasrc}" destdir="${classes}" target="jvm-1.5" deprecation="yes" classpathref="build.class.path" addparams="-no-specialization" fork="true" jvmargs="${jvmargs}" /> -->
+        <scalac srcdir="${scalasrc}:${build.generated.src}:${javasrc}" destdir="${classes}" target="jvm-1.5" deprecation="no" classpathref="build.class.path" addparams="-no-specialization" fork="true" jvmargs="${jvmargs}" />
 
     	<!-- Compile the Java code from ${javasrc} into ${classes} -->
     	<javac srcdir="${javasrc}" destdir="${classes}" compiler="javac1.5" memoryMaximumSize="1500M" fork="true" classpathref="build.class.path" debug="yes">
@@ -340,6 +341,7 @@
             <membersonly package="org.scalatest" />
             <membersonly package="org.scalatest.fixture" />
             <membersonly package="org.scalatest.concurrent" />
+            <membersonly package="org.scalatest.exceptions" />
             <membersonly package="org.scalatest.testng" />
             <membersonly package="org.scalatest.junit" />
             <membersonly package="org.scalatest.events" />
