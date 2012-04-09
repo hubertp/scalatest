@@ -71,18 +71,20 @@ private[scalatest] abstract class ThreadAwareInformer extends Informer {
 // refactor can rename ConcurrentInformer2 to ConcurrentInformer, deleting the old one
 private[scalatest] class ConcurrentInformer2(fire: (String, Option[Any], Boolean) => Unit) extends ThreadAwareInformer {
 
+/*
   def apply(message: String) {
     if (message == null)
       throw new NullPointerException
     fire(message, None, isConstructingThread) // Fire the info provided event using the passed function
   }
+*/
   
-  def apply(message: String, payload: Any) {
+  def apply(message: String, payload: Option[Any] = None) {
     if (message == null)
       throw new NullPointerException
     if (payload == null)
       throw new NullPointerException
-    fire(message, Some(payload), isConstructingThread)
+    fire(message, payload, isConstructingThread)
   }
 }
 
@@ -113,6 +115,7 @@ private[scalatest] class MessageRecordingInformer2(fire: (String, Option[Any], B
   // Returns them in order recorded
   private def recordedMessages: List[(String, Option[Any])] = messages.reverse
 
+/*
   def apply(message: String) {
     if (message == null)
       throw new NullPointerException
@@ -121,16 +124,17 @@ private[scalatest] class MessageRecordingInformer2(fire: (String, Option[Any], B
     else 
       fire(message, None, false, false) // Fire the info provided event using the passed function
   }
+*/
   
-  def apply(message: String, payload: Any) {
+  def apply(message: String, payload: Option[Any] = None) {
     if (message == null)
       throw new NullPointerException
     if (payload == null)
       throw new NullPointerException
     if (isConstructingThread)
-      record(message, Some(payload))
+      record(message, payload)
     else 
-      fire(message, Some(payload), false, false) // Fire the info provided event using the passed function
+      fire(message, payload, false, false) // Fire the info provided event using the passed function
   }
 
   // send out any recorded messages
@@ -164,18 +168,20 @@ private[scalatest] class PathMessageRecordingInformer(fire: (String, Option[Any]
   // Returns them in order recorded
  // private def recordedMessages: List[String] = for ((msg, _) <- messages) yield toList
 
+/*
   def apply(message: String) {
     if (message == null)
       throw new NullPointerException
     record(message, None) // have to record all because of eager execution of tests in path traits
   }
+*/
   
-  def apply(message: String, payload: Any) {
+  def apply(message: String, payload: Option[Any] = None) {
     if (message == null)
       throw new NullPointerException
     if (payload == null)
       throw new NullPointerException
-    record(message, Some(payload))
+    record(message, payload)
   }
 
   // send out any recorded messages

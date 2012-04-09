@@ -30,8 +30,7 @@ class ConcurrentInformerSpec extends fixture.FunSpec {
   def withFixture(test: OneArgTest) {
     val informer =
       new ConcurrentInformer(nameInfo) {
-        def apply(message: String) = ()
-        def apply(message: String, payload: Any) = ()
+        def apply(message: String, payload: Option[Any] = None) = ()
       }
     test(informer)
   }
