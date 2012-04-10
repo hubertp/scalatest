@@ -133,39 +133,27 @@ write a sbt plugin to deploy the task.
       // println("sbt args: " + args.toList)
       if (isAccessibleSuite(testClass) || isRunnable(testClass)) {
 
-        val (propertiesArgsList, includesArgsList,
-        excludesArgsList, repoArgsList) = parsePropsAndTags(args.filter(!_.equals("")))
+        val (propertiesArgsList, includesArgsList, excludesArgsList, repoArg) 
+          = parsePropsAndTags(args.filter(!_.equals("")))
         val configMap: Map[String, String] = parsePropertiesArgsIntoMap(propertiesArgsList)
         val tagsToInclude: Set[String] = parseCompoundArgIntoSet(includesArgsList, "-n")
         val tagsToExclude: Set[String] = parseCompoundArgIntoSet(excludesArgsList, "-l")
         val filter = org.scalatest.Filter(if (tagsToInclude.isEmpty) None else Some(tagsToInclude), tagsToExclude)
         
-        object SbtReporterFactory extends ReporterFactory {
-          
-          override def createStandardOutReporter(configSet: Set[ReporterConfigParam]) = {
-            if (configSetMinusNonFilterParams(configSet).isEmpty)
-              new SbtLogInfoReporter(
-                configSet.contains(PresentAllDurations),
-                !configSet.contains(PresentWithoutColor),
-                configSet.contains(PresentShortStackTraces) || configSet.contains(PresentFullStackTraces),
-                configSet.contains(PresentFullStackTraces) // If they say both S and F, F overrules
-              )
-            else
-              new FilterReporter(
-                new SbtLogInfoReporter(
-                  configSet.contains(PresentAllDurations),
-                  !configSet.contains(PresentWithoutColor),
-                  configSet.contains(PresentShortStackTraces) || configSet.contains(PresentFullStackTraces),
-                  configSet.contains(PresentFullStackTraces) // If they say both S and F, F overrules
-                ),
-                configSet
-              )
+        val (presentAllDurations, presentInColor, presentShortStackTraces, presentFullStackTraces) =
+          repoArg match {
+            case Some(arg) => (
+              arg contains 'D',
+              !(arg contains 'W'),
+              arg contains 'S',
+              arg contains 'F'
+             )
+             case None => (false, true, false, false)
           }
-        }
+
         
-        // If no reporters specified, just give them a default stdout reporter
-        val fullReporterConfigurations: ReporterConfigurations = Runner.parseReporterArgsIntoConfigurations(if(repoArgsList.isEmpty) "-o" :: Nil else repoArgsList)
-        val report = new SbtReporter(eventHandler, Some(SbtReporterFactory.getDispatchReporter(fullReporterConfigurations, None, None, testLoader)))
+        val logInfoReporter = new SbtLogInfoReporter(presentAllDurations, presentInColor, presentShortStackTraces, presentFullStackTraces)
+        val report = new SbtReporter(eventHandler, Some(logInfoReporter))
         
         val tracker = new Tracker
         val suiteStartTime = System.currentTimeMillis
@@ -253,7 +241,7 @@ write a sbt plugin to deploy the task.
       val props = new ListBuffer[String]()
       val includes = new ListBuffer[String]()
       val excludes = new ListBuffer[String]()
-      var repoArgs = new ListBuffer[String]()
+      var repoArg: Option[String] = None
 
       val it = args.iterator
       while (it.hasNext) {
@@ -274,11 +262,12 @@ write a sbt plugin to deploy the task.
             excludes += it.next
         }
         else if (s.startsWith("-o")) {
-          repoArgs += s
+          if (repoArg.isEmpty) // Just use first one. Ignore any others.
+            repoArg = Some(s)
         }
         else if (s == "sequential") {
           // To skip as it is passed in from Play 2.0 as arg to specs2.
-          println("Warning: \"sequential\" is ignored by ScalaTest. To get rid of this warning, please add \"testOptions in Test := Nil\" in main defintion of your project build file.")
+          println("Warning: \"sequential\" is ignored by ScalaTest. To get rid of this warning, please add \"testOptions in Test := Nil\" in main definition of your project build file.")
         }
         //      else if (s.startsWith("-b")) {
         //
@@ -290,7 +279,7 @@ write a sbt plugin to deploy the task.
           throw new IllegalArgumentException("Unrecognized argument: " + s)
         }
       }
-      (props.toList, includes.toList, excludes.toList, repoArgs.toList)
+      (props.toList, includes.toList, excludes.toList, repoArg)
     }
   }
 }
