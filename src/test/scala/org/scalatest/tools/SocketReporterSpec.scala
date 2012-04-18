@@ -96,24 +96,22 @@ class SocketReporterSpec extends FunSpec with SharedHelpers with Eventually {
         connection = socket.accept
         val inputStream = connection.getInputStream
         in = new BufferedReader(new InputStreamReader(inputStream))
-        while (!stopped || in.ready) {
+        while (!connection.isClosed && (!stopped || in.ready)) {
           var eventRawXml = ""
+          var endingXml = ""
           var eventXml: Elem = null
-          while (eventXml == null && (!stopped || in.ready)) {
+          while (eventXml == null && !connection.isClosed && (!stopped || in.ready)) {
             val line = in.readLine
             if (line != null) {
+              if (eventRawXml == "" && line.length > 0)
+                endingXml = line.substring(0, 1) + "/" + line.substring(1)
               eventRawXml += line
-              try {
+              if (line.trim == endingXml.trim) 
                 eventXml = XML.loadString(eventRawXml)
-              }
-              catch {
-                case e: SAXException => 
-                  if (!in.ready)
-                    Thread.sleep(10)
-              }
+              else if (!connection.isClosed && !in.ready)
+                Thread.sleep(10)
             }
-            else
-              if (!in.ready)
+            else if (!in.ready)
                 Thread.sleep(10)
           }
           if (eventXml != null) {
@@ -137,7 +135,7 @@ class SocketReporterSpec extends FunSpec with SharedHelpers with Eventually {
               case "MarkupProvided" => markupProvidedList += eventXml
             }
           }
-          if (!in.ready)
+          if (!connection.isClosed && !in.ready)
             Thread.sleep(10)
         }
       }
