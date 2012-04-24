@@ -1339,7 +1339,11 @@ trait FunSpec extends Suite { thisSuite =>
      * @throws NullPointerException if <code>specText</code> or any passed test tag is <code>null</code>
      */
     def apply(specText: String, testTags: Tag*)(testFun: => Unit) {
+<<<<<<< .working
       registerTest(specText, testFun _, "itCannotAppearInsideAnotherIt", sourceFileName, "apply", stackDepth, None, None, testTags: _*)
+=======
+      registerTest(specText, testFun _, "itCannotAppearInsideAnotherIt", sourceFileName, "apply", 1, None, None, testTags: _*)
+>>>>>>> .merge-right.r3742
     }
 
     /**
@@ -1451,7 +1455,11 @@ trait FunSpec extends Suite { thisSuite =>
      * @throws NullPointerException if <code>specText</code> or any passed test tag is <code>null</code>
      */
     def apply(specText: String, testTags: Tag*)(testFun: => Unit) {
+<<<<<<< .working
       registerTest(specText, testFun _, "theyCannotAppearInsideAnotherThey", sourceFileName, "apply", stackDepth, None, None, testTags: _*)
+=======
+      registerTest(specText, testFun _, "theyCannotAppearInsideAnotherThey", sourceFileName, "apply", 1, None, None, testTags: _*)
+>>>>>>> .merge-right.r3742
     }
 
     /**
@@ -1535,7 +1543,11 @@ trait FunSpec extends Suite { thisSuite =>
    * @throws NullPointerException if <code>specText</code> or any passed test tag is <code>null</code>
    */
   protected def ignore(testText: String, testTags: Tag*)(testFun: => Unit) {
+<<<<<<< .working
     registerIgnoredTest(testText, testFun _, "ignoreCannotAppearInsideAnIt", sourceFileName, "ignore", stackDepth + 1, testTags: _*)
+=======
+    registerIgnoredTest(testText, testFun _, "ignoreCannotAppearInsideAnIt", sourceFileName, "ignore", 1, testTags: _*)
+>>>>>>> .merge-right.r3742
   }
 
   /**
@@ -1546,7 +1558,11 @@ trait FunSpec extends Suite { thisSuite =>
    */
   protected def describe(description: String)(fun: => Unit) {
 
+<<<<<<< .working
     registerNestedBranch(description, None, fun, "describeCannotAppearInsideAnIt", sourceFileName, "describe", stackDepth + 1)
+=======
+    registerNestedBranch(description, None, fun, "describeCannotAppearInsideAnIt", sourceFileName, "describe", 1)
+>>>>>>> .merge-right.r3742
   }
 
   /**

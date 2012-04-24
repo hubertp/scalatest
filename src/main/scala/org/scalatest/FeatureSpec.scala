@@ -1587,7 +1587,11 @@ trait FeatureSpec extends Suite { thisSuite =>
    */
   protected def scenario(specText: String, testTags: Tag*)(testFun: => Unit) {
 
+<<<<<<< .working
     registerTest(Resources("scenario", specText), testFun _, "scenarioCannotAppearInsideAnotherScenario", "FeatureSpec.scala", "scenario", stackDepth, None, None, testTags: _*)
+=======
+    registerTest(Resources("scenario", specText), testFun _, "scenarioCannotAppearInsideAnotherScenario", "FeatureSpec.scala", "scenario", 2, None, None, testTags: _*)
+>>>>>>> .merge-right.r3742
   }
 
   /**
@@ -1609,7 +1613,11 @@ trait FeatureSpec extends Suite { thisSuite =>
    * @throws NullPointerException if <code>specText</code> or any passed test tag is <code>null</code>
    */
   protected def ignore(specText: String, testTags: Tag*)(testFun: => Unit) {
+<<<<<<< .working
     registerIgnoredTest(Resources("scenario", specText), testFun _, "ignoreCannotAppearInsideAScenario", "FeatureSpec.scala", "ignore", stackDepth, testTags: _*)
+=======
+    registerIgnoredTest(Resources("scenario", specText), testFun _, "ignoreCannotAppearInsideAScenario", "FeatureSpec.scala", "ignore", 1, testTags: _*)
+>>>>>>> .merge-right.r3742
   }
   
   /**
@@ -1623,7 +1631,11 @@ trait FeatureSpec extends Suite { thisSuite =>
     if (!currentBranchIsTrunk)
       throw new NotAllowedException(Resources("cantNestFeatureClauses"), getStackDepthFun("FeatureSpec.scala", "feature"))
 
+<<<<<<< .working
     registerNestedBranch(description, None, fun, "featureCannotAppearInsideAScenario", "FeatureSpec.scala", "feature", stackDepth)
+=======
+    registerNestedBranch(description, None, fun, "featureCannotAppearInsideAScenario", "FeatureSpec.scala", "feature", 1)
+>>>>>>> .merge-right.r3742
   }
 
   /**

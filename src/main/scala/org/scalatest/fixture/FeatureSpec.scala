@@ -412,7 +412,11 @@ trait FeatureSpec extends Suite { thisSuite =>
    */
   protected def scenario(specText: String, testTags: Tag*)(testFun: FixtureParam => Any) {
 
+<<<<<<< .working
     registerTest(Resources("scenario", specText), testFun, "scenarioCannotAppearInsideAnotherScenario", sourceFileName, "scenario", stackDepth, None, None, testTags: _*)
+=======
+    registerTest(Resources("scenario", specText), testFun, "scenarioCannotAppearInsideAnotherScenario", sourceFileName, "scenario", 2, None, None, testTags: _*)
+>>>>>>> .merge-right.r3742
   }
 
   /**
@@ -434,7 +438,11 @@ trait FeatureSpec extends Suite { thisSuite =>
    * @throws NullPointerException if <code>specText</code> or any passed test tag is <code>null</code>
    */
   protected def ignore(specText: String, testTags: Tag*)(testFun: FixtureParam => Any) {
+<<<<<<< .working
     registerIgnoredTest(Resources("scenario", specText), testFun , "ignoreCannotAppearInsideAScenario", sourceFileName, "ignore", stackDepth, testTags: _*)
+=======
+    registerIgnoredTest(Resources("scenario", specText), testFun , "ignoreCannotAppearInsideAScenario", sourceFileName, "ignore", 2, testTags: _*)
+>>>>>>> .merge-right.r3742
   }
 
   /**
@@ -448,7 +456,11 @@ trait FeatureSpec extends Suite { thisSuite =>
     if (!currentBranchIsTrunk)
       throw new NotAllowedException(Resources("cantNestFeatureClauses"), getStackDepthFun(sourceFileName, "feature"))
 
+<<<<<<< .working
     registerNestedBranch(description, None, fun, "featureCannotAppearInsideAScenario", sourceFileName, "feature", stackDepth)
+=======
+    registerNestedBranch(description, None, fun, "featureCannotAppearInsideAScenario", sourceFileName, "feature", 1)
+>>>>>>> .merge-right.r3742
   }
 
   /**

@@ -720,15 +720,21 @@ trait FreeSpec extends org.scalatest.Suite with OneInstancePerTest { thisSuite =
    * @param specText the specification text, which will be combined with the descText of any surrounding describers
    * to form the test name
    * @param testTags the optional list of tags for this test
+   * @param methodName caller's method name
    * @param testFun the test function
    * @throws DuplicateTestNameException if a test with the same name has been registered previously
    * @throws TestRegistrationClosedException if invoked after <code>run</code> has been invoked on this suite
    * @throws NullPointerException if <code>specText</code> or any passed test tag is <code>null</code>
    */
+<<<<<<< .working
   private def registerTestToRun(specText: String, testTags: List[Tag], testFun: () => Unit) {
     // TODO: This is what was being used before but it is wrong
     handleTest(thisSuite, specText, testFun, "itCannotAppearInsideAnotherIt", "FunSpec.scala", "apply", stackDepth, testTags: _*)
     // registerTest(specText, testFun, "itCannotAppearInsideAnotherIt", "FreeSpec.scala", "it", None, testTags: _*)
+=======
+  private def registerTestToRun(specText: String, testTags: List[Tag], methodName: String, testFun: () => Unit) {
+    handleTest(thisSuite, specText, testFun, "itCannotAppearInsideAnotherIt", "FreeSpec.scala", methodName, 1, testTags: _*)
+>>>>>>> .merge-right.r3742
   }
 
   /**
@@ -744,15 +750,21 @@ trait FreeSpec extends org.scalatest.Suite with OneInstancePerTest { thisSuite =
    * @param specText the specification text, which will be combined with the descText of any surrounding describers
    * to form the test name
    * @param testTags the optional list of tags for this test
+   * @param methodName caller's method name
    * @param testFun the test function
    * @throws DuplicateTestNameException if a test with the same name has been registered previously
    * @throws TestRegistrationClosedException if invoked after <code>run</code> has been invoked on this suite
    * @throws NullPointerException if <code>specText</code> or any passed test tag is <code>null</code>
    */
+<<<<<<< .working
   private def registerTestToIgnore(specText: String, testTags: List[Tag], testFun: () => Unit) {
 
     // TODO: This is how these were, but it needs attention. Mentions "it".
     handleIgnoredTest(specText, testFun, "ignoreCannotAppearInsideAnIt", "FreeSpec.scala", "ignore", stackDepth, testTags: _*)
+=======
+  private def registerTestToIgnore(specText: String, testTags: List[Tag], methodName: String, testFun: () => Unit) {
+    handleIgnoredTest(specText, testFun, "ignoreCannotAppearInsideAnIt", "FreeSpec.scala", methodName, 1, testTags: _*)
+>>>>>>> .merge-right.r3742
   }
 
   /**
@@ -788,7 +800,7 @@ trait FreeSpec extends org.scalatest.Suite with OneInstancePerTest { thisSuite =
      * </p>
      */
     def in(testFun: => Unit) {
-      registerTestToRun(specText, tags, testFun _)
+      registerTestToRun(specText, tags, "in", testFun _)
     }
 
     /**
@@ -815,7 +827,7 @@ trait FreeSpec extends org.scalatest.Suite with OneInstancePerTest { thisSuite =
      * </p>
      */
     def is(testFun: => PendingNothing) {
-      registerTestToRun(specText, tags, testFun _)
+      registerTestToRun(specText, tags, "is", testFun _)
     }
 
     /**
@@ -839,7 +851,7 @@ trait FreeSpec extends org.scalatest.Suite with OneInstancePerTest { thisSuite =
      * </p>
      */
     def ignore(testFun: => Unit) {
-      registerTestToIgnore(specText, tags, testFun _)
+      registerTestToIgnore(specText, tags, "ignore", testFun _)
     }
   }       
 
@@ -862,9 +874,13 @@ trait FreeSpec extends org.scalatest.Suite with OneInstancePerTest { thisSuite =
      * <code>org.scalatest.path.FreeSpec</code>.
      */
     def - (fun: => Unit) {
+<<<<<<< .working
       // TODO: Fix the resource name and method name
       
       handleNestedBranch(string, None, fun, "describeCannotAppearInsideAnIt", "FreeSpec.scala", "-", stackDepth - 1)
+=======
+      handleNestedBranch(string, None, fun, "itCannotAppearInsideAnIt", "FreeSpec.scala", "-")
+>>>>>>> .merge-right.r3742
     }
 
     /**
@@ -888,7 +904,7 @@ trait FreeSpec extends org.scalatest.Suite with OneInstancePerTest { thisSuite =
      * </p>
      */
     def in(f: => Unit) {
-      registerTestToRun(string, List(), f _)
+      registerTestToRun(string, List(), "in", f _)
     }
 
     /**
@@ -912,7 +928,7 @@ trait FreeSpec extends org.scalatest.Suite with OneInstancePerTest { thisSuite =
      * </p>
      */
     def ignore(f: => Unit) {
-      registerTestToIgnore(string, List(), f _)
+      registerTestToIgnore(string, List(), "ignore", f _)
     }
 
     /**
@@ -939,7 +955,7 @@ trait FreeSpec extends org.scalatest.Suite with OneInstancePerTest { thisSuite =
      * </p>
      */
     def is(f: => PendingNothing) {
-      registerTestToRun(string, List(), f _)
+      registerTestToRun(string, List(), "is", f _)
     }
 
     /**
