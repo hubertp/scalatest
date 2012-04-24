@@ -1,0 +1,122 @@
+
+Mi-Novia:bv-mh1 bv$ svn merge -r3653:HEAD https://scalatest.googlecode.com/svn/branches/1.8-cs
+Error validating server certificate for 'https://scalatest.googlecode.com:443':
+ - The certificate is not issued by a trusted authority. Use the
+   fingerprint to validate the certificate manually!
+Certificate information:
+ - Hostname: *.googlecode.com
+ - Valid: from Wed, 11 Apr 2012 00:04:01 GMT until Thu, 11 Apr 2013 00:14:01 GMT
+ - Issuer: Google Inc, US
+ - Fingerprint: cb:f1:c8:ac:28:d5:61:b7:c1:9c:73:7e:3a:b6:bb:e2:e6:55:95:2a
+(R)eject, accept (t)emporarily or accept (p)ermanently? p
+--- Merging r3654 through r3742 into 'src':
+U    src/test/scala/org/scalatest/FlatSpecSpec.scala
+U    src/test/scala/org/scalatest/WordSpecSpec.scala
+U    src/test/scala/org/scalatest/fixture/WordSpecSpec.scala
+U    src/test/scala/org/scalatest/fixture/SuiteSpec.scala
+U    src/test/scala/org/scalatest/fixture/PropSpecSpec.scala
+U    src/test/scala/org/scalatest/fixture/FreeSpecSpec.scala
+U    src/test/scala/org/scalatest/fixture/FlatSpecSpec.scala
+U    src/test/scala/org/scalatest/fixture/FunSuiteSpec.scala
+U    src/test/scala/org/scalatest/fixture/FunSpecSpec.scala
+U    src/test/scala/org/scalatest/fixture/FeatureSpecSpec.scala
+U    src/test/scala/org/scalatest/PropSpecSpec.scala
+U    src/test/scala/org/scalatest/FunSuiteSpec.scala
+U    src/test/scala/org/scalatest/FreeSpecSpec.scala
+U    src/test/scala/org/scalatest/FeatureSpecSpec.scala
+U    src/test/scala/org/scalatest/SuiteSuite.scala
+U    src/test/scala/org/scalatest/path/FunSpecSpec.scala
+U    src/test/scala/org/scalatest/path/FreeSpecSpec.scala
+U    src/test/scala/org/scalatest/FunSpecSpec.scala
+Conflict discovered in 'src/test/scala/org/scalatest/EngineSpec.scala'.
+Select: (p) postpone, (df) diff-full, (e) edit,
+        (mc) mine-conflict, (tc) theirs-conflict,
+        (s) show all options: p
+C    src/test/scala/org/scalatest/EngineSpec.scala
+Conflict discovered in 'src/main/scala/org/scalatest/FlatSpec.scala'.
+Select: (p) postpone, (df) diff-full, (e) edit,
+        (mc) mine-conflict, (tc) theirs-conflict,
+        (s) show all options: p
+C    src/main/scala/org/scalatest/FlatSpec.scala
+Conflict discovered in 'src/main/scala/org/scalatest/WordSpec.scala'.
+Select: (p) postpone, (df) diff-full, (e) edit,
+        (mc) mine-conflict, (tc) theirs-conflict,
+        (s) show all options: p
+C    src/main/scala/org/scalatest/WordSpec.scala
+Conflict discovered in 'src/main/scala/org/scalatest/PropSpec.scala'.
+Select: (p) postpone, (df) diff-full, (e) edit,
+        (mc) mine-conflict, (tc) theirs-conflict,
+        (s) show all options: p
+C    src/main/scala/org/scalatest/PropSpec.scala
+Conflict discovered in 'src/main/scala/org/scalatest/FunSuite.scala'.
+Select: (p) postpone, (df) diff-full, (e) edit,
+        (mc) mine-conflict, (tc) theirs-conflict,
+        (s) show all options: p
+C    src/main/scala/org/scalatest/FunSuite.scala
+Conflict discovered in 'src/main/scala/org/scalatest/fixture/FlatSpec.scala'.
+Select: (p) postpone, (df) diff-full, (e) edit,
+        (mc) mine-conflict, (tc) theirs-conflict,
+        (s) show all options: p
+C    src/main/scala/org/scalatest/fixture/FlatSpec.scala
+Conflict discovered in 'src/main/scala/org/scalatest/fixture/FunSuite.scala'.
+Select: (p) postpone, (df) diff-full, (e) edit,
+        (mc) mine-conflict, (tc) theirs-conflict,
+        (s) show all options: p
+C    src/main/scala/org/scalatest/fixture/FunSuite.scala
+Conflict discovered in 'src/main/scala/org/scalatest/fixture/FunSpec.scala'.
+Select: (p) postpone, (df) diff-full, (e) edit,
+        (mc) mine-conflict, (tc) theirs-conflict,
+        (s) show all options: p
+C    src/main/scala/org/scalatest/fixture/FunSpec.scala
+Conflict discovered in 'src/main/scala/org/scalatest/fixture/FeatureSpec.scala'.
+Select: (p) postpone, (df) diff-full, (e) edit,
+        (mc) mine-conflict, (tc) theirs-conflict,
+        (s) show all options: p
+C    src/main/scala/org/scalatest/fixture/FeatureSpec.scala
+Conflict discovered in 'src/main/scala/org/scalatest/fixture/WordSpec.scala'.
+Select: (p) postpone, (df) diff-full, (e) edit,
+        (mc) mine-conflict, (tc) theirs-conflict,
+        (s) show all options: p
+C    src/main/scala/org/scalatest/fixture/WordSpec.scala
+Conflict discovered in 'src/main/scala/org/scalatest/fixture/PropSpec.scala'.
+Select: (p) postpone, (df) diff-full, (e) edit,
+        (mc) mine-conflict, (tc) theirs-conflict,
+        (s) show all options: p
+C    src/main/scala/org/scalatest/fixture/PropSpec.scala
+Conflict discovered in 'src/main/scala/org/scalatest/fixture/FreeSpec.scala'.
+Select: (p) postpone, (df) diff-full, (e) edit,
+        (mc) mine-conflict, (tc) theirs-conflict,
+        (s) show all options: p
+C    src/main/scala/org/scalatest/fixture/FreeSpec.scala
+Conflict discovered in 'src/main/scala/org/scalatest/FreeSpec.scala'.
+Select: (p) postpone, (df) diff-full, (e) edit,
+        (mc) mine-conflict, (tc) theirs-conflict,
+        (s) show all options: p
+C    src/main/scala/org/scalatest/FreeSpec.scala
+Conflict discovered in 'src/main/scala/org/scalatest/FeatureSpec.scala'.
+Select: (p) postpone, (df) diff-full, (e) edit,
+        (mc) mine-conflict, (tc) theirs-conflict,
+        (s) show all options: p
+C    src/main/scala/org/scalatest/FeatureSpec.scala
+Conflict discovered in 'src/main/scala/org/scalatest/FunSpec.scala'.
+Select: (p) postpone, (df) diff-full, (e) edit,
+        (mc) mine-conflict, (tc) theirs-conflict,
+        (s) show all options: p
+C    src/main/scala/org/scalatest/FunSpec.scala
+Conflict discovered in 'src/main/scala/org/scalatest/Engine.scala'.
+Select: (p) postpone, (df) diff-full, (e) edit,
+        (mc) mine-conflict, (tc) theirs-conflict,
+        (s) show all options: p
+C    src/main/scala/org/scalatest/Engine.scala
+Conflict discovered in 'src/main/scala/org/scalatest/path/FunSpec.scala'.
+Select: (p) postpone, (df) diff-full, (e) edit,
+        (mc) mine-conflict, (tc) theirs-conflict,
+        (s) show all options: p
+C    src/main/scala/org/scalatest/path/FunSpec.scala
+Conflict discovered in 'src/main/scala/org/scalatest/path/FreeSpec.scala'.
+Select: (p) postpone, (df) diff-full, (e) edit,
+        (mc) mine-conflict, (tc) theirs-conflict,
+        (s) show all options: p
+C    src/main/scala/org/scalatest/path/FreeSpec.scala
+Summary of conflicts:
+  Text conflicts: 18
