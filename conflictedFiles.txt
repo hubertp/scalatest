@@ -1,0 +1,19 @@
+C    src/test/scala/org/scalatest/EngineSpec.scala
+C    src/main/scala/org/scalatest/FlatSpec.scala
+C    src/main/scala/org/scalatest/WordSpec.scala
+C    src/main/scala/org/scalatest/PropSpec.scala
+C    src/main/scala/org/scalatest/FunSuite.scala
+C    src/main/scala/org/scalatest/fixture/FlatSpec.scala
+C    src/main/scala/org/scalatest/fixture/FunSuite.scala
+C    src/main/scala/org/scalatest/fixture/FunSpec.scala
+C    src/main/scala/org/scalatest/fixture/FeatureSpec.scala
+C    src/main/scala/org/scalatest/fixture/WordSpec.scala
+C    src/main/scala/org/scalatest/fixture/PropSpec.scala
+C    src/main/scala/org/scalatest/fixture/FreeSpec.scala
+C    src/main/scala/org/scalatest/FreeSpec.scala
+C    src/main/scala/org/scalatest/FeatureSpec.scala
+C    src/main/scala/org/scalatest/FunSpec.scala
+C    src/main/scala/org/scalatest/Engine.scala
+C    src/main/scala/org/scalatest/path/FunSpec.scala
+C    src/main/scala/org/scalatest/path/FreeSpec.scala
+
