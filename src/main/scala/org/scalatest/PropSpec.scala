@@ -371,7 +371,6 @@ import Suite.checkRunTestParamsForNull
 trait PropSpec extends Suite { thisSuite =>
 
   private final val engine = new Engine("concurrentPropSpecMod", "PropSpec")
-  private final val stackDepth = 4
   import engine._
 
   /**
@@ -409,11 +408,7 @@ trait PropSpec extends Suite { thisSuite =>
    * @throws NullPointerException if <code>testName</code> or any passed test tag is <code>null</code>
    */
   protected def property(testName: String, testTags: Tag*)(testFun: => Unit) {
-<<<<<<< .working
-    registerTest(testName, testFun _, "propertyCannotAppearInsideAnotherProperty", "PropSpec.scala", "property", stackDepth, None, None, testTags: _*)
-=======
-    registerTest(testName, testFun _, "propertyCannotAppearInsideAnotherProperty", "PropSpec.scala", "property", 2, None, None, testTags: _*)
->>>>>>> .merge-right.r3742
+    registerTest(testName, testFun _, "propertyCannotAppearInsideAnotherProperty", "PropSpec.scala", "property", 4, -2, None, None, testTags: _*)
   }
 
   /**
@@ -432,11 +427,7 @@ trait PropSpec extends Suite { thisSuite =>
    * @throws NotAllowedException if <code>testName</code> had been registered previously
    */
   protected def ignore(testName: String, testTags: Tag*)(testFun: => Unit) {
-<<<<<<< .working
-    registerIgnoredTest(testName, testFun _, "ignoreCannotAppearInsideAProperty", "PropSpec.scala", "ignore", stackDepth, testTags: _*)
-=======
-    registerIgnoredTest(testName, testFun _, "ignoreCannotAppearInsideAProperty", "PropSpec.scala", "ignore", 1, testTags: _*)
->>>>>>> .merge-right.r3742
+    registerIgnoredTest(testName, testFun _, "ignoreCannotAppearInsideAProperty", "PropSpec.scala", "ignore", 4, -2, testTags: _*)
   }
 
   /**

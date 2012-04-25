@@ -1183,7 +1183,6 @@ import Suite.checkRunTestParamsForNull
 trait FunSuite extends Suite { thisSuite =>
 
   private final val engine = new Engine("concurrentFunSuiteMod", "FunSuite")
-  private final val stackDepth = 4
   import engine._
 
   /**
@@ -1221,11 +1220,7 @@ trait FunSuite extends Suite { thisSuite =>
    * @throws NullPointerException if <code>testName</code> or any passed test tag is <code>null</code>
    */
   protected def test(testName: String, testTags: Tag*)(testFun: => Unit) {
-<<<<<<< .working
-    registerTest(testName, testFun _, "testCannotAppearInsideAnotherTest", "FunSuite.scala", "test", stackDepth, None, None, testTags: _*)
-=======
-    registerTest(testName, testFun _, "testCannotAppearInsideAnotherTest", "FunSuite.scala", "test", 2, None, None, testTags: _*)
->>>>>>> .merge-right.r3742
+    registerTest(testName, testFun _, "testCannotAppearInsideAnotherTest", "FunSuite.scala", "test", 4, -2, None, None, testTags: _*)
   }
 
   /**
@@ -1244,11 +1239,7 @@ trait FunSuite extends Suite { thisSuite =>
    * @throws NotAllowedException if <code>testName</code> had been registered previously
    */
   protected def ignore(testName: String, testTags: Tag*)(testFun: => Unit) {
-<<<<<<< .working
-    registerIgnoredTest(testName, testFun _, "ignoreCannotAppearInsideATest", "FunSuite.scala", "ignore", stackDepth, testTags: _*)
-=======
-    registerIgnoredTest(testName, testFun _, "ignoreCannotAppearInsideATest", "FunSuite.scala", "ignore", 1, testTags: _*)
->>>>>>> .merge-right.r3742
+    registerIgnoredTest(testName, testFun _, "ignoreCannotAppearInsideATest", "FunSuite.scala", "ignore", 4, -2, testTags: _*)
   }
 
   /**

@@ -1486,7 +1486,6 @@ import Suite.anErrorThatShouldCauseAnAbort
 trait FreeSpec extends Suite { thisSuite =>
 
   private final val engine = new Engine("concurrentFreeSpecMod", "FreeSpec")
-  private final val stackDepth = 4
   import engine._
 
   /**
@@ -1521,7 +1520,6 @@ trait FreeSpec extends Suite { thisSuite =>
    *
    * @param specText the specification text, which will be combined with the descText of any surrounding describers
    * to form the test name
-   * @param methodName Method name of the caller
    * @param testTags the optional list of tags for this test
    * @param methodName caller's method name
    * @param testFun the test function
@@ -1529,18 +1527,8 @@ trait FreeSpec extends Suite { thisSuite =>
    * @throws TestRegistrationClosedException if invoked after <code>run</code> has been invoked on this suite
    * @throws NullPointerException if <code>specText</code> or any passed test tag is <code>null</code>
    */
-<<<<<<< .working
-  private def registerTestToRun(specText: String, methodName: String, testTags: List[Tag], testFun: () => Unit) {
-=======
   private def registerTestToRun(specText: String, testTags: List[Tag], methodName: String, testFun: () => Unit) {
->>>>>>> .merge-right.r3742
-    // TODO: This is what was being used before but it is wrong
-<<<<<<< .working
-    registerTest(specText, testFun, "itCannotAppearInsideAnotherIt", "FreeSpec.scala", 
-                 methodName, stackDepth, None, None, testTags: _*)
-=======
-    registerTest(specText, testFun, "itCannotAppearInsideAnotherIt", "FreeSpec.scala", methodName, 1, None, None, testTags: _*)
->>>>>>> .merge-right.r3742
+    registerTest(specText, testFun, "itCannotAppearInsideAnotherIt", "FreeSpec.scala", methodName, 4, -3, None, None, testTags: _*)
   }
 
   /**
@@ -1555,7 +1543,6 @@ trait FreeSpec extends Suite { thisSuite =>
    *
    * @param specText the specification text, which will be combined with the descText of any surrounding describers
    * to form the test name
-   * @param methodName Method name of the caller
    * @param testTags the optional list of tags for this test
    * @param methodName caller's method name
    * @param testFun the test function
@@ -1563,18 +1550,8 @@ trait FreeSpec extends Suite { thisSuite =>
    * @throws TestRegistrationClosedException if invoked after <code>run</code> has been invoked on this suite
    * @throws NullPointerException if <code>specText</code> or any passed test tag is <code>null</code>
    */
-<<<<<<< .working
-  private def registerTestToIgnore(specText: String, methodName: String, testTags: List[Tag], testFun: () => Unit) {
-=======
   private def registerTestToIgnore(specText: String, testTags: List[Tag], methodName: String, testFun: () => Unit) {
->>>>>>> .merge-right.r3742
-
-    // TODO: This is how these were, but it needs attention. Mentions "it".
-<<<<<<< .working
-    registerIgnoredTest(specText, testFun, "ignoreCannotAppearInsideAnIt", "FreeSpec.scala", methodName, stackDepth, testTags: _*)
-=======
-    registerIgnoredTest(specText, testFun, "ignoreCannotAppearInsideAnIt", "FreeSpec.scala", methodName, 1, testTags: _*)
->>>>>>> .merge-right.r3742
+    registerIgnoredTest(specText, testFun, "ignoreCannotAppearInsideAnIt", "FreeSpec.scala", methodName, 4, -3, testTags: _*)
   }
 
   /**
@@ -1606,11 +1583,7 @@ trait FreeSpec extends Suite { thisSuite =>
      * </p>
      */
     def in(testFun: => Unit) {
-<<<<<<< .working
-      registerTestToRun(specText, "in", tags, testFun _)
-=======
       registerTestToRun(specText, tags, "in", testFun _)
->>>>>>> .merge-right.r3742
     }
 
     /**
@@ -1630,11 +1603,7 @@ trait FreeSpec extends Suite { thisSuite =>
      * </p>
      */
     def is(testFun: => PendingNothing) {
-<<<<<<< .working
-      registerTestToRun(specText, "is", tags, testFun _)
-=======
       registerTestToRun(specText, tags, "is", testFun _)
->>>>>>> .merge-right.r3742
     }
 
     /**
@@ -1654,11 +1623,7 @@ trait FreeSpec extends Suite { thisSuite =>
      * </p>
      */
     def ignore(testFun: => Unit) {
-<<<<<<< .working
-      registerTestToIgnore(specText, "ignore", tags, testFun _)
-=======
       registerTestToIgnore(specText, tags, "ignore", testFun _)
->>>>>>> .merge-right.r3742
     }
   }       
 
@@ -1678,12 +1643,7 @@ trait FreeSpec extends Suite { thisSuite =>
      * text (passed to the contructor of <code>FreeSpecStringWrapper</code> and immediately invoke the passed function.
      */
     def - (fun: => Unit) {
-<<<<<<< .working
-      // TODO: Fix the resource name and method name
-      registerNestedBranch(string, None, fun, "describeCannotAppearInsideAnIt", "FreeSpec.scala", "-", stackDepth - 1)
-=======
-      registerNestedBranch(string, None, fun, "describeCannotAppearInsideAnIt", "FreeSpec.scala", "-", 1)
->>>>>>> .merge-right.r3742
+      registerNestedBranch(string, None, fun, "describeCannotAppearInsideAnIt", "FreeSpec.scala", "-", 3, -2)
     }
 
     /**
@@ -1703,11 +1663,7 @@ trait FreeSpec extends Suite { thisSuite =>
      * </p>
      */
     def in(f: => Unit) {
-<<<<<<< .working
-      registerTestToRun(string, "in", List(), f _)
-=======
       registerTestToRun(string, List(), "in", f _)
->>>>>>> .merge-right.r3742
     }
 
     /**
@@ -1727,11 +1683,7 @@ trait FreeSpec extends Suite { thisSuite =>
      * </p>
      */
     def ignore(f: => Unit) {
-<<<<<<< .working
-      registerTestToIgnore(string, "ignore", List(), f _)
-=======
       registerTestToIgnore(string, List(), "ignore", f _)
->>>>>>> .merge-right.r3742
     }
 
     /**
@@ -1751,11 +1703,7 @@ trait FreeSpec extends Suite { thisSuite =>
      * </p>
      */
     def is(f: => PendingNothing) {
-<<<<<<< .working
-      registerTestToRun(string, "is", List(), f _)
-=======
       registerTestToRun(string, List(), "is", f _)
->>>>>>> .merge-right.r3742
     }
 
     /**

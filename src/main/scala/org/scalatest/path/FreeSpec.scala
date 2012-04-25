@@ -693,7 +693,6 @@ import org.scalatest.Style
 trait FreeSpec extends org.scalatest.Suite with OneInstancePerTest { thisSuite =>
   
   private final val engine = PathEngine.getEngine()
-  private final val stackDepth = 4
   import engine._
 
   override def newInstance = this.getClass.newInstance.asInstanceOf[FreeSpec]
@@ -726,15 +725,8 @@ trait FreeSpec extends org.scalatest.Suite with OneInstancePerTest { thisSuite =
    * @throws TestRegistrationClosedException if invoked after <code>run</code> has been invoked on this suite
    * @throws NullPointerException if <code>specText</code> or any passed test tag is <code>null</code>
    */
-<<<<<<< .working
-  private def registerTestToRun(specText: String, testTags: List[Tag], testFun: () => Unit) {
-    // TODO: This is what was being used before but it is wrong
-    handleTest(thisSuite, specText, testFun, "itCannotAppearInsideAnotherIt", "FunSpec.scala", "apply", stackDepth, testTags: _*)
-    // registerTest(specText, testFun, "itCannotAppearInsideAnotherIt", "FreeSpec.scala", "it", None, testTags: _*)
-=======
   private def registerTestToRun(specText: String, testTags: List[Tag], methodName: String, testFun: () => Unit) {
-    handleTest(thisSuite, specText, testFun, "itCannotAppearInsideAnotherIt", "FreeSpec.scala", methodName, 1, testTags: _*)
->>>>>>> .merge-right.r3742
+    handleTest(thisSuite, specText, testFun, "itCannotAppearInsideAnotherIt", "FreeSpec.scala", methodName, 4, -2, testTags: _*)
   }
 
   /**
@@ -756,15 +748,8 @@ trait FreeSpec extends org.scalatest.Suite with OneInstancePerTest { thisSuite =
    * @throws TestRegistrationClosedException if invoked after <code>run</code> has been invoked on this suite
    * @throws NullPointerException if <code>specText</code> or any passed test tag is <code>null</code>
    */
-<<<<<<< .working
-  private def registerTestToIgnore(specText: String, testTags: List[Tag], testFun: () => Unit) {
-
-    // TODO: This is how these were, but it needs attention. Mentions "it".
-    handleIgnoredTest(specText, testFun, "ignoreCannotAppearInsideAnIt", "FreeSpec.scala", "ignore", stackDepth, testTags: _*)
-=======
   private def registerTestToIgnore(specText: String, testTags: List[Tag], methodName: String, testFun: () => Unit) {
-    handleIgnoredTest(specText, testFun, "ignoreCannotAppearInsideAnIt", "FreeSpec.scala", methodName, 1, testTags: _*)
->>>>>>> .merge-right.r3742
+    handleIgnoredTest(specText, testFun, "ignoreCannotAppearInsideAnIt", "FreeSpec.scala", methodName, 4, -2, testTags: _*)
   }
 
   /**
@@ -874,13 +859,8 @@ trait FreeSpec extends org.scalatest.Suite with OneInstancePerTest { thisSuite =
      * <code>org.scalatest.path.FreeSpec</code>.
      */
     def - (fun: => Unit) {
-<<<<<<< .working
-      // TODO: Fix the resource name and method name
-      
-      handleNestedBranch(string, None, fun, "describeCannotAppearInsideAnIt", "FreeSpec.scala", "-", stackDepth - 1)
-=======
-      handleNestedBranch(string, None, fun, "itCannotAppearInsideAnIt", "FreeSpec.scala", "-")
->>>>>>> .merge-right.r3742
+      // TODO: Fix the resource name
+      handleNestedBranch(string, None, fun, "describeCannotAppearInsideAnIt", "FreeSpec.scala", "-", 6, -2)
     }
 
     /**

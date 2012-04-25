@@ -369,7 +369,6 @@ import org.scalatest.Suite.checkRunTestParamsForNull
 trait FunSuite extends Suite { thisSuite =>
 
   private final val engine = new FixtureEngine[FixtureParam]("concurrentFixtureFunSuiteMod", "FixtureFunSuite")
-  private final val stackDepth = 4
   import engine._
   
   private[scalatest] val sourceFileName = "FunSuite.scala"
@@ -399,11 +398,7 @@ trait FunSuite extends Suite { thisSuite =>
    * @throws NullPointerException if <code>testName</code> or any passed test tag is <code>null</code>
    */
   protected def test(testName: String, testTags: Tag*)(testFun: FixtureParam => Any) {
-<<<<<<< .working
-    registerTest(testName, testFun, "testCannotAppearInsideAnotherTest", sourceFileName, "test", stackDepth, None, None, testTags: _*)
-=======
-    registerTest(testName, testFun, "testCannotAppearInsideAnotherTest", sourceFileName, "test", 2, None, None, testTags: _*)
->>>>>>> .merge-right.r3742
+    registerTest(testName, testFun, "testCannotAppearInsideAnotherTest", sourceFileName, "test", 4, -2, None, None, testTags: _*)
   }
 
   /**
@@ -422,11 +417,7 @@ trait FunSuite extends Suite { thisSuite =>
    * @throws NotAllowedException if <code>testName</code> had been registered previously
    */
   protected def ignore(testName: String, testTags: Tag*)(testFun: FixtureParam => Any) {
-<<<<<<< .working
-    registerIgnoredTest(testName, testFun, "ignoreCannotAppearInsideATest", sourceFileName, "ignore", stackDepth, testTags: _*)
-=======
-    registerIgnoredTest(testName, testFun, "ignoreCannotAppearInsideATest", sourceFileName, "ignore", 1, testTags: _*)
->>>>>>> .merge-right.r3742
+    registerIgnoredTest(testName, testFun, "ignoreCannotAppearInsideATest", sourceFileName, "ignore", 4, -2, testTags: _*)
   }
 
   /**
