@@ -81,8 +81,8 @@
     </dependency>
 
     <dependency>
-      <groupId>org.scala-tools.testing</groupId>
-      <artifactId>scalacheck_@SCALA_VERSION@</artifactId>
+      <groupId>org.scalacheck</groupId>
+      <artifactId>scalacheck_2.9.1</artifactId>
       <version>1.8</version>
       <optional>true</optional>
     </dependency>
