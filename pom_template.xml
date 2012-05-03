@@ -67,6 +67,12 @@
     </dependency>
 
     <dependency>
+      <groupId>org.scala-lang</groupId>
+      <artifactId>scala-actors</artifactId>
+      <version>@SCALA_VERSION@</version>
+    </dependency>
+
+    <dependency>
       <groupId>org.scala-tools.testing</groupId>
       <artifactId>test-interface</artifactId>
       <version>0.5</version>
