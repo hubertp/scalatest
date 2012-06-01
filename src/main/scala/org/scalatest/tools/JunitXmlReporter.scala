@@ -226,7 +226,7 @@ private[scalatest] class JunitXmlReporter(directory: String) extends Reporter {
 
     (startIndex, endIndex)
   }
-
+  
   //
   // Constructs a Testcase object from events in orderedEvents array.
   //
@@ -251,19 +251,51 @@ private[scalatest] class JunitXmlReporter(directory: String) extends Reporter {
         case e: TestSucceeded =>
           endIndex = idx
           testcase.time = e.timeStamp - testcase.timeStamp
+          e.testEvents.foreach { e => 
+            e match {
+              case ipEvent: InfoProvided => 
+                idx += 1
+              case mpEvent: MarkupProvided => 
+                idx += 1
+            }
+          }
 
         case e: TestFailed =>
           endIndex = idx
           testcase.failure = Some(e)
           testcase.time = e.timeStamp - testcase.timeStamp
+          e.testEvents.foreach { e => 
+            e match {
+              case ipEvent: InfoProvided => 
+                idx += 1
+              case mpEvent: MarkupProvided => 
+                idx += 1
+            }
+          }
 
         case e: TestPending =>
           endIndex = idx
           testcase.pending = true
+          e.testEvents.foreach { e => 
+            e match {
+              case ipEvent: InfoProvided => 
+                idx += 1
+              case mpEvent: MarkupProvided => 
+                idx += 1
+            }
+          }
 
         case e: TestCanceled =>
           endIndex = idx
           testcase.canceled = true
+          e.testEvents.foreach { e => 
+            e match {
+              case ipEvent: InfoProvided => 
+                idx += 1
+              case mpEvent: MarkupProvided => 
+                idx += 1
+            }
+          }
 
         case e: ScopeOpened    => idx += 1
         case e: ScopeClosed    => idx += 1

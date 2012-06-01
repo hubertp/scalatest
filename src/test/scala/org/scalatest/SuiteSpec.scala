@@ -47,11 +47,14 @@ class SuiteSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
       }
       val rep = new EventRecordingReporter
       a.run(None, RunArgs(rep, new Stopper {}, Filter(), Map(), None, new Tracker(), Set.empty))
-      val ip = rep.infoProvidedEventsReceived
-      assert(ip.size === 3)
-      for (event <- ip) {
-        assert(event.aboutAPendingTest.isDefined && event.aboutAPendingTest.get)
-        assert(event.aboutACanceledTest.isDefined && !event.aboutACanceledTest.get)
+      val testPending = rep.testPendingEventsReceived
+      assert(testPending.size === 1)
+      val testEvents = testPending(0).testEvents
+      assert(testEvents.size === 3)
+      for (event <- testEvents) {
+        val ip = event.asInstanceOf[InfoProvided]
+        assert(ip.aboutAPendingTest.isDefined && ip.aboutAPendingTest.get)
+        assert(ip.aboutACanceledTest.isDefined && !ip.aboutACanceledTest.get)
       }
     }
     it("should send InfoProvided events with aboutAPendingTest and aboutACanceledTest set to false for info " +
@@ -66,11 +69,14 @@ class SuiteSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
       }
       val rep = new EventRecordingReporter
       a.run(None, RunArgs(rep, new Stopper {}, Filter(), Map(), None, new Tracker(), Set.empty))
-      val ip = rep.infoProvidedEventsReceived
-      assert(ip.size === 3)
-      for (event <- ip) {
-        assert(event.aboutAPendingTest.isDefined && !event.aboutAPendingTest.get)
-        assert(event.aboutACanceledTest.isDefined && !event.aboutACanceledTest.get)
+      val testSucceeded = rep.testSucceededEventsReceived
+      assert(testSucceeded.size === 1)
+      val testEvents = testSucceeded(0).testEvents
+      assert(testEvents.size === 3)
+      for (event <- testEvents) {
+        val ip = event.asInstanceOf[InfoProvided]
+        assert(ip.aboutAPendingTest.isDefined && !ip.aboutAPendingTest.get)
+        assert(ip.aboutACanceledTest.isDefined && !ip.aboutACanceledTest.get)
       }
     }
     it("should send InfoProvided events with aboutAPendingTest set to false and aboutACanceledTest set to true for info " +
@@ -85,11 +91,14 @@ class SuiteSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
       }
       val rep = new EventRecordingReporter
       a.run(None, RunArgs(rep, new Stopper {}, Filter(), Map(), None, new Tracker(), Set.empty))
-      val ip = rep.infoProvidedEventsReceived
-      assert(ip.size === 3)
-      for (event <- ip) {
-        assert(event.aboutAPendingTest.isDefined && !event.aboutAPendingTest.get)
-        assert(event.aboutACanceledTest.isDefined && event.aboutACanceledTest.get)
+      val testCanceled = rep.testCanceledEventsReceived
+      assert(testCanceled.size === 1)
+      val testEvents = testCanceled(0).testEvents
+      assert(testEvents.size === 3)
+      for (event <- testEvents) {
+        val ip = event.asInstanceOf[InfoProvided]
+        assert(ip.aboutAPendingTest.isDefined && !ip.aboutAPendingTest.get)
+        assert(ip.aboutACanceledTest.isDefined && ip.aboutACanceledTest.get)
       }
     }
     it("should return the test names in alphabetical order from testNames") {
