@@ -541,8 +541,6 @@ trait Suite extends org.scalatest.Suite { thisSuite =>
 // use Engine in Suite, though then I'd have two Engines in everything. Or even three down here.
 // Nah, go ahead and use message recording informer here, and maybe find some other way to
 // reduce the duplication between Suite, FixtureSuite, and Engine.
-    var testWasPending = false
-    var testWasCanceled = false
     try {
       if (testMethodTakesAFixtureAndInformer(testName) || testMethodTakesAFixture(testName)) {
         val testFun: FixtureParam => Unit = {
@@ -564,26 +562,8 @@ trait Suite extends org.scalatest.Suite { thisSuite =>
         val testFun: () => Unit = {
           () => {
             val args: Array[Object] =
-              if (testMethodTakesAnInformer(testName)) {
-                val informer =
-                  new Informer {
-/*
-                    def apply(message: String) {
-                      if (message == null)
-                        throw new NullPointerException
-                      reportInfoProvided(thisSuite, report, tracker, Some(testName), message, None, 2, getLineInFile(Thread.currentThread().getStackTrace, 2), true)
-                    }
-*/
-                    def apply(message: String, payload: Option[Any] = None) {
-                      if (message == null)
-                        throw new NullPointerException
-                      if (payload == null)
-                        throw new NullPointerException
-                      reportInfoProvided(thisSuite, report, tracker, Some(testName), message, payload, 2, getLineInFile(Thread.currentThread().getStackTrace, 2), true)
-                    }
-                  }
-                Array(informer)
-              }
+              if (testMethodTakesAnInformer(testName)) 
+                Array(informerForThisTest)
               else
                 Array()
 

@@ -2071,8 +2071,6 @@ trait Suite extends Assertions with AbstractSuite with Serializable { thisSuite 
       }
       else Array()
 
-    //var testWasPending = false
-    //var testWasCanceled = false
     try {
       val theConfigMap = configMap
       withFixture(

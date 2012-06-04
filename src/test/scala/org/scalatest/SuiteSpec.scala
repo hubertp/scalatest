@@ -685,17 +685,22 @@ class SuiteSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
         }
       }
     }
-    it("should, when a test methods takes an Informer and writes to it, report the info after the test completion event") {
+    it("should, when a test methods takes an Informer and writes to it, report the info in test completion event") {
       val msg = "hi there dude"
       class MySuite extends Suite {
         def testWithInformer(info: Informer) {
           info(msg)
         }
       }
-      val (infoProvidedIndex, testStartingIndex, testSucceededIndex) =
-        getIndexesForInformerEventOrderTests(new MySuite, "testWithInformer(Informer)", msg)
-      assert(testStartingIndex < testSucceededIndex)
-      assert(testSucceededIndex < infoProvidedIndex)
+      val myRep = new EventRecordingReporter
+      new MySuite().run(None, RunArgs(myRep, new Stopper {}, Filter(), Map(), None, new Tracker, Set.empty))
+      val testStarting = myRep.testStartingEventsReceived
+      assert(testStarting.size === 1)
+      val testSucceeded = myRep.testSucceededEventsReceived
+      assert(testSucceeded.size === 1)
+      assert(testSucceeded(0).testEvents.size === 1)
+      val ip: InfoProvided = testSucceeded(0).testEvents(0).asInstanceOf[InfoProvided]
+      assert(msg === ip.message)
     }
   }
   describe("the stopper") {
