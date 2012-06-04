@@ -4,17 +4,29 @@ import org.scalatest._
 import org.scalatest.events._
 import DispatchReporter.propagateDispose
 import scala.collection.mutable.ListBuffer
+import org.scalatest.time.Span
+import java.util.Timer
+import java.util.TimerTask
 
-class TestSortingReporter(dispatch: Reporter) extends ResourcefulReporter {
+class TestSortingReporter(dispatch: Reporter, timeout: Span) extends ResourcefulReporter {
 
-  case class Slot(startEvent: Option[Event], completedEvent: Option[Event], ready: Boolean)
+  case class Slot(testName: String, startEvent: Option[Event], completedEvent: Option[Event], ready: Boolean)
   
   private val waitingBuffer = new ListBuffer[Slot]()
   private val slotMap = new collection.mutable.HashMap[String, Slot]()  // testName -> Slot
   
+  class TimeoutTask(val event: Event) extends TimerTask {
+    override def run() {
+      timeout()
+    }
+  }
+  
+  private val timer = new Timer()
+  private var timeoutTask: Option[TimeoutTask] = None
+  
   def waitForTestCompleted(testName: String) {
     synchronized {
-      slotMap.put(testName, Slot(None, None, false))
+      slotMap.put(testName, Slot(testName, None, None, false))
     }
   }
   
@@ -87,6 +99,45 @@ class TestSortingReporter(dispatch: Reporter) extends ResourcefulReporter {
     }
     waitingBuffer.clear()
     waitingBuffer ++= pending
+    if (waitingBuffer.size > 0) 
+      scheduleTimeoutTask()
+    else {
+      timeoutTask match {
+        case Some(task) => 
+          task.cancel()
+          timeoutTask = None
+        case None =>
+      }
+    }
+  }
+  
+  private def scheduleTimeoutTask() {
+    val head = waitingBuffer.head
+    timeoutTask match {
+        case Some(task) => 
+          if (head.startEvent.get != task.event) {
+            task.cancel()
+            timeoutTask = Some(new TimeoutTask(head.startEvent.get))
+            timer.schedule(timeoutTask.get, timeout.millisPart)
+          }
+        case None => 
+          timeoutTask = Some(new TimeoutTask(head.startEvent.get))
+          timer.schedule(timeoutTask.get, timeout.millisPart)
+      }
+  }
+  
+  private def timeout() {
+    synchronized {
+      if (waitingBuffer.size > 0) {
+        val head = waitingBuffer.head
+        if (timeoutTask.get.event == head.startEvent.get) {
+          val newSlot = head.copy(ready = true)
+          waitingBuffer.update(0, newSlot)
+          slotMap.remove(newSlot.testName)
+        }
+        fireReadyEvents()
+      }
+    }
   }
   
   override def dispose() = propagateDispose(dispatch)

@@ -9,6 +9,8 @@ import org.scalatest.events.NameInfo
 import org.scalatest.events.TestStarting
 import org.scalatest.events.TestSucceeded
 import org.scalatest.events.ScopeClosed
+import org.scalatest.time.Span
+import org.scalatest.time.Seconds
 
 class TestSortingReporterSpec extends FunSpec with ShouldMatchers {
 
@@ -37,7 +39,7 @@ class TestSortingReporterSpec extends FunSpec with ShouldMatchers {
     
     it("should fire event passed to it in the order they arrive if waitForTestCompleted is not called.") {
       val recordingReporter = new EventRecordingReporter()
-      val dispatch = new TestSortingReporter(recordingReporter)
+      val dispatch = new TestSortingReporter(recordingReporter, Span(15, Seconds))
       
       dispatch(scope1Opened)
       dispatch(scope2Opened)
@@ -81,7 +83,7 @@ class TestSortingReporterSpec extends FunSpec with ShouldMatchers {
     
     it("should wait and fire event based on the order of waitForTestCompleted is called.") {
       val recordingReporter = new EventRecordingReporter()
-      val dispatch = new TestSortingReporter(recordingReporter)
+      val dispatch = new TestSortingReporter(recordingReporter, Span(15, Seconds))
       
       dispatch(scope1Opened)
       dispatch(scope2Opened)
@@ -127,6 +129,43 @@ class TestSortingReporterSpec extends FunSpec with ShouldMatchers {
       recordedEvents(14) should be (s3t2Succeeded)
       recordedEvents(15) should be (s3t3Starting)
       recordedEvents(16) should be (s3t3Succeeded)
+    }
+    
+    it("should wait and fire blocking event when timeout, and just fire the missing event directly without waiting when received later.") {
+    
+      val recordingReporter = new EventRecordingReporter()
+      val dispatch = new TestSortingReporter(recordingReporter, Span(3, Seconds))
+      
+      dispatch(scope1Opened)
+      dispatch(scope2Opened)
+      dispatch.waitForTestCompleted(s1s2t1Starting.testName)
+      dispatch(s1s2t1Starting)
+      dispatch.waitForTestCompleted(s1s2t2Starting.testName)
+      dispatch(s1s2t2Starting)
+      dispatch.waitForTestCompleted(s1s2t3Starting.testName)
+      dispatch(s1s2t3Starting)
+      dispatch(s1s2t3Succeeded)
+      dispatch(s1s2t2Succeeded)
+      
+      Thread.sleep(4000)
+      dispatch(s1s2t1Succeeded)
+      
+      dispatch(scope2Closed)
+      dispatch(scope1Closed)
+      
+      
+      
+      val recordedEvents = recordingReporter.eventsReceived
+      recordedEvents(0) should be (scope1Opened)
+      recordedEvents(1) should be (scope2Opened)
+      recordedEvents(2) should be (s1s2t1Starting)
+      recordedEvents(3) should be (s1s2t2Starting)
+      recordedEvents(4) should be (s1s2t2Succeeded)
+      recordedEvents(5) should be (s1s2t3Starting)
+      recordedEvents(6) should be (s1s2t3Succeeded)
+      recordedEvents(7) should be (s1s2t1Succeeded)
+      recordedEvents(8) should be (scope2Closed)
+      recordedEvents(9) should be (scope1Closed)
     }
   }
   
