@@ -58,7 +58,7 @@ class TestSortingReporter(dispatch: Reporter) extends ResourcefulReporter {
     slotMap.get(testName) match {
       case Some(slot) => 
         val newSlot = slot.copy(completedEvent = Some(event), ready = true)
-        waitingBuffer += newSlot
+        waitingBuffer.update(waitingBuffer.indexOf(slot), newSlot)
         slotMap.put(testName, newSlot)
       case None => 
         dispatch(event)
