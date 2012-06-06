@@ -21,6 +21,7 @@ import MessageRecorder.ConcurrentMessageEventFun
 import org.scalatest.events.Location
 import org.scalatest.Suite.getLineInFile
 import org.scalatest.events.Event
+import org.scalatest.events.RecordableEvent
 
 /*
  This is used by Suite and test informers created as tests run, which therefore have
@@ -137,14 +138,8 @@ private[scalatest] class MessageRecorder(dispatch: Reporter) extends ThreadAware
       dispatch(eventFun(message, payload, false, false, false, location)) // Fire the info provided event using the passed function
   }
 
-  // send out any recorded messages
-  /*def fireRecordedMessages(testWasPending: Boolean, testWasCanceled: Boolean) {
-    for ((message, payload, fire, location) <- recordedMessages)
-      fire(message, payload, true, testWasPending, testWasCanceled, location) // Fire the info provided event using the passed function
-  }*/
-  def recordedEvents(testWasPending: Boolean, testWasCanceled: Boolean) = {
-    //for ((message, payload, eventFun, location) <- recordedMessages)
-    recordedMessages.map { case (message, payload, eventFun, location) =>
+  def recordedEvents(testWasPending: Boolean, testWasCanceled: Boolean): IndexedSeq[RecordableEvent] = {
+    Vector.empty ++ recordedMessages.map { case (message, payload, eventFun, location) =>
       eventFun(message, payload, true, testWasPending, testWasCanceled, location)
     }
   }
@@ -174,7 +169,7 @@ private[scalatest] object MessageRecorder {
   // Three params of function are the string message, a boolean indicating this was from the current
   // thread, two booleans that indicate the message is about a pending or canceled
   // test (in which case it would be printed out in yellow) and an optional location.
-  type RecordedMessageEventFun = (String, Option[Any], Boolean, Boolean, Boolean, Option[Location]) => Event 
+  type RecordedMessageEventFun = (String, Option[Any], Boolean, Boolean, Boolean, Option[Location]) => RecordableEvent 
 
   // First two params of function are the string message and a boolean indicating this was from the current thread, 
   // and an optional location.
@@ -183,7 +178,7 @@ private[scalatest] object MessageRecorder {
 
 // For path traits, need a message recording informer that only later gets 
 // (theSuite: Suite, report: Reporter, tracker: Tracker, testName: String, theTest: TestLeaf, includeIcon: Boolean. thread: Thread)
-private[scalatest] class PathMessageRecordingInformer(eventFun: (String, Option[Any], Boolean, Boolean, Suite, Reporter, Tracker, String, Int, Boolean, Thread) => Event) extends ThreadAwareness with Informer {
+private[scalatest] class PathMessageRecordingInformer(eventFun: (String, Option[Any], Boolean, Boolean, Suite, Reporter, Tracker, String, Int, Boolean, Thread) => RecordableEvent) extends ThreadAwareness with Informer {
 
   import scala.collection.mutable.SynchronizedBuffer
   import scala.collection.mutable.ArrayBuffer
@@ -217,21 +212,13 @@ private[scalatest] class PathMessageRecordingInformer(eventFun: (String, Option[
     record(message, payload)
   }
 
-  // send out any recorded messages
-  /*def fireRecordedMessages(testWasPending: Boolean, theSuite: Suite, report: Reporter, tracker: Tracker, testName: String, indentation: Int, includeIcon: Boolean) {
-    for ((message, payload, thread, wasConstructingThread) <- messages) {
-     // (theSuite: Suite, report: Reporter, tracker: Tracker, testName: String, theTest: TestLeaf, includeIcon: Boolean)
-      fire(message, payload, wasConstructingThread, testWasPending, theSuite, report, tracker, testName, indentation, includeIcon, thread) // Fire the info provided event using the passed function
-    }
-  }*/
-  def recordedEvents(testWasPending: Boolean, theSuite: Suite, report: Reporter, tracker: Tracker, testName: String, indentation: Int, includeIcon: Boolean) = {
-    //for ((message, payload, eventFun, location) <- recordedMessages)
-    messages.map { case (message, payload, thread, wasConstructingThread) =>
+  def recordedEvents(testWasPending: Boolean, theSuite: Suite, report: Reporter, tracker: Tracker, testName: String, indentation: Int, includeIcon: Boolean): IndexedSeq[RecordableEvent] = {
+    Vector.empty ++ messages.map { case (message, payload, thread, wasConstructingThread) =>
       eventFun(message, payload, wasConstructingThread, testWasPending, theSuite, report, tracker, testName, indentation, includeIcon, thread)
     }
   }
 }
 
 private[scalatest] object PathMessageRecordingInformer {
-  def apply(eventFun: (String, Option[Any], Boolean, Boolean, Suite, Reporter, Tracker, String, Int, Boolean, Thread) => Event) = new PathMessageRecordingInformer(eventFun)
+  def apply(eventFun: (String, Option[Any], Boolean, Boolean, Suite, Reporter, Tracker, String, Int, Boolean, Thread) => RecordableEvent) = new PathMessageRecordingInformer(eventFun)
 }

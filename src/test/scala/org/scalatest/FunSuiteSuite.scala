@@ -110,9 +110,9 @@ class FunSuiteSuite extends Suite with SharedHelpers {
     a.run(None, RunArgs(myRep, new Stopper {}, Filter(), Map(), None, new Tracker, Set.empty))
     val testSucceeded = myRep.testSucceededEventsReceived
     assert(testSucceeded.size === 1)
-    val testEvents = testSucceeded(0).testEvents
-    assert(testEvents.size === 1)
-    val ip = testEvents(0).asInstanceOf[InfoProvided]
+    val recordedEvents = testSucceeded(0).recordedEvents
+    assert(recordedEvents.size === 1)
+    val ip = recordedEvents(0).asInstanceOf[InfoProvided]
     assert(ip.message === msg)
   }
   

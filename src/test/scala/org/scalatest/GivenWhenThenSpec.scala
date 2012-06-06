@@ -37,9 +37,9 @@ class GivenWhenThenSpec extends FunSpec with SharedHelpers {
     spec.run(None, RunArgs(myRep, new Stopper {}, Filter(), Map(), None, new Tracker, Set.empty))
     val testSucceeded = myRep.testSucceededEventsReceived
     assert(testSucceeded.size === 1)
-    val testEvents = testSucceeded(0).testEvents
-    assert(testEvents.size === 4)
-    val infoProvidedList = testEvents.map(_.asInstanceOf[InfoProvided])
+    val recordedEvents = testSucceeded(0).recordedEvents
+    assert(recordedEvents.size === 4)
+    val infoProvidedList = recordedEvents.map(_.asInstanceOf[InfoProvided])
 
     it("should pass given through to the reporter") {
       assert(infoProvidedList.exists(_.message == "Given " + theGiven))

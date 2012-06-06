@@ -800,9 +800,9 @@ class FixtureFreeSpecSpec extends org.scalatest.FunSpec with PrivateMethodTester
       a.run(None, RunArgs(rep, new Stopper {}, Filter(), Map(), None, new Tracker(), Set.empty))
       val testPending = rep.testPendingEventsReceived
       assert(testPending.size === 1)
-      val testEvents = testPending(0).testEvents
-      assert(testEvents.size === 3)
-      for (event <- testEvents) {
+      val recordedEvents = testPending(0).recordedEvents
+      assert(recordedEvents.size === 3)
+      for (event <- recordedEvents) {
         val ip = event.asInstanceOf[InfoProvided]
         assert(ip.aboutAPendingTest.isDefined && ip.aboutAPendingTest.get)
         assert(ip.aboutACanceledTest.isDefined && !ip.aboutACanceledTest.get)
@@ -839,9 +839,9 @@ class FixtureFreeSpecSpec extends org.scalatest.FunSpec with PrivateMethodTester
       a.run(None, RunArgs(rep, new Stopper {}, Filter(), Map(), None, new Tracker(), Set.empty))
       val testSucceeded = rep.testSucceededEventsReceived
       assert(testSucceeded.size === 1)
-      val testEvents = testSucceeded(0).testEvents
-      assert(testEvents.size === 3)
-      for (event <- testEvents) {
+      val recordedEvents = testSucceeded(0).recordedEvents
+      assert(recordedEvents.size === 3)
+      for (event <- recordedEvents) {
         val ip = event.asInstanceOf[InfoProvided]
         assert(ip.aboutAPendingTest.isDefined && !ip.aboutAPendingTest.get)
         assert(ip.aboutACanceledTest.isDefined && !ip.aboutACanceledTest.get)
@@ -878,9 +878,9 @@ class FixtureFreeSpecSpec extends org.scalatest.FunSpec with PrivateMethodTester
       a.run(None, RunArgs(rep, new Stopper {}, Filter(), Map(), None, new Tracker(), Set.empty))
       val testCanceled = rep.testCanceledEventsReceived
       assert(testCanceled.size === 1)
-      val testEvents = testCanceled(0).testEvents
-      assert(testEvents.size === 3)
-      for (event <- testEvents) {
+      val recordedEvents = testCanceled(0).recordedEvents
+      assert(recordedEvents.size === 3)
+      for (event <- recordedEvents) {
         val ip = event.asInstanceOf[InfoProvided]
         assert(ip.aboutAPendingTest.isDefined && !ip.aboutAPendingTest.get)
         assert(ip.aboutACanceledTest.isDefined && ip.aboutACanceledTest.get)

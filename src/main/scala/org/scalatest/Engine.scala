@@ -236,7 +236,7 @@ private[scalatest] sealed abstract class SuperEngine[T](concurrentBundleModResou
                          (if (theTest.recordedMessages.isDefined) 
                             theTest.recordedMessages.get.recordedEvents(false, theSuite, report, tracker, testName, theTest.indentationLevel + 1, includeIcon)
                           else
-                            List.empty[Event])
+                            Vector.empty)
       reportTestSucceeded(theSuite, report, tracker, testName, theTest.testText, None, recordEvents, durationToReport, formatter, theSuite.rerunner, theTest.lineInFile)
     }
     catch { // XXX
@@ -247,7 +247,7 @@ private[scalatest] sealed abstract class SuperEngine[T](concurrentBundleModResou
                            (if (theTest.recordedMessages.isDefined) 
                              theTest.recordedMessages.get.recordedEvents(true, theSuite, report, tracker, testName, theTest.indentationLevel + 1, includeIcon)
                            else
-                             List.empty[Event])
+                             Vector.empty)
         reportTestPending(theSuite, report, tracker, testName, theTest.testText, None, recordEvents, duration, formatter, theTest.lineInFile)
       case e: TestCanceledException =>
         val duration = System.currentTimeMillis - testStartTime
@@ -256,7 +256,7 @@ private[scalatest] sealed abstract class SuperEngine[T](concurrentBundleModResou
                            (if (theTest.recordedMessages.isDefined) 
                              theTest.recordedMessages.get.recordedEvents(false, theSuite, report, tracker, testName, theTest.indentationLevel + 1, includeIcon)
                            else
-                             List.empty[Event])
+                             Vector.empty)
         reportTestCanceled(theSuite, report, e, testName, theTest.testText, None, recordEvents, theSuite.rerunner, tracker, duration, theTest.indentationLevel, includeIcon, theTest.lineInFile)
       case e if !anErrorThatShouldCauseAnAbort(e) =>
         val duration = System.currentTimeMillis - testStartTime
@@ -265,7 +265,7 @@ private[scalatest] sealed abstract class SuperEngine[T](concurrentBundleModResou
                            (if (theTest.recordedMessages.isDefined)
                              theTest.recordedMessages.get.recordedEvents(false, theSuite, report, tracker, testName, theTest.indentationLevel + 1, includeIcon)
                            else
-                             List.empty[Event])
+                             Vector.empty)
         reportTestFailed(theSuite, report, e, testName, theTest.testText, None, recordEvents, theSuite.rerunner, tracker, durationToReport, theTest.indentationLevel, includeIcon, Some(SeeStackDepthException))
       case e => throw e
     }

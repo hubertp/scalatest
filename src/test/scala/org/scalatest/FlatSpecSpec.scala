@@ -164,8 +164,8 @@ class FlatSpecSpec extends FunSpec with SharedHelpers with GivenWhenThen with Sh
         assert(1 === testStarting.size)
         val testSucceeded = myRep.testSucceededEventsReceived
         assert(1 === testSucceeded.size)
-        assert(1 === testSucceeded(0).testEvents.size)
-        val ip: InfoProvided = testSucceeded(0).testEvents(0).asInstanceOf[InfoProvided]
+        assert(1 === testSucceeded(0).recordedEvents.size)
+        val ip: InfoProvided = testSucceeded(0).recordedEvents(0).asInstanceOf[InfoProvided]
         assert(spec.msg === ip.message)
       }
       class InfoBeforeTestFlatSpec extends FlatSpec {
@@ -948,9 +948,9 @@ class FlatSpecSpec extends FunSpec with SharedHelpers with GivenWhenThen with Sh
       a.run(None, RunArgs(rep, new Stopper {}, Filter(), Map(), None, new Tracker(), Set.empty))
       val testPending = rep.testPendingEventsReceived
       assert(1 === testPending.size)
-      val testEvents = testPending(0).testEvents
-      assert(testEvents.size === 3)
-      for (event <- testEvents) {
+      val recordedEvents = testPending(0).recordedEvents
+      assert(recordedEvents.size === 3)
+      for (event <- recordedEvents) {
         val ip = event.asInstanceOf[InfoProvided]
         assert(ip.aboutAPendingTest.isDefined && ip.aboutAPendingTest.get)
       }
@@ -969,9 +969,9 @@ class FlatSpecSpec extends FunSpec with SharedHelpers with GivenWhenThen with Sh
       a.run(None, RunArgs(rep, new Stopper {}, Filter(), Map(), None, new Tracker(), Set.empty))
       val testSucceeded = rep.testSucceededEventsReceived
       assert(1 === testSucceeded.size)
-      val testEvents = testSucceeded(0).testEvents
-      assert(testEvents.size === 3)
-      for (event <- testEvents) {
+      val recordedEvents = testSucceeded(0).recordedEvents
+      assert(recordedEvents.size === 3)
+      for (event <- recordedEvents) {
         val ip = event.asInstanceOf[InfoProvided]
         assert(ip.aboutAPendingTest.isDefined && !ip.aboutAPendingTest.get)
       }

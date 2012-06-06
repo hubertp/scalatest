@@ -822,13 +822,13 @@ class FreeSpecSpec extends org.scalatest.FunSpec with SharedHelpers with GivenWh
       a.run(None, RunArgs(rep, new Stopper {}, Filter(), Map(), None, new Tracker(), Set.empty))
       val testPending = rep.testPendingEventsReceived
       assert(testPending.size === 1)
-      val testEvents = testPending(0).testEvents
+      val recordedEvents = testPending(0).recordedEvents
       val so = rep.scopeOpenedEventsReceived
       val sc = rep.scopeClosedEventsReceived
-      assert(testEvents.size === 3)
+      assert(recordedEvents.size === 3)
       assert(so.size === 1)
       assert(sc.size === 1)
-      for (event <- testEvents) {
+      for (event <- recordedEvents) {
         val ip = event.asInstanceOf[InfoProvided]
         assert(ip.message == "A FreeSpec" || ip.aboutAPendingTest.isDefined && ip.aboutAPendingTest.get)
       }
@@ -851,13 +851,13 @@ class FreeSpecSpec extends org.scalatest.FunSpec with SharedHelpers with GivenWh
       a.run(None, RunArgs(rep, new Stopper {}, Filter(), Map(), None, new Tracker(), Set.empty))
       val testSucceeded = rep.testSucceededEventsReceived
       assert(testSucceeded.size === 1)
-      val testEvents = testSucceeded(0).testEvents
+      val recordedEvents = testSucceeded(0).recordedEvents
       val so = rep.scopeOpenedEventsReceived
       val sc = rep.scopeClosedEventsReceived
-      assert(testEvents.size === 3)
+      assert(recordedEvents.size === 3)
       assert(so.size === 1)
       assert(sc.size === 1)
-      for (event <- testEvents) {
+      for (event <- recordedEvents) {
         val ip = event.asInstanceOf[InfoProvided]
         assert(ip.message == "A FreeSpec" || ip.aboutAPendingTest.isDefined && !ip.aboutAPendingTest.get)
       }

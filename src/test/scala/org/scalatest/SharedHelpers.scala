@@ -184,9 +184,9 @@ trait SharedHelpers extends Assertions {
     val testStarting = testStartingOption.get._1.asInstanceOf[TestStarting]
     val testSucceeded = testSucceededOption.get._1.asInstanceOf[TestSucceeded]
     
-    val testEvents = testSucceeded.testEvents
+    val recordedEvents = testSucceeded.recordedEvents
     
-    val infoProvidedOption = testEvents.find {
+    val infoProvidedOption = recordedEvents.find {
       case event: InfoProvided => event.message == infoMsg
       case _ => false
     }
@@ -248,7 +248,7 @@ trait SharedHelpers extends Assertions {
   def getIndentedTextFromTestInfoProvided(suite: Suite): IndentedText = {
     val myRep = new EventRecordingReporter
     suite.run(None, RunArgs(myRep, new Stopper {}, Filter(), Map(), None, new Tracker, Set.empty))
-    val testEvents: Seq[Event] = myRep.eventsReceived.find { e => 
+    val recordedEvents: Seq[Event] = myRep.eventsReceived.find { e => 
       e match {
         case testSucceeded: TestSucceeded => 
           true
@@ -265,19 +265,19 @@ trait SharedHelpers extends Assertions {
       case Some(testCompleted) =>
         testCompleted match {
           case testSucceeded: TestSucceeded => 
-            testSucceeded.testEvents
+            testSucceeded.recordedEvents
           case testFailed: TestFailed => 
-            testFailed.testEvents
+            testFailed.recordedEvents
           case testPending: TestPending => 
-            testPending.testEvents
+            testPending.recordedEvents
           case testCanceled: TestCanceled =>
-            testCanceled.testEvents
+            testCanceled.recordedEvents
         }
       case None => 
         fail("Test completed event is expected but not found.")
     }
-    assert(testEvents.size === 1)
-    testEvents(0) match {
+    assert(recordedEvents.size === 1)
+    recordedEvents(0) match {
       case ip: InfoProvided => 
         ip.formatter match {
           case Some(indentedText: IndentedText) => indentedText

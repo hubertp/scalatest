@@ -251,7 +251,7 @@ private[scalatest] class JunitXmlReporter(directory: String) extends Reporter {
         case e: TestSucceeded =>
           endIndex = idx
           testcase.time = e.timeStamp - testcase.timeStamp
-          e.testEvents.foreach { e => 
+          e.recordedEvents.foreach { e => 
             e match {
               case ipEvent: InfoProvided => 
                 idx += 1
@@ -264,7 +264,7 @@ private[scalatest] class JunitXmlReporter(directory: String) extends Reporter {
           endIndex = idx
           testcase.failure = Some(e)
           testcase.time = e.timeStamp - testcase.timeStamp
-          e.testEvents.foreach { e => 
+          e.recordedEvents.foreach { e => 
             e match {
               case ipEvent: InfoProvided => 
                 idx += 1
@@ -276,7 +276,7 @@ private[scalatest] class JunitXmlReporter(directory: String) extends Reporter {
         case e: TestPending =>
           endIndex = idx
           testcase.pending = true
-          e.testEvents.foreach { e => 
+          e.recordedEvents.foreach { e => 
             e match {
               case ipEvent: InfoProvided => 
                 idx += 1
@@ -288,7 +288,7 @@ private[scalatest] class JunitXmlReporter(directory: String) extends Reporter {
         case e: TestCanceled =>
           endIndex = idx
           testcase.canceled = true
-          e.testEvents.foreach { e => 
+          e.recordedEvents.foreach { e => 
             e match {
               case ipEvent: InfoProvided => 
                 idx += 1

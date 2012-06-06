@@ -8,7 +8,7 @@ import org.scalatest.time.Span
 import java.util.Timer
 import java.util.TimerTask
 
-class TestSortingReporter(dispatch: Reporter, timeout: Span) extends ResourcefulReporter {
+private[scalatest] class TestSortingReporter(dispatch: Reporter, timeout: Span) extends ResourcefulReporter {
 
   case class Slot(testName: String, startEvent: Option[Event], completedEvent: Option[Event], ready: Boolean)
   
@@ -86,13 +86,13 @@ class TestSortingReporter(dispatch: Reporter, timeout: Span) extends Resourceful
           dispatch(completedEvent)
           completedEvent match {
             case testSucceeded: TestSucceeded => 
-              testSucceeded.testEvents.foreach(dispatch(_))
+              testSucceeded.recordedEvents.foreach(dispatch(_))
             case testFailed: TestFailed => 
-              testFailed.testEvents.foreach(dispatch(_))
+              testFailed.recordedEvents.foreach(dispatch(_))
             case testPending: TestPending => 
-              testPending.testEvents.foreach(dispatch(_))
+              testPending.recordedEvents.foreach(dispatch(_))
             case testCanceled: TestCanceled => 
-              testCanceled.testEvents.foreach(dispatch(_))
+              testCanceled.recordedEvents.foreach(dispatch(_))
           }
         case None =>
       }

@@ -94,7 +94,7 @@ trait TestLocationServices {
         checkSeeStackDepthExceptionPair(expectedSuiteAbortedList, suiteAborted.suiteId, event)
       case testSucceeded: TestSucceeded => 
         checkLocation(expectedTestSucceededList, testSucceeded)
-        testSucceeded.testEvents.foreach { e => 
+        testSucceeded.recordedEvents.foreach { e => 
           checkLocation(expectedInfoProvidedList, e)
         }
       case testFailed: TestFailed => 
