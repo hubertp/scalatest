@@ -75,9 +75,9 @@ object GenMustMatchersTests extends Application {
       "ShouldContainValueSpec.scala",
       "ShouldEqualSpec.scala",
       "ShouldHavePropertiesSpec.scala",
-      "ShouldLengthSpec.scala",
+      // "ShouldLengthSpec.scala",
       "ShouldOrderedSpec.scala",
-      "ShouldSizeSpec.scala",
+      // "ShouldSizeSpec.scala",
       // "ShouldStackSpec.scala", now in examples
       // "ShouldStackFlatSpec.scala",
       "ShouldBeASymbolSpec.scala",

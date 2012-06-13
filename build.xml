@@ -160,7 +160,7 @@
     </target>
 
     <target name="compile-codegenerators" depends="init">
-        <scalac srcdir="${generators}" destdir="${build.generators}" target="jvm-1.5" deprecation="yes" classpathref="build.generators.class.path" />
+        <scalac srcdir="${generators}" destdir="${build.generators}" target="jvm-1.5" deprecation="no" classpathref="build.generators.class.path" />
     </target>
 
     <target name="gentables" depends="init, compile-codegenerators"
@@ -221,10 +221,10 @@
     <target name="compile-tests" depends="compile-main">
 
         <!-- Compile the Scala code from ${scalasrc.test} into ${build.tests} -->
-        <scalac srcdir="${scalasrc.test}:${javasrc.test}" destdir="${build.tests}" target="jvm-1.5" classpathref="build.test.class.path" deprecation="yes" addparams="-no-specialization" fork="true" jvmargs="${jvmargs} -XX:+UseConcMarkSweepGC"/>
+        <scalac srcdir="${scalasrc.test}:${javasrc.test}" destdir="${build.tests}" target="jvm-1.5" classpathref="build.test.class.path" deprecation="no" addparams="-no-specialization" fork="true" jvmargs="${jvmargs} -XX:+UseConcMarkSweepGC"/>
 
         <!-- Compile the Scala code from ${build.generated.tests} into ${classes}. Scalac will parse any referenced .java files. -->
-        <scalac srcdir="${build.generated.tests}" destdir="${build.tests}" target="jvm-1.5" classpathref="build.test.class.path" deprecation="yes" addparams="-no-specialization" fork="true" jvmargs="${jvmargs}" />
+        <scalac srcdir="${build.generated.tests}" destdir="${build.tests}" target="jvm-1.5" classpathref="build.test.class.path" deprecation="no" addparams="-no-specialization" fork="true" jvmargs="${jvmargs}" />
 
         <!-- Compile the Java code from ${javasrc.test} into ${build.tests} -->
         <javac srcdir="${javasrc.test}" destdir="${build.tests}" compiler="javac1.5" memoryMaximumSize="2000M" fork="true" classpath="${classes}:${org.scala-lang:scala-library:jar}:${junit:junit:jar}" debug="yes" />
@@ -233,7 +233,7 @@
     <target name="compile-examples" depends="compile-main">
 
         <!-- Compile the Scala code from ${scalasrc.examples} into ${build.examples} -->
-        <scalac srcdir="${scalasrc.examples}:${javasrc.examples}" destdir="${build.examples}" target="jvm-1.5" classpathref="build.test.class.path" addparams="-no-specialization" deprecation="yes" fork="true" jvmargs="${jvmargs} -XX:+UseConcMarkSweepGC"/>
+        <scalac srcdir="${scalasrc.examples}:${javasrc.examples}" destdir="${build.examples}" target="jvm-1.5" classpathref="build.test.class.path" addparams="-no-specialization" deprecation="no" fork="true" jvmargs="${jvmargs} -XX:+UseConcMarkSweepGC"/>
 
         <!-- Compile the Java code from ${examples} into ${build.examples} -->
         <javac srcdir="${javasrc.examples}" destdir="${build.examples}" compiler="javac1.5" classpath="${classes}:${org.easymock:easymock:jar}:${org.scala-lang:scala-library:jar}" debug="yes" />

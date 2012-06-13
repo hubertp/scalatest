@@ -94,8 +94,8 @@
 
     <dependency>
       <groupId>org.scalacheck</groupId>
-      <artifactId>scalacheck_2.9.1</artifactId>
-      <version>1.8</version>
+      <artifactId>scalacheck_2.10.0-M3</artifactId>
+      <version>1.10-SNAPSHOT</version>
       <optional>true</optional>
     </dependency>
 
