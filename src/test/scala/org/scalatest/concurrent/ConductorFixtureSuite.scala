@@ -249,7 +249,7 @@ class ConductorFixtureSuite extends fixture.FunSuite with ConductorFixture with 
     thread {
       val t2 = thread {waitForBeat(2)}
       waitForBeat(1)
-      t2.getThreadGroup should be (currentThread.getThreadGroup)
+      t2.getThreadGroup should be (Thread.currentThread.getThreadGroup)
     }
   }
 
