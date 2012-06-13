@@ -116,6 +116,7 @@
             <classpath>
                 <pathelement location="${org.scala-lang:scala-library:jar}" />
                 <pathelement location="${org.scala-lang:scala-compiler:jar}" />
+                <pathelement location="${org.scala-lang:scala-reflect:jar}" />
             </classpath>
         </taskdef>
 
