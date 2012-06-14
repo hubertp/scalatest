@@ -41,7 +41,7 @@ import scala.xml
  *
  * @author George Berger
  */
-private[scalatest] class JunitXmlReporter(directory: String) extends Reporter {
+private[scalatest] class JUnitXmlReporter(directory: String) extends Reporter {
 
   private val events = Set.empty[Event]
   private val propertiesXml = genPropertiesXml
@@ -226,6 +226,9 @@ private[scalatest] class JunitXmlReporter(directory: String) extends Reporter {
 
     (startIndex, endIndex)
   }
+
+  private def idxAdjustmentForRecordedEvents(recordedEvents: IndexedSeq[RecordableEvent]) =
+    recordedEvents.filter(e => e.isInstanceOf[InfoProvided] || e.isInstanceOf[MarkupProvided]).size
   
   //
   // Constructs a Testcase object from events in orderedEvents array.
@@ -251,51 +254,23 @@ private[scalatest] class JunitXmlReporter(directory: String) extends Reporter {
         case e: TestSucceeded =>
           endIndex = idx
           testcase.time = e.timeStamp - testcase.timeStamp
-          e.recordedEvents.foreach { e => 
-            e match {
-              case ipEvent: InfoProvided => 
-                idx += 1
-              case mpEvent: MarkupProvided => 
-                idx += 1
-            }
-          }
+          idx += idxAdjustmentForRecordedEvents(e.recordedEvents)
 
         case e: TestFailed =>
           endIndex = idx
           testcase.failure = Some(e)
           testcase.time = e.timeStamp - testcase.timeStamp
-          e.recordedEvents.foreach { e => 
-            e match {
-              case ipEvent: InfoProvided => 
-                idx += 1
-              case mpEvent: MarkupProvided => 
-                idx += 1
-            }
-          }
+          idx += idxAdjustmentForRecordedEvents(e.recordedEvents)
 
         case e: TestPending =>
           endIndex = idx
           testcase.pending = true
-          e.recordedEvents.foreach { e => 
-            e match {
-              case ipEvent: InfoProvided => 
-                idx += 1
-              case mpEvent: MarkupProvided => 
-                idx += 1
-            }
-          }
+          idx += idxAdjustmentForRecordedEvents(e.recordedEvents)
 
         case e: TestCanceled =>
           endIndex = idx
           testcase.canceled = true
-          e.recordedEvents.foreach { e => 
-            e match {
-              case ipEvent: InfoProvided => 
-                idx += 1
-              case mpEvent: MarkupProvided => 
-                idx += 1
-            }
-          }
+          idx += idxAdjustmentForRecordedEvents(e.recordedEvents)
 
         case e: ScopeOpened    => idx += 1
         case e: ScopeClosed    => idx += 1

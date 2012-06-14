@@ -369,7 +369,7 @@ org.scalatest.prop.TableDrivenPropertyCheckFailedException: TestFailedException 
           case None =>
         }
 
-      case TestSucceeded(ordinal, suiteName, suiteID, suiteClassName, decodedSuiteName, testName, testText, decodedTestName, testEvents, duration, formatter, location, rerunnable, payload, threadName, timeStamp) => 
+      case TestSucceeded(ordinal, suiteName, suiteID, suiteClassName, decodedSuiteName, testName, testText, decodedTestName, recordedEvents, duration, formatter, location, rerunnable, payload, threadName, timeStamp) =>
 
         val stringToPrint = stringToPrintWhenNoError("testSucceeded", formatter, suiteName, Some(testName), duration)
 
@@ -378,7 +378,7 @@ org.scalatest.prop.TableDrivenPropertyCheckFailedException: TestFailedException 
           case None =>
         }
         
-        handleTestEvents(testEvents)
+        handleRecordedEvents(recordedEvents)
     
       case TestIgnored(ordinal, suiteName, suiteID, suiteClassName, decodedSuiteName, testName, testText, decodedTestName, formatter, location, payload, threadName, timeStamp) => 
 
@@ -394,19 +394,19 @@ org.scalatest.prop.TableDrivenPropertyCheckFailedException: TestFailedException 
           case None =>
         }
 
-      case TestFailed(ordinal, message, suiteName, suiteID, suiteClassName, decodedSuiteName, testName, testText, decodedTestName, testEvents, throwable, duration, formatter, location, rerunnable, payload, threadName, timeStamp) => 
+      case TestFailed(ordinal, message, suiteName, suiteID, suiteClassName, decodedSuiteName, testName, testText, decodedTestName, recordedEvents, throwable, duration, formatter, location, rerunnable, payload, threadName, timeStamp) =>
 
         val lines = stringsToPrintOnError("failedNote", "testFailed", message, throwable, formatter, Some(suiteName), Some(testName), duration)
         for (line <- lines) printPossiblyInColor(line, ansiRed)
 
-        handleTestEvents(testEvents)
+        handleRecordedEvents(recordedEvents)
         
-      case TestCanceled(ordinal, message, suiteName, suiteID, suiteClassName, decodedSuiteName, testName, testText, decodedTestName, testEvents, throwable, duration, formatter, location, payload, threadName, timeStamp) =>
+      case TestCanceled(ordinal, message, suiteName, suiteID, suiteClassName, decodedSuiteName, testName, testText, decodedTestName, recordedEvents, throwable, duration, formatter, location, payload, threadName, timeStamp) =>
 
         val lines = stringsToPrintOnError("canceledNote", "testCanceled", message, throwable, formatter, Some(suiteName), Some(testName), duration)
         for (line <- lines) printPossiblyInColor(line, ansiRed)
 
-        handleTestEvents(testEvents)
+        handleRecordedEvents(recordedEvents)
         
       case ipEvent: InfoProvided =>
         handleInfoProvided(ipEvent)        
@@ -471,7 +471,7 @@ org.scalatest.prop.TableDrivenPropertyCheckFailedException: TestFailedException 
       case mpEvent: MarkupProvided =>
         handleMarkupProvided(mpEvent)
 
-      case TestPending(ordinal, suiteName, suiteID, suiteClassName, decodedSuiteName, testName, testText, decodedTestName, testEvents, duration, formatter, location, payload, threadName, timeStamp) =>
+      case TestPending(ordinal, suiteName, suiteID, suiteClassName, decodedSuiteName, testName, testText, decodedTestName, recordedEvents, duration, formatter, location, payload, threadName, timeStamp) =>
 
         val stringToPrint =
           formatter match {
@@ -485,7 +485,7 @@ org.scalatest.prop.TableDrivenPropertyCheckFailedException: TestFailedException 
           case None =>
         }
         
-        handleTestEvents(testEvents)
+        handleRecordedEvents(recordedEvents)
 
      // case _ => throw new RuntimeException("Unhandled event")
     }
@@ -525,8 +525,8 @@ org.scalatest.prop.TableDrivenPropertyCheckFailedException: TestFailedException 
     // Won't do anything here, because not reporting these events in the StringReporter.
   }
   
-  private def handleTestEvents(testEvents: Seq[Event]) {
-    testEvents.foreach { e =>
+  private def handleRecordedEvents(recordedEvents: IndexedSeq[Event]) {
+    recordedEvents.foreach { e =>
       e match {
         case ipEvent: InfoProvided => handleInfoProvided(ipEvent)
         case mpEvent: MarkupProvided => handleMarkupProvided(mpEvent)
