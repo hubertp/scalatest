@@ -51,17 +51,14 @@ import org.scalatest.tools.Runner
  */
 trait ParallelTestExecution extends OneInstancePerTest { this: Suite =>
   
-  @volatile private var sortingReporter: Option[TestSortingReporter] = None
-  
   protected abstract override def runTests(testName: Option[String], args: RunArgs) {
-    if (args.configMap.contains(RunTestInNewInstance)) {
-      super.runTests(testName, args)
-    }
-    else {
-      sortingReporter = Some(new TestSortingReporter(args.reporter, timeout))
-      val newArgs = args.copy(reporter = sortingReporter.get)
-      super.runTests(testName, newArgs)
-    }
+    val newArgs =
+      if (args.configMap.contains(RunTestInNewInstance))
+        args
+      else
+        args.copy(reporter = new TestSortingReporter(args.reporter, timeout))
+
+    super.runTests(testName, newArgs)
   }
 
   protected abstract override def runTest(testName: String, args: RunArgs) {
@@ -72,10 +69,10 @@ trait ParallelTestExecution extends OneInstancePerTest { this: Suite =>
         case None =>
           oneInstance.run(Some(testName), args)
         case Some(distribute) =>
-          sortingReporter match {
-            case Some(sortingReporter) => 
+          args.reporter match {
+            case sortingReporter : TestSortingReporter =>
               sortingReporter.waitForTestCompleted(testName)
-            case None => 
+            case _ =>
           }
           distribute(new DistributedTestRunnerSuite(oneInstance, testName, args), args.tracker.nextTracker)
       }
