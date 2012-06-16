@@ -63,12 +63,17 @@ trait ParallelTestExecution extends OneInstancePerTest { this: Suite =>
         }
       }
 
+    // Always call super.runTests, which is OneInstancePerTest's runTests. But if RTINI is NOT
+    // set, that means we are in the initial instance.In that case, we wrap the reporter in
+    // a new TestSortingReporter, and wrap the distributor in a new DistributorWrapper that
+    // knows is passed the TestSortingReporter. We then call super.runTests, which is OIPT's runTests.
     super.runTests(testName, newArgs)
   }
 
   protected abstract override def runTest(testName: String, args: RunArgs) {
 
     if (args.configMap.contains(RunTestInNewInstance)) {
+      // In initial instance, so wrap the test in a DistributedTestRunnerSuite and pass it to the Distributor.
       val oneInstance = newInstance
       args.distributor match {
         case None =>
@@ -77,7 +82,8 @@ trait ParallelTestExecution extends OneInstancePerTest { this: Suite =>
           distribute(new DistributedTestRunnerSuite(oneInstance, testName, args), args.tracker.nextTracker)
       }
     }
-    else
+    else // In test-specific (distributed) instance, so just run the test. (RTINI was
+         // removed by OIPT's implementation of runTests.)
       super.runTest(testName, args)
   }
 
