@@ -56,7 +56,7 @@ trait ParallelTestExecution extends OneInstancePerTest { this: Suite =>
       else {
         args.distributor match {
           case Some(distributor) =>
-            val testSortingReporter = new TestSortingReporter(args.reporter, timeout)
+            val testSortingReporter = new TestSortingReporter(args.reporter, sortingTimeout)
             args.copy(reporter = testSortingReporter, distributor = Some(new DistributorWrapper(distributor, testSortingReporter)))
           case None =>
             args
@@ -93,5 +93,5 @@ trait ParallelTestExecution extends OneInstancePerTest { this: Suite =>
     instance
   }
   
-  protected def timeout: Span = Runner.testSortingReporterTimeout
+  protected def sortingTimeout: Span = Runner.testSortingReporterTimeout
 }
