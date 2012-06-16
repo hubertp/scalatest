@@ -2107,6 +2107,13 @@ trait ShouldMatchers extends Matchers with ShouldVerb {
    */
   implicit def convertHasIntGetLengthMethodToLengthShouldWrapper[T <: AnyRef { def getLength(): Int}](o: T): LengthShouldWrapper[T] = new LengthShouldWrapper[T](o)
 
+  /** 
+   * Implicitly converts an <code>AnyRef</code> of type <code>T</code> whose structure includes
+   * a <code>getLength</code> method that results in <code>Int</code>
+   * to a <code>SizeShouldWrapper[T]</code>, to enable <code>should</code> methods to be invokable on that object.
+   */
+  implicit def convertHasIntGetLengthParameterlessMethodToLengthShouldWrapper[T <: AnyRef { def getLength: Int}](o: T): LengthShouldWrapper[T] = new LengthShouldWrapper[T](o)
+
   /**
    * Implicitly converts an <code>AnyRef</code> of type <code>T</code> whose structure includes
    * a <code>getLength</code> <code>val</code> of type <code>Int</code>
@@ -2128,6 +2135,13 @@ trait ShouldMatchers extends Matchers with ShouldVerb {
    */
   implicit def convertHasIntLengthMethodToLengthShouldWrapper[T <: AnyRef { def length(): Int}](o: T): LengthShouldWrapper[T] = new LengthShouldWrapper[T](o)
 
+  /**
+   * Implicitly converts an <code>AnyRef</code> of type <code>T</code> whose structure includes
+   * a <code>length</code> method that results in <code>Int</code>
+   * to a <code>SizeShouldWrapper[T]</code>, to enable <code>should</code> methods to be invokable on that object.
+   */
+  implicit def convertHasIntParameterlessLengthMethodToLengthShouldWrapper[T <: AnyRef { def length: Int}](o: T): LengthShouldWrapper[T] = new LengthShouldWrapper[T](o)
+
 
   /**
    * Implicitly converts an <code>AnyRef</code> of type <code>T</code> whose structure includes
@@ -2135,6 +2149,13 @@ trait ShouldMatchers extends Matchers with ShouldVerb {
    * to a <code>SizeShouldWrapper[T]</code>, to enable <code>should</code> methods to be invokable on that object.
    */
   implicit def convertHasLongGetLengthMethodToLengthShouldWrapper[T <: AnyRef { def getLength(): Long}](o: T): LengthShouldWrapper[T] = new LengthShouldWrapper[T](o)
+
+  /**
+   * Implicitly converts an <code>AnyRef</code> of type <code>T</code> whose structure includes
+   * a <code>getLength</code> method that results in <code>Long</code>
+   * to a <code>SizeShouldWrapper[T]</code>, to enable <code>should</code> methods to be invokable on that object.
+   */
+  implicit def convertHasLongGetLengthParameterlessMethodToLengthShouldWrapper[T <: AnyRef { def getLength: Long}](o: T): LengthShouldWrapper[T] = new LengthShouldWrapper[T](o)
 
   /**
    * Implicitly converts an <code>AnyRef</code> of type <code>T</code> whose structure includes
@@ -2156,6 +2177,13 @@ trait ShouldMatchers extends Matchers with ShouldVerb {
    * to a <code>SizeShouldWrapper[T]</code>, to enable <code>should</code> methods to be invokable on that object.
    */
   implicit def convertHasLongLengthMethodToLengthShouldWrapper[T <: AnyRef { def length(): Long}](o: T): LengthShouldWrapper[T] = new LengthShouldWrapper[T](o)
+
+  /**
+   * Implicitly converts an <code>AnyRef</code> of type <code>T</code> whose structure includes
+   * a <code>length</code> method that results in <code>Long</code>
+   * to a <code>SizeShouldWrapper[T]</code>, to enable <code>should</code> methods to be invokable on that object.
+   */
+  implicit def convertHasLongLengthParameterlessMethodToLengthShouldWrapper[T <: AnyRef { def length: Long}](o: T): LengthShouldWrapper[T] = new LengthShouldWrapper[T](o)
 
   /**
    * Implicitly converts an <code>AnyRef</code> of type <code>T</code> whose structure includes
