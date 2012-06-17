@@ -23,7 +23,6 @@ import Prop._
 import Integer.MIN_VALUE
 import org.scalatest.exceptions.TestFailedException
 
-@Ignore
 class ShouldSizeSpec extends FunSpec with ShouldMatchers with Checkers with ReturnsNormallyThrowsAssertion {
 
   // Checking for a specific size

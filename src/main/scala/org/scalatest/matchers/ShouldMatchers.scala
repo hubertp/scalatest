@@ -2109,7 +2109,7 @@ trait ShouldMatchers extends Matchers with ShouldVerb {
 
   /** 
    * Implicitly converts an <code>AnyRef</code> of type <code>T</code> whose structure includes
-   * a <code>getLength</code> method that results in <code>Int</code>
+   * a <code>getLength</code> parameterless method that results in <code>Int</code>
    * to a <code>SizeShouldWrapper[T]</code>, to enable <code>should</code> methods to be invokable on that object.
    */
   implicit def convertHasIntGetLengthParameterlessMethodToLengthShouldWrapper[T <: AnyRef { def getLength: Int}](o: T): LengthShouldWrapper[T] = new LengthShouldWrapper[T](o)
@@ -2137,7 +2137,7 @@ trait ShouldMatchers extends Matchers with ShouldVerb {
 
   /**
    * Implicitly converts an <code>AnyRef</code> of type <code>T</code> whose structure includes
-   * a <code>length</code> method that results in <code>Int</code>
+   * a <code>length</code> parameterless method that results in <code>Int</code>
    * to a <code>SizeShouldWrapper[T]</code>, to enable <code>should</code> methods to be invokable on that object.
    */
   implicit def convertHasIntParameterlessLengthMethodToLengthShouldWrapper[T <: AnyRef { def length: Int}](o: T): LengthShouldWrapper[T] = new LengthShouldWrapper[T](o)
@@ -2152,7 +2152,7 @@ trait ShouldMatchers extends Matchers with ShouldVerb {
 
   /**
    * Implicitly converts an <code>AnyRef</code> of type <code>T</code> whose structure includes
-   * a <code>getLength</code> method that results in <code>Long</code>
+   * a <code>getLength</code> parameterless method that results in <code>Long</code>
    * to a <code>SizeShouldWrapper[T]</code>, to enable <code>should</code> methods to be invokable on that object.
    */
   implicit def convertHasLongGetLengthParameterlessMethodToLengthShouldWrapper[T <: AnyRef { def getLength: Long}](o: T): LengthShouldWrapper[T] = new LengthShouldWrapper[T](o)
@@ -2180,7 +2180,7 @@ trait ShouldMatchers extends Matchers with ShouldVerb {
 
   /**
    * Implicitly converts an <code>AnyRef</code> of type <code>T</code> whose structure includes
-   * a <code>length</code> method that results in <code>Long</code>
+   * a <code>length</code> parameterless method that results in <code>Long</code>
    * to a <code>SizeShouldWrapper[T]</code>, to enable <code>should</code> methods to be invokable on that object.
    */
   implicit def convertHasLongLengthParameterlessMethodToLengthShouldWrapper[T <: AnyRef { def length: Long}](o: T): LengthShouldWrapper[T] = new LengthShouldWrapper[T](o)
@@ -2191,6 +2191,13 @@ trait ShouldMatchers extends Matchers with ShouldVerb {
    * to a <code>SizeShouldWrapper[T]</code>, to enable <code>should</code> methods to be invokable on that object.
    */
   implicit def convertHasIntGetSizeMethodToSizeShouldWrapper[T <: AnyRef { def getSize(): Int}](o: T): SizeShouldWrapper[T] = new SizeShouldWrapper[T](o)
+
+  /**
+   * Implicitly converts an <code>AnyRef</code> of type <code>T</code> whose structure includes
+   * a <code>getSize</code> parameterless method that results in <code>Int</code>
+   * to a <code>SizeShouldWrapper[T]</code>, to enable <code>should</code> methods to be invokable on that object.
+   */
+  implicit def convertHasIntGetSizeParameterlessMethodToSizeShouldWrapper[T <: AnyRef { def getSize: Int}](o: T): SizeShouldWrapper[T] = new SizeShouldWrapper[T](o)
 
   /**
    * Implicitly converts an <code>AnyRef</code> of type <code>T</code> whose structure includes
@@ -2213,6 +2220,13 @@ trait ShouldMatchers extends Matchers with ShouldVerb {
    */
   implicit def convertHasIntSizeMethodToSizeShouldWrapper[T <: AnyRef { def size(): Int}](o: T): SizeShouldWrapper[T] = new SizeShouldWrapper[T](o)
 
+  /**
+   * Implicitly converts an <code>AnyRef</code> of type <code>T</code> whose structure includes
+   * a <code>size</code> parameterless method that results in <code>Int</code>
+   * to a <code>SizeShouldWrapper[T]</code>, to enable <code>should</code> methods to be invokable on that object.
+   */
+  implicit def convertHasIntSizeParameterlessMethodToSizeShouldWrapper[T <: AnyRef { def size: Int}](o: T): SizeShouldWrapper[T] = new SizeShouldWrapper[T](o)
+
 
   /**
    * Implicitly converts an <code>AnyRef</code> of type <code>T</code> whose structure includes
@@ -2220,6 +2234,13 @@ trait ShouldMatchers extends Matchers with ShouldVerb {
    * to a <code>SizeShouldWrapper[T]</code>, to enable <code>should</code> methods to be invokable on that object.
    */
   implicit def convertHasLongGetSizeMethodToSizeShouldWrapper[T <: AnyRef { def getSize(): Long}](o: T): SizeShouldWrapper[T] = new SizeShouldWrapper[T](o)
+
+  /**
+   * Implicitly converts an <code>AnyRef</code> of type <code>T</code> whose structure includes
+   * a <code>getSize</code> parameterless method that results in <code>Long</code>
+   * to a <code>SizeShouldWrapper[T]</code>, to enable <code>should</code> methods to be invokable on that object.
+   */
+  implicit def convertHasLongGetSizeParameterlessMethodToSizeShouldWrapper[T <: AnyRef { def getSize: Long}](o: T): SizeShouldWrapper[T] = new SizeShouldWrapper[T](o)
 
   /**
    * Implicitly converts an <code>AnyRef</code> of type <code>T</code> whose structure includes
@@ -2241,6 +2262,13 @@ trait ShouldMatchers extends Matchers with ShouldVerb {
    * to a <code>SizeShouldWrapper[T]</code>, to enable <code>should</code> methods to be invokable on that object.
    */
   implicit def convertHasLongSizeMethodToSizeShouldWrapper[T <: AnyRef { def size(): Long}](o: T): SizeShouldWrapper[T] = new SizeShouldWrapper[T](o)
+
+  /**
+   * Implicitly converts an <code>AnyRef</code> of type <code>T</code> whose structure includes
+   * a <code>size</code> parameterless method that results in <code>Long</code>
+   * to a <code>SizeShouldWrapper[T]</code>, to enable <code>should</code> methods to be invokable on that object.
+   */
+  implicit def convertHasLongSizeParameterlessMethodToSizeShouldWrapper[T <: AnyRef { def size: Long}](o: T): SizeShouldWrapper[T] = new SizeShouldWrapper[T](o)
 }
 /*
 When Scala must chose between an implicit with a structural type and one with a nominal one,
