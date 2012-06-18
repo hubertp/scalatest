@@ -10,7 +10,7 @@ import java.util.TimerTask
 
 private[scalatest] class TestSortingReporter(dispatch: Reporter, timeout: Span) extends ResourcefulReporter {
 
-  case class Slot(testName: String, startEvent: Option[Event], completedEvent: Option[Event], ready: Boolean)
+  case class Slot(startEvent: Option[Event], completedEvent: Option[Event], ready: Boolean)
   
   private val waitingBuffer = new ListBuffer[Slot]()
   private val slotMap = new collection.mutable.HashMap[String, Slot]()  // testName -> Slot
@@ -26,7 +26,7 @@ private[scalatest] class TestSortingReporter(dispatch: Reporter, timeout: Span) 
   
   def waitForTestCompleted(testName: String) {
     synchronized {
-      slotMap.put(testName, Slot(testName, None, None, false))
+      slotMap.put(testName, Slot(None, None, false))
     }
   }
   
@@ -59,6 +59,14 @@ private[scalatest] class TestSortingReporter(dispatch: Reporter, timeout: Span) 
           handleTestCompleted(testPending, testPending.testName)
         case testCanceled: TestCanceled => 
           handleTestCompleted(testCanceled, testCanceled.testName)
+        case scopeOpened: ScopeOpened =>
+          handleSuiteEvent(scopeOpened)
+        case scopeClosed: ScopeClosed =>
+          handleSuiteEvent(scopeClosed)
+        case infoProvided: InfoProvided =>
+          handleSuiteEvent(infoProvided)
+        case markupProvided: MarkupProvided =>
+          handleSuiteEvent(markupProvided)
         case _ => 
           dispatch(event)
       }
@@ -66,12 +74,22 @@ private[scalatest] class TestSortingReporter(dispatch: Reporter, timeout: Span) 
     }
   }
   
+  private def handleSuiteEvent(event: Event) {
+    val slot = Slot(Some(event), None, true)
+    waitingBuffer += slot
+  }
+  
   private def handleTestCompleted(event: Event, testName: String) {
     slotMap.get(testName) match {
-      case Some(slot) => 
-        val newSlot = slot.copy(completedEvent = Some(event), ready = true)
-        waitingBuffer.update(waitingBuffer.indexOf(slot), newSlot)
-        slotMap.put(testName, newSlot)
+      case Some(slot) =>
+        val slotIdx = waitingBuffer.indexOf(slot)
+        if (slotIdx >= 0) {
+          val newSlot = slot.copy(completedEvent = Some(event), ready = true)
+          waitingBuffer.update(waitingBuffer.indexOf(slot), newSlot)
+          slotMap.put(testName, newSlot)
+        }
+        else // could happen when timeout, just fire the test completed event.
+          dispatch(event)
       case None => 
         dispatch(event)
     }
@@ -84,7 +102,7 @@ private[scalatest] class TestSortingReporter(dispatch: Reporter, timeout: Span) 
       slot.completedEvent match {
         case Some(completedEvent) => 
           dispatch(completedEvent)
-          completedEvent match {
+          /*completedEvent match {
             case testSucceeded: TestSucceeded => 
               testSucceeded.recordedEvents.foreach(dispatch(_))
             case testFailed: TestFailed => 
@@ -93,7 +111,7 @@ private[scalatest] class TestSortingReporter(dispatch: Reporter, timeout: Span) 
               testPending.recordedEvents.foreach(dispatch(_))
             case testCanceled: TestCanceled => 
               testCanceled.recordedEvents.foreach(dispatch(_))
-          }
+          }*/
         case None =>
       }
     }
@@ -133,7 +151,6 @@ private[scalatest] class TestSortingReporter(dispatch: Reporter, timeout: Span) 
         if (timeoutTask.get.event == head.startEvent.get) {
           val newSlot = head.copy(ready = true)
           waitingBuffer.update(0, newSlot)
-          slotMap.remove(newSlot.testName)
         }
         fireReadyEvents()
       }

@@ -1992,8 +1992,7 @@ object Runner {
                   for (suiteConfig <- suiteInstances) {
                     val tagsToInclude = if (suiteConfig.requireSelectedTag) tagsToIncludeSet ++ Set(SELECTED_TAG) else tagsToIncludeSet
                     val filter = Filter(if (tagsToInclude.isEmpty) None else Some(tagsToInclude), tagsToExcludeSet, suiteConfig.excludeNestedSuites, suiteConfig.dynaTags)
-                    // TODO: Can't put Some(distributor) here, will cause some weird error in JUnitXmlReporter, to check with Bill
-                    val runArgs = RunArgs(dispatch, stopRequested, filter, configMap, None, tracker.nextTracker, chosenStyleSet)
+                    val runArgs = RunArgs(dispatch, stopRequested, filter, configMap, Some(distributor), tracker.nextTracker, chosenStyleSet)
                     distributor.apply(suiteConfig.suite, runArgs)
                   }
                   distributor.waitUntilDone()
@@ -2003,8 +2002,7 @@ object Runner {
                 for (suiteConfig <- suiteInstances) {
                   val tagsToInclude = if (suiteConfig.requireSelectedTag) tagsToIncludeSet ++ Set(SELECTED_TAG) else tagsToIncludeSet
                   val filter = Filter(if (tagsToInclude.isEmpty) None else Some(tagsToInclude), tagsToExcludeSet, suiteConfig.excludeNestedSuites, suiteConfig.dynaTags)
-                  // TODO: Can't put Some(distributor) here, will cause some weird error in JUnitXmlReporter, to check with Bill
-                  val runArgs = RunArgs(dispatch, stopRequested, filter, configMap, None, tracker.nextTracker, chosenStyleSet)
+                  val runArgs = RunArgs(dispatch, stopRequested, filter, configMap, Some(distributor), tracker.nextTracker, chosenStyleSet)
                   distributor.apply(suiteConfig.suite, runArgs)
                 }
                 distributor.waitUntilDone()

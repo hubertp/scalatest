@@ -2408,7 +2408,7 @@ trait Suite extends Assertions with AbstractSuite with Serializable { thisSuite 
           }
         case Some(distribute) =>
           for (nestedSuite <- nestedSuitesArray) 
-            distribute(nestedSuite, args)
+            distribute(nestedSuite, args.copy(tracker = tracker.nextTracker))
       }
     }
   }
