@@ -102,16 +102,6 @@ private[scalatest] class TestSortingReporter(dispatch: Reporter, timeout: Span) 
       slot.completedEvent match {
         case Some(completedEvent) => 
           dispatch(completedEvent)
-          /*completedEvent match {
-            case testSucceeded: TestSucceeded => 
-              testSucceeded.recordedEvents.foreach(dispatch(_))
-            case testFailed: TestFailed => 
-              testFailed.recordedEvents.foreach(dispatch(_))
-            case testPending: TestPending => 
-              testPending.recordedEvents.foreach(dispatch(_))
-            case testCanceled: TestCanceled => 
-              testCanceled.recordedEvents.foreach(dispatch(_))
-          }*/
         case None =>
       }
     }
