@@ -7,15 +7,22 @@ import scala.collection.mutable.ListBuffer
 import org.scalatest.time.Span
 import java.util.Timer
 import java.util.TimerTask
+import java.util.UUID
 
 private[scalatest] class TestSortingReporter(dispatch: Reporter, timeout: Span) extends ResourcefulReporter {
 
-  case class Slot(startEvent: Option[Event], completedEvent: Option[Event], ready: Boolean)
+  case class Slot(uuid: UUID, startEvent: Option[Event], completedEvent: Option[Event], ready: Boolean) extends Ordered[Slot] {
+    def compare(that: Slot): Int = //ordinal.compare(that.ordinal)
+      if (startEvent.isDefined && that.startEvent.isDefined)
+        startEvent.get compare that.startEvent.get
+      else
+        0
+  }
   
   private val waitingBuffer = new ListBuffer[Slot]()
   private val slotMap = new collection.mutable.HashMap[String, Slot]()  // testName -> Slot
   
-  class TimeoutTask(val event: Event) extends TimerTask {
+  class TimeoutTask(val slot: Slot) extends TimerTask {
     override def run() {
       timeout()
     }
@@ -26,7 +33,9 @@ private[scalatest] class TestSortingReporter(dispatch: Reporter, timeout: Span) 
   
   def waitForTestCompleted(testName: String) {
     synchronized {
-      slotMap.put(testName, Slot(None, None, false))
+      val slot = Slot(UUID.randomUUID, None, None, false)
+      waitingBuffer += slot
+      slotMap.put(testName, slot)
     }
   }
   
@@ -36,18 +45,28 @@ private[scalatest] class TestSortingReporter(dispatch: Reporter, timeout: Span) 
         case testStarting: TestStarting => 
           slotMap.get(testStarting.testName) match {
             case Some(slot) => 
-              val newSlot = slot.copy(startEvent = Some(testStarting))
-              waitingBuffer += newSlot
-              slotMap.put(testStarting.testName, newSlot)
+              val slotIdx = waitingBuffer.indexOf(slot)
+              if (slotIdx >= 0) {
+                val newSlot = slot.copy(startEvent = Some(testStarting))
+                waitingBuffer.update(slotIdx, newSlot)
+                slotMap.put(testStarting.testName, newSlot)
+              }
+              else
+                dispatch(testStarting)
             case None => 
               dispatch(testStarting)
           }
         case testIgnored: TestIgnored => 
           slotMap.get(testIgnored.testName) match {
             case Some(slot) => 
-              val newSlot = slot.copy(startEvent = Some(testIgnored), ready = true)
-              waitingBuffer += newSlot
-              slotMap.put(testIgnored.testName, newSlot)
+              val slotIdx = waitingBuffer.indexOf(slot)
+              if (slotIdx >= 0) {
+                val newSlot = slot.copy(startEvent = Some(testIgnored), ready = true)
+                waitingBuffer.update(slotIdx, newSlot)
+                slotMap.put(testIgnored.testName, newSlot)
+              }
+              else
+                dispatch(testIgnored)
             case None => 
               dispatch(testIgnored)
           }
@@ -75,7 +94,7 @@ private[scalatest] class TestSortingReporter(dispatch: Reporter, timeout: Span) 
   }
   
   private def handleSuiteEvent(event: Event) {
-    val slot = Slot(Some(event), None, true)
+    val slot = Slot(UUID.randomUUID, Some(event), None, true)
     waitingBuffer += slot
   }
   
@@ -85,7 +104,7 @@ private[scalatest] class TestSortingReporter(dispatch: Reporter, timeout: Span) 
         val slotIdx = waitingBuffer.indexOf(slot)
         if (slotIdx >= 0) {
           val newSlot = slot.copy(completedEvent = Some(event), ready = true)
-          waitingBuffer.update(waitingBuffer.indexOf(slot), newSlot)
+          waitingBuffer.update(slotIdx, newSlot)
           slotMap.put(testName, newSlot)
         }
         else // could happen when timeout, just fire the test completed event.
@@ -96,6 +115,25 @@ private[scalatest] class TestSortingReporter(dispatch: Reporter, timeout: Span) 
   }
   
   private def fireReadyEvents() {
+    // Check if there's InfoProvided or MarkupProvided in the buffer.
+    val infoMarkupOpt = waitingBuffer.find { slot =>
+      if (slot.startEvent.isDefined) 
+        slot.startEvent.get.isInstanceOf[InfoProvided] || slot.startEvent.get.isInstanceOf[MarkupProvided]
+      else
+        false
+    }
+    
+    // We need to sort the buffer based on ordinal if there's InfoProvided or MarkupProvided in the buffer, 
+    // this is because the InfoProvided can be fired from runTest, but before TestStarting (e.g. info in before 
+    // of BeforeAndAfter trait)
+    infoMarkupOpt match {
+      case Some(slot) => 
+        val sortedBuffer = waitingBuffer.sortWith((a, b) => a < b)
+        waitingBuffer.clear()
+        waitingBuffer ++= sortedBuffer
+      case None =>
+    }
+    
     val (ready, pending) = waitingBuffer.span(slot => slot.ready)
     ready.foreach { slot => 
       dispatch(slot.startEvent.get)
@@ -123,13 +161,13 @@ private[scalatest] class TestSortingReporter(dispatch: Reporter, timeout: Span) 
     val head = waitingBuffer.head
     timeoutTask match {
         case Some(task) => 
-          if (head.startEvent.get != task.event) {
+          if (head.uuid != task.slot.uuid) {
             task.cancel()
-            timeoutTask = Some(new TimeoutTask(head.startEvent.get))
+            timeoutTask = Some(new TimeoutTask(head))
             timer.schedule(timeoutTask.get, timeout.millisPart)
           }
         case None => 
-          timeoutTask = Some(new TimeoutTask(head.startEvent.get))
+          timeoutTask = Some(new TimeoutTask(head))
           timer.schedule(timeoutTask.get, timeout.millisPart)
       }
   }
@@ -138,7 +176,7 @@ private[scalatest] class TestSortingReporter(dispatch: Reporter, timeout: Span) 
     synchronized {
       if (waitingBuffer.size > 0) {
         val head = waitingBuffer.head
-        if (timeoutTask.get.event == head.startEvent.get) {
+        if (timeoutTask.get.slot.uuid == head.uuid) {
           val newSlot = head.copy(ready = true)
           waitingBuffer.update(0, newSlot)
         }
@@ -147,5 +185,8 @@ private[scalatest] class TestSortingReporter(dispatch: Reporter, timeout: Span) 
     }
   }
   
-  override def dispose() = propagateDispose(dispatch)
+  override def dispose() = {
+    fireReadyEvents()
+    propagateDispose(dispatch)
+  }
 }

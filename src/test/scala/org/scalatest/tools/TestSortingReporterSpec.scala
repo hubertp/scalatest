@@ -11,31 +11,32 @@ import org.scalatest.events.TestSucceeded
 import org.scalatest.events.ScopeClosed
 import org.scalatest.time.Span
 import org.scalatest.time.Seconds
+import org.scalatest.Tracker
 
 class TestSortingReporterSpec extends FunSpec with ShouldMatchers {
 
   describe("TestSortingReporter") {
     
-    val ordinal = new Ordinal(0)
-    val scope1Opened = ScopeOpened(ordinal, "Scope 1", NameInfo("aSuite", "aSuite", Some("a.b.aSuite"), None, None))
-    val scope2Opened = ScopeOpened(ordinal, "Scope 2", NameInfo("aSuite", "aSuite", Some("a.b.aSuite"), None, None))
-    val s1s2t1Starting = TestStarting(ordinal, "aSuite", "aSuite", Some("a.b.aSuite"), None, "Scope 1 Scope 2 Test 1", "Test 1", None)
-    val s1s2t1Succeeded = TestSucceeded(ordinal, "aSuite", "aSuite", Some("a.b.aSuite"), None, "Scope 1 Scope 2 Test 1", "Test 1", None, Vector.empty)
-    val s1s2t2Starting = TestStarting(ordinal, "aSuite", "aSuite", Some("a.b.aSuite"), None, "Scope 1 Scope 2 Test 2", "Test 2", None)
-    val s1s2t2Succeeded = TestSucceeded(ordinal, "aSuite", "aSuite", Some("a.b.aSuite"), None, "Scope 1 Scope 2 Test 2", "Test 2", None, Vector.empty)
-    val s1s2t3Starting = TestStarting(ordinal, "aSuite", "aSuite", Some("a.b.aSuite"), None, "Scope 1 Scope 2 Test 3", "Test 3", None)
-    val s1s2t3Succeeded = TestSucceeded(ordinal, "aSuite", "aSuite", Some("a.b.aSuite"), None, "Scope 1 Scope 2 Test 3", "Test 3", None, Vector.empty)
-    val scope2Closed = ScopeClosed(ordinal, "Scope 2", NameInfo("aSuite", "aSuite", Some("a.b.aSuite"), None, None))
-    val scope1Closed = ScopeClosed(ordinal, "Scope 1", NameInfo("aSuite", "aSuite", Some("a.b.aSuite"), None, None))
+    val tracker = new Tracker()
+    val scope1Opened = ScopeOpened(tracker.nextOrdinal, "Scope 1", NameInfo("aSuite", "aSuite", Some("a.b.aSuite"), None, None))
+    val scope2Opened = ScopeOpened(tracker.nextOrdinal, "Scope 2", NameInfo("aSuite", "aSuite", Some("a.b.aSuite"), None, None))
+    val s1s2t1Starting = TestStarting(tracker.nextOrdinal, "aSuite", "aSuite", Some("a.b.aSuite"), None, "Scope 1 Scope 2 Test 1", "Test 1", None)
+    val s1s2t1Succeeded = TestSucceeded(tracker.nextOrdinal, "aSuite", "aSuite", Some("a.b.aSuite"), None, "Scope 1 Scope 2 Test 1", "Test 1", None, Vector.empty)
+    val s1s2t2Starting = TestStarting(tracker.nextOrdinal, "aSuite", "aSuite", Some("a.b.aSuite"), None, "Scope 1 Scope 2 Test 2", "Test 2", None)
+    val s1s2t2Succeeded = TestSucceeded(tracker.nextOrdinal, "aSuite", "aSuite", Some("a.b.aSuite"), None, "Scope 1 Scope 2 Test 2", "Test 2", None, Vector.empty)
+    val s1s2t3Starting = TestStarting(tracker.nextOrdinal, "aSuite", "aSuite", Some("a.b.aSuite"), None, "Scope 1 Scope 2 Test 3", "Test 3", None)
+    val s1s2t3Succeeded = TestSucceeded(tracker.nextOrdinal, "aSuite", "aSuite", Some("a.b.aSuite"), None, "Scope 1 Scope 2 Test 3", "Test 3", None, Vector.empty)
+    val scope2Closed = ScopeClosed(tracker.nextOrdinal, "Scope 2", NameInfo("aSuite", "aSuite", Some("a.b.aSuite"), None, None))
+    val scope1Closed = ScopeClosed(tracker.nextOrdinal, "Scope 1", NameInfo("aSuite", "aSuite", Some("a.b.aSuite"), None, None))
     
-    val scope3Opened = ScopeOpened(ordinal, "Scope 3", NameInfo("aSuite", "aSuite", Some("a.b.aSuite"), None, None))
-    val s3t1Starting = TestStarting(ordinal, "aSuite", "aSuite", Some("a.b.aSuite"), None, "Scope 3 Test 1", "Test 1", None)
-    val s3t1Succeeded = TestSucceeded(ordinal, "aSuite", "aSuite", Some("a.b.aSuite"), None, "Scope 3 Test 1", "Test 1", None, Vector.empty)
-    val s3t2Starting = TestStarting(ordinal, "aSuite", "aSuite", Some("a.b.aSuite"), None, "Scope 3 Test 2", "Test 2", None)
-    val s3t2Succeeded = TestSucceeded(ordinal, "aSuite", "aSuite", Some("a.b.aSuite"), None, "Scope 3 Test 2", "Test 2", None, Vector.empty)
-    val s3t3Starting = TestStarting(ordinal, "aSuite", "aSuite", Some("a.b.aSuite"), None, "Scope 3 Test 3", "Test 3", None)
-    val s3t3Succeeded = TestSucceeded(ordinal, "aSuite", "aSuite", Some("a.b.aSuite"), None, "Scope 3 Test 3", "Test 3", None, Vector.empty)
-    val scope3Closed = ScopeClosed(ordinal, "Scope 3", NameInfo("aSuite", "aSuite", Some("a.b.aSuite"), None, None))
+    val scope3Opened = ScopeOpened(tracker.nextOrdinal, "Scope 3", NameInfo("aSuite", "aSuite", Some("a.b.aSuite"), None, None))
+    val s3t1Starting = TestStarting(tracker.nextOrdinal, "aSuite", "aSuite", Some("a.b.aSuite"), None, "Scope 3 Test 1", "Test 1", None)
+    val s3t1Succeeded = TestSucceeded(tracker.nextOrdinal, "aSuite", "aSuite", Some("a.b.aSuite"), None, "Scope 3 Test 1", "Test 1", None, Vector.empty)
+    val s3t2Starting = TestStarting(tracker.nextOrdinal, "aSuite", "aSuite", Some("a.b.aSuite"), None, "Scope 3 Test 2", "Test 2", None)
+    val s3t2Succeeded = TestSucceeded(tracker.nextOrdinal, "aSuite", "aSuite", Some("a.b.aSuite"), None, "Scope 3 Test 2", "Test 2", None, Vector.empty)
+    val s3t3Starting = TestStarting(tracker.nextOrdinal, "aSuite", "aSuite", Some("a.b.aSuite"), None, "Scope 3 Test 3", "Test 3", None)
+    val s3t3Succeeded = TestSucceeded(tracker.nextOrdinal, "aSuite", "aSuite", Some("a.b.aSuite"), None, "Scope 3 Test 3", "Test 3", None, Vector.empty)
+    val scope3Closed = ScopeClosed(tracker.nextOrdinal, "Scope 3", NameInfo("aSuite", "aSuite", Some("a.b.aSuite"), None, None))
     
     it("should fire event passed to it in the order they arrive if waitForTestCompleted is not called.") {
       val recordingReporter = new EventRecordingReporter()

@@ -17,7 +17,7 @@ package org.scalatest
 
 import java.util.concurrent.atomic.AtomicReference
 import MessageRecorder.RecordedMessageEventFun
-import MessageRecorder.ConcurrentMessageEventFun
+import MessageRecorder.ConcurrentMessageFiringFun
 import org.scalatest.events.Location
 import org.scalatest.Suite.getLineInFile
 import org.scalatest.events.Event
@@ -78,30 +78,30 @@ private[scalatest] class ConcurrentMessageSender(fire: ConcurrentMessageFiringFu
 }
 */
 
-private[scalatest] class ConcurrentInformer(eventFun: ConcurrentMessageEventFun) extends ThreadAwareness with Informer {
+private[scalatest] class ConcurrentInformer(fire: ConcurrentMessageFiringFun) extends ThreadAwareness with Informer {
   def apply(message: String, payload: Option[Any] = None) = {
     if (message == null)
       throw new NullPointerException
     if (payload == null)
       throw new NullPointerException
-    eventFun(message, payload, isConstructingThread, getLineInFile(Thread.currentThread.getStackTrace, 2))
+    fire(message, payload, isConstructingThread, getLineInFile(Thread.currentThread.getStackTrace, 2))
   }
 }
 
 private[scalatest] object ConcurrentInformer {
-  def apply(eventFun: (String, Option[Any], Boolean, Option[Location]) => Event) = new ConcurrentInformer(eventFun)
+  def apply(fire: (String, Option[Any], Boolean, Option[Location]) => Unit) = new ConcurrentInformer(fire)
 }
 
-private[scalatest] class ConcurrentDocumenter(eventFun: ConcurrentMessageEventFun) extends ThreadAwareness with Documenter {
+private[scalatest] class ConcurrentDocumenter(fire: ConcurrentMessageFiringFun) extends ThreadAwareness with Documenter {
   def apply(text: String) = {
     if (text == null)
       throw new NullPointerException("text was null")
-    eventFun(text, None, isConstructingThread, getLineInFile(Thread.currentThread.getStackTrace, 2)) // Fire the info provided event using the passed function
+    fire(text, None, isConstructingThread, getLineInFile(Thread.currentThread.getStackTrace, 2)) // Fire the info provided event using the passed function
   }
 }
 
 private[scalatest] object ConcurrentDocumenter {
-  def apply(eventFun: (String, Option[Any], Boolean, Option[Location]) => Event) = new ConcurrentDocumenter(eventFun)
+  def apply(fire: (String, Option[Any], Boolean, Option[Location]) => Unit) = new ConcurrentDocumenter(fire)
 }
 
 //
@@ -173,7 +173,7 @@ private[scalatest] object MessageRecorder {
 
   // First two params of function are the string message and a boolean indicating this was from the current thread, 
   // and an optional location.
-  type ConcurrentMessageEventFun = (String, Option[Any], Boolean, Option[Location]) => Event 
+  type ConcurrentMessageFiringFun = (String, Option[Any], Boolean, Option[Location]) => Unit 
 }
 
 // For path traits, need a message recording informer that only later gets 

@@ -406,7 +406,7 @@ private[scalatest] sealed abstract class SuperEngine[T](concurrentBundleModResou
     val informerForThisSuite =
       ConcurrentInformer(
         (message, payload, isConstructingThread, location) => {
-          createInfoProvided(theSuite, report, tracker, None, message, payload, 1, location, isConstructingThread)
+          reportInfoProvided(theSuite, report, tracker, None, message, payload, 1, location, isConstructingThread)
         }
       )
 
@@ -839,7 +839,7 @@ private[scalatest] class PathEngine(concurrentBundleModResourceName: String, sim
     val informerForThisSuite =
       ConcurrentInformer(
         (message, payload, isConstructingThread, location) =>
-          createInfoProvided(theSuite, report, tracker, None, message, payload, 1, location, isConstructingThread)
+          reportInfoProvided(theSuite, report, tracker, None, message, payload, 1, location, isConstructingThread)
       )
 
     atomicInformer.set(informerForThisSuite)
