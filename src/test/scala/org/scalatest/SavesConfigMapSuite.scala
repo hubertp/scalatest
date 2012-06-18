@@ -12,7 +12,7 @@ class SavesConfigMapSuite(configMap: Map[String, Any]) extends FunSuite {
   test("blue test", org.scalatest.mytags.FastAsLight) {}
   ignore("ignore me") {}
   class NSuite extends Suite {
-    override def suiteId = getClass.getName + "-" + UUID.randomUUID.toString
+    override val suiteId = getClass.getName + "-" + UUID.randomUUID.toString
   }
   override def nestedSuites: Vector[Suite] = Vector(new NSuite, new NSuite, new NSuite)
 }

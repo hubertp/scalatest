@@ -31,7 +31,7 @@ private[scalatest] class DiscoverySuite(path: String, accessibleSuites: Set[Stri
   if (path == null || accessibleSuites == null || runpathClassLoader == null)
     throw new NullPointerException
 
-  override def suiteId = getClass.getName + "-" + UUID.randomUUID.toString
+  override val suiteId = getClass.getName + "-" + UUID.randomUUID.toString
     
   override val nestedSuites: IndexedSeq[Suite] =
     for (suiteClassName <- DiscoverySuite.nestedSuiteNames(path, accessibleSuites, wildcard))
