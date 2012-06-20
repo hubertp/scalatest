@@ -9,7 +9,7 @@
     <!-- set global properties for this build -->
     <property name="scala.version" value="2.10.0-M4" />
 	<property name="for.scala" value="2.10.0-M4" />
-	<property name="release" value="1.9-2.10.0-M4-B1" />
+	<property name="release" value="1.9-2.10.0-M4-B2" />
 
     <property name="scalasrc" value="src/main/scala" />
     <property name="javasrc" value="src/main/java" />

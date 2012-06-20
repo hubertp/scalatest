@@ -107,35 +107,23 @@ trait BeforeAndAfterAllFunctions extends AbstractSuite {
 
     var thrownException: Option[Throwable] = None
 
-    beforeFunctionAtomic.get match {
-      case Some(fun) => fun()
-      case None =>
-    }
+    beforeFunctionAtomic.get.foreach(fun => fun())
 
     try {
       super.run(testName, reporter, stopper, filter, configMap, distributor, tracker)
     }
     catch {
-      case e: Exception => thrownException = Some(e)
+      case e: Exception => thrownException = Some(e); throw e;
     }
     finally {
       try {
         // Make sure that code passed to afterAll, if any, is called even if run completes abruptly.
-        afterFunctionAtomic.get match {
-          case Some(fun) => fun()
-          case None =>
-        }
-        thrownException match {
-          case Some(e) => throw e
-          case None =>
-        }
+        afterFunctionAtomic.get.foreach(fun => fun())
       }
       catch {
         case laterException: Exception =>
-          thrownException match { // If both run and afterAll throw an exception, report the test exception
-            case Some(earlierException) => throw earlierException
-            case None => throw laterException
-          }
+          // If both run and afterAll throw an exception, report the test exception
+          throw thrownException.getOrElse(laterException)
       }
     }
   }

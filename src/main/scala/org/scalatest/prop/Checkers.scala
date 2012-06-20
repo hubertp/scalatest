@@ -466,7 +466,9 @@ object Checkers extends Checkers {
     if (argNames.isDefined) {
       // length of scalaCheckArgs should equal length of argNames
       val zipped = argNames.get zip scalaCheckArgs
-      zipped map { case (argName, arg) => arg.copy(label = argName) }
+      // zipped map { case (argName, arg) => arg.copy(label = argName) } workaround bug in 2.10.0-M4
+      zipped map { case (argName, arg) => Arg(argName, arg.arg, arg.shrinks, arg.origArg) }
+
     }
     else
       scalaCheckArgs
