@@ -617,6 +617,27 @@ class SuiteSuite extends Suite with PrivateMethodTester with SharedHelpers with 
     expect(false) { Suite.anErrorThatShouldCauseAnAbort(new AssertionError) }
     expect(false) { Suite.anErrorThatShouldCauseAnAbort(new AssertionError) }
   }
+  
+  def testTestColonPrefixEscape() {
+    val rep = new EventRecordingReporter
+    val a = new Suite {
+      def `test: A Test`() = {}
+    }
+    a.run(None, RunArgs(rep, new Stopper {}, Filter(), Map(), None, new Tracker(), Set.empty))
+    assert(rep.testSucceededEventsReceived.size === 1)
+    val testSucceeded = rep.testSucceededEventsReceived(0)
+    testSucceeded.formatter match {
+      case Some(formatter) =>
+        formatter match {
+          case IndentedText(formattedText, _, _) =>
+            assert(formattedText === "- A Test")
+          case _ =>
+            fail("Expected Some(IndentedText as formatter, but got: " + testSucceeded.formatter)
+        }
+      case None =>
+        fail("Expected Some(IndentedText) as formatter, but got None.")
+    }
+  }
 }
 
 class `My Test` extends Suite {}
