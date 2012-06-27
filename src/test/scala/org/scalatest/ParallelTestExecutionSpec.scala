@@ -9,6 +9,10 @@ import org.scalatest.events.TestSucceeded
 import org.scalatest.events.ScopeClosed
 import collection.mutable.ListBuffer
 import org.scalatest.events.InfoProvided
+import org.scalatest.tools.ConcurrentDistributor
+import java.util.concurrent.Executors
+import java.util.concurrent.ExecutorService
+import org.scalatest.tools.SuiteRunner
 
 class ParallelTestExecutionSpec extends FunSpec with ShouldMatchers {
   /*
@@ -73,6 +77,28 @@ class ParallelTestExecutionSpec extends FunSpec with ShouldMatchers {
       def executeInReverseOrder() {
         for ((suite, args) <- buf.reverse) {
           suite.run(None, args)
+        }
+      }
+
+      def apply(suite: Suite, tracker: Tracker) {
+        throw new UnsupportedOperationException("Hey, we're not supposed to be calling this anymore!")
+      }
+    }
+    
+    class ControlledOrderConcurrentDistributor(poolSize: Int) extends Distributor {
+      val buf = ListBuffer.empty[SuiteRunner]
+      val execSvc: ExecutorService = Executors.newFixedThreadPool(2)
+      def apply(suite: Suite, args: RunArgs) {
+        buf += new SuiteRunner(suite, args)
+      }
+      def executeInOrder() {
+        for (suiteRunner <- buf) {
+          execSvc.submit(suiteRunner)
+        }
+      }
+      def executeInReverseOrder() {
+        for (suiteRunner <- buf.reverse) {
+          execSvc.submit(suiteRunner)
         }
       }
 
@@ -156,6 +182,43 @@ class ParallelTestExecutionSpec extends FunSpec with ShouldMatchers {
         checkInfoProvided(eventRecorded(26), "In After")
         checkScopeClosed(eventRecorded(27), "Thing 2")
       }
+      withDistributor(_.executeInOrder())
+      withDistributor(_.executeInReverseOrder())
+    }
+    
+    it("should have the blocking event fired without waiting when timeout reaches, and when the missing event finally reach later, it should just get fired") {
+      def withDistributor(fun: ControlledOrderConcurrentDistributor => Unit) {
+        val recordingReporter = new EventRecordingReporter
+        val args = RunArgs(recordingReporter)
+        val outOfOrderConcurrentDistributor = new ControlledOrderConcurrentDistributor(2)
+        (new ExampleTimeoutParallelSpec).run(None, RunArgs(recordingReporter, distributor = Some(outOfOrderConcurrentDistributor)))
+        fun(outOfOrderConcurrentDistributor)
+        Thread.sleep(3000)  // Get enough time for the timeout to reach, and the missing event to fire.
+
+        val eventRecorded = recordingReporter.eventsReceived
+        assert(eventRecorded.size === 16)
+
+        checkScopeOpened(eventRecorded(0), "Thing 1")
+        checkTestStarting(eventRecorded(1), "Thing 1 do thing 1a")
+        checkTestSucceeded(eventRecorded(2), "Thing 1 do thing 1a")
+        checkTestStarting(eventRecorded(3), "Thing 1 do thing 1b")        
+        checkTestStarting(eventRecorded(4), "Thing 1 do thing 1c")
+        checkTestSucceeded(eventRecorded(5), "Thing 1 do thing 1c")
+        checkScopeClosed(eventRecorded(6), "Thing 1")
+        
+        checkScopeOpened(eventRecorded(7), "Thing 2")
+        checkTestStarting(eventRecorded(8), "Thing 2 do thing 2a")
+        checkTestSucceeded(eventRecorded(9), "Thing 2 do thing 2a")
+        checkTestStarting(eventRecorded(10), "Thing 2 do thing 2b")
+        checkTestSucceeded(eventRecorded(11), "Thing 2 do thing 2b")
+        checkTestStarting(eventRecorded(12), "Thing 2 do thing 2c")
+        checkTestSucceeded(eventRecorded(13), "Thing 2 do thing 2c")
+        checkScopeClosed(eventRecorded(14), "Thing 2")
+        
+        // Now the missing one.
+        checkTestSucceeded(eventRecorded(15), "Thing 1 do thing 1b")
+      }
+
       withDistributor(_.executeInOrder())
       withDistributor(_.executeInReverseOrder())
     }
