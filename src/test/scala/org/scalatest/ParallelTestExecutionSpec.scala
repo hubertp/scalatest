@@ -8,6 +8,7 @@ import org.scalatest.events.TestStarting
 import org.scalatest.events.TestSucceeded
 import org.scalatest.events.ScopeClosed
 import collection.mutable.ListBuffer
+import org.scalatest.events.InfoProvided
 
 class ParallelTestExecutionSpec extends FunSpec with ShouldMatchers {
   /*
@@ -47,6 +48,13 @@ class ParallelTestExecutionSpec extends FunSpec with ShouldMatchers {
     event match {
       case testSucceeded: TestSucceeded => assert(testSucceeded.testName === testName)
       case _ => fail("Expected TestStarting, but got " + event.getClass.getName)
+    }
+  }
+  
+  private def checkInfoProvided(event: Event, message: String) {
+    event match {
+      case infoProvided: InfoProvided => assert(infoProvided.message === message)
+      case _ => fail("Expected InfoProvided, but got " + event.getClass.getName)
     }
   }
   
@@ -101,6 +109,52 @@ class ParallelTestExecutionSpec extends FunSpec with ShouldMatchers {
         checkTestStarting(eventRecorded(13), "Subject 2 should have behavior 2c")
         checkTestSucceeded(eventRecorded(14), "Subject 2 should have behavior 2c")
         checkScopeClosed(eventRecorded(15), "Subject 2")
+      }
+      withDistributor(_.executeInOrder())
+      withDistributor(_.executeInReverseOrder())
+    }
+    
+    it("should have InfoProvided fired from before and after block in correct order when tests are executed in parallel") {
+      
+      def withDistributor(fun: ControlledOrderDistributor => Unit) {
+
+        val recordingReporter = new EventRecordingReporter
+        val outOfOrderDistributor = new ControlledOrderDistributor
+        (new ExampleBeforeAfterParallelSpec).run(None, RunArgs(recordingReporter, distributor = Some(outOfOrderDistributor)))
+        fun(outOfOrderDistributor)
+
+        val eventRecorded = recordingReporter.eventsReceived
+        assert(eventRecorded.size === 28)
+
+        checkScopeOpened(eventRecorded(0), "Thing 1")
+        checkInfoProvided(eventRecorded(1), "In Before")
+        checkTestStarting(eventRecorded(2), "Thing 1 do thing 1a")
+        checkTestSucceeded(eventRecorded(3), "Thing 1 do thing 1a")
+        checkInfoProvided(eventRecorded(4), "In After")
+        checkInfoProvided(eventRecorded(5), "In Before")
+        checkTestStarting(eventRecorded(6), "Thing 1 do thing 1b")
+        checkTestSucceeded(eventRecorded(7), "Thing 1 do thing 1b")
+        checkInfoProvided(eventRecorded(8), "In After")
+        checkInfoProvided(eventRecorded(9), "In Before")
+        checkTestStarting(eventRecorded(10), "Thing 1 do thing 1c")
+        checkTestSucceeded(eventRecorded(11), "Thing 1 do thing 1c")
+        checkInfoProvided(eventRecorded(12), "In After")
+        checkScopeClosed(eventRecorded(13), "Thing 1")
+        
+        checkScopeOpened(eventRecorded(14), "Thing 2")
+        checkInfoProvided(eventRecorded(15), "In Before")
+        checkTestStarting(eventRecorded(16), "Thing 2 do thing 2a")
+        checkTestSucceeded(eventRecorded(17), "Thing 2 do thing 2a")
+        checkInfoProvided(eventRecorded(18), "In After")
+        checkInfoProvided(eventRecorded(19), "In Before")
+        checkTestStarting(eventRecorded(20), "Thing 2 do thing 2b")
+        checkTestSucceeded(eventRecorded(21), "Thing 2 do thing 2b")
+        checkInfoProvided(eventRecorded(22), "In After")
+        checkInfoProvided(eventRecorded(23), "In Before")
+        checkTestStarting(eventRecorded(24), "Thing 2 do thing 2c")
+        checkTestSucceeded(eventRecorded(25), "Thing 2 do thing 2c")
+        checkInfoProvided(eventRecorded(26), "In After")
+        checkScopeClosed(eventRecorded(27), "Thing 2")
       }
       withDistributor(_.executeInOrder())
       withDistributor(_.executeInReverseOrder())
