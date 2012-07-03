@@ -50,6 +50,10 @@ private[scalatest] class TestSortingReporter(suiteId: String, dispatch: Reporter
       val slot = Slot(UUID.randomUUID, new ListBuffer[Event](), false)
       slotMap.put(testName, slot)
       waitingBuffer += slot
+      // if it is the head, we should start the timer, because it is possible that this slot has no event coming later and it keeps blocking 
+      // without the timer.
+      if (waitingBuffer.size == 1) 
+        scheduleTimeoutTask()
     }
   }
 
