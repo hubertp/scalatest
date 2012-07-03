@@ -21,14 +21,15 @@ private[scalatest] class SuiteSortingReporter(dispatch: Reporter) extends Resour
       synchronized {
         event match {
           case suiteStarting: SuiteStarting =>
-            val slot = Slot(suiteStarting.suiteId, None, false, false)
-            slotListBuf += slot // Why put this in the ListBuffer then throw an exception?
-            slotMap.get(suiteStarting.suiteId) match {
-              case Some(slot) =>
-                throw new RuntimeException("2 SuiteStarting (" + slot.suiteId + ", " + suiteStarting.suiteId + ") having same suiteId '" + suiteStarting.suiteId + "'.")
-              case None =>
-                slotMap.put(suiteStarting.suiteId, slot)
+            // if distributingTests is called (in case of the suite is ParallelTestExecution), the slot is already exists
+            val slot = slotMap.get(suiteStarting.suiteId) match {
+              case Some(s) => s
+              case None => 
+                val newSlot = Slot(suiteStarting.suiteId, None, false, false)
+                slotMap.put(suiteStarting.suiteId, newSlot)
+                newSlot
             }
+            slotListBuf += slot
             handleTestEvents(suiteStarting.suiteId, suiteStarting)
 
           case suiteCompleted: SuiteCompleted =>
@@ -92,13 +93,20 @@ private[scalatest] class SuiteSortingReporter(dispatch: Reporter) extends Resour
   // Handles SuiteStarting, TestStarting, TestIgnored, TestSucceeded, TestFailed, TestPending,
   // TestCanceled, InfoProvided, MarkupProvided, ScopeOpened, ScopeClosed.
   private def handleTestEvents(suiteId: String, event: Event) {
-    suiteEventMap.get(suiteId) match { // Can probably use the transform or some such method
-      case Some(eventList) =>
-        suiteEventMap.put(suiteId, eventList :+ event)
-      case None =>                                     // oldest events at front of vector
-        suiteEventMap.put(suiteId, Vector(event))
+    val slot = slotMap(suiteId)
+    val slotIdx = slotListBuf.indexOf(slot)
+    if (slotIdx >= 0) {
+      // Only keep the events if the slot is still in slotListBuf
+      suiteEventMap.get(suiteId) match { // Can probably use the transform or some such method
+        case Some(eventList) =>
+          suiteEventMap.put(suiteId, eventList :+ event)
+        case None =>                                     // oldest events at front of vector
+          suiteEventMap.put(suiteId, Vector(event))
+      }
+      fireReadyEvents() // Then if at end of apply, why have it here too?
     }
-    fireReadyEvents() // Then if at end of apply, why have it here too?
+    else
+      dispatch(event)
   }
 
   // Only called within synchronized
@@ -150,13 +158,15 @@ private[scalatest] class SuiteSortingReporter(dispatch: Reporter) extends Resour
   }
   
   def completedTests(suiteId: String) {
-    val slot = slotMap(suiteId)
-    val newSlot = slot.copy(testsCompleted = true)
-    slotMap.put(suiteId, newSlot)
-    val slotIdx = slotListBuf.indexOf(slot)
-    if (slotIdx >= 0)
-      slotListBuf.update(slotIdx, newSlot)
-    fireReadyEvents()
+    synchronized {
+      val slot = slotMap(suiteId)
+      val newSlot = slot.copy(testsCompleted = true)
+      slotMap.put(suiteId, newSlot)
+      val slotIdx = slotListBuf.indexOf(slot)
+      if (slotIdx >= 0)
+        slotListBuf.update(slotIdx, newSlot)
+      fireReadyEvents()
+    }
   }
 
   // Will need a timeout. Hmm. Because can change it. Hmm. This is an issue. I wanted
@@ -164,12 +174,18 @@ private[scalatest] class SuiteSortingReporter(dispatch: Reporter) extends Resour
   // that's no prob. But if it is longer, then the suiteTimeout will timeout first. I think that's fine. I'll
   // just document that behavior.
   def distributingTests(suiteId: String) {
-    val slot = slotMap(suiteId)
-    val newSlot = slot.copy(includesDistributedTests = true)
-    slotMap.put(suiteId, newSlot)
-    val slotIdx = slotListBuf.indexOf(slot)
-    if (slotIdx >= 0)
-      slotListBuf.update(slotIdx, newSlot)
+    synchronized {
+      slotMap.get(suiteId) match {
+        case Some(slot) => 
+          val newSlot = slot.copy(includesDistributedTests = true)
+          slotMap.put(suiteId, newSlot)
+           val slotIdx = slotListBuf.indexOf(slot)
+          if (slotIdx >= 0)
+            slotListBuf.update(slotIdx, newSlot)
+        case None =>
+          slotMap.put(suiteId, Slot(suiteId, None, true, false))
+      }
+    }
   }
 /*
   def distributingTests(suiteId: String, timeout: Span, testCount: Int) = {

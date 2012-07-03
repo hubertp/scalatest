@@ -11,6 +11,12 @@ import java.util.UUID
 
 private[scalatest] class TestSortingReporter(suiteId: String, dispatch: Reporter, sortingTimeout: Span, testCount: Int, suiteSorter: Option[DistributedSuiteSorter]) extends ResourcefulReporter with DistributedTestSorter {
 
+  suiteSorter match {
+    case Some(suiteSorter) => 
+      suiteSorter.distributingTests(suiteId)
+    case None =>
+  }
+  
   // Chee Seng: What's the UUID for?
   // Each test gets one slot, but other events such as an info from an after an also get a slot i think.
   case class Slot(uuid: UUID, eventList: ListBuffer[Event], ready: Boolean)
