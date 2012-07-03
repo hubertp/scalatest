@@ -38,6 +38,7 @@ import scala.collection.mutable.ArrayBuffer
 import SuiteDiscoveryHelper._
 import org.scalatest.time.Span
 import org.scalatest.time.Seconds
+import org.scalatest.time.Millis
 
 private[tools] case class SuiteParam(className: String, testNames: Array[String], wildcardTestNames: Array[String], nestedSuites: Array[NestedSuiteParam])
 private[tools] case class NestedSuiteParam(suiteId: String, testNames: Array[String], wildcardTestNames: Array[String])
@@ -2076,7 +2077,7 @@ object Runner {
 
             val distributedSuiteSorter = 
               if (concurrentConfig.enableSuiteSortingReporter)
-                Some(new SuiteSortingReporter(dispatch))
+                Some(new SuiteSortingReporter(dispatch, Span(testSortingReporterTimeout.millisPart + 1000, Millis)))
               else
                 None
               
