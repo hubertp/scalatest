@@ -749,7 +749,7 @@ object Runner {
     val tagsToInclude: Set[String] = parseCompoundArgIntoSet(includesArgsList, "-n")
     val tagsToExclude: Set[String] = parseCompoundArgIntoSet(excludesArgsList, "-l")
     val concurrent: Boolean = !concurrentList.isEmpty
-    val concurrentConfig: ConcurrentConfig = parseConcurrentNumArg(concurrentList)
+    val concurrentConfig: ConcurrentConfig = parseConcurrentConfig(concurrentList)
     val membersOnlyList: List[String] = parseSuiteArgsIntoNameStrings(membersOnlyArgsList, "-m")
     val wildcardList: List[String] = parseSuiteArgsIntoNameStrings(wildcardArgsList, "-w")
     val testNGList: List[String] = parseSuiteArgsIntoNameStrings(testNGArgsList, "-b")
@@ -933,8 +933,8 @@ object Runner {
   // that.  If none have a number it just returns 0.  If anyone of the -P comes 
   // with the 'S' option, SuiteSortingReporter will be enabled.
   //
-  private[scalatest] def parseConcurrentNumArg(concurrentList: List[String]): ConcurrentConfig = {
-    val threadOpt = concurrentList.find(_.matches("-c\\d+"))
+  private[scalatest] def parseConcurrentConfig(concurrentList: List[String]): ConcurrentConfig = {
+    val threadOpt = concurrentList.find(s => s.matches("-c\\d+") || s.matches("-cS\\d+"))
     val numThreads = threadOpt match {
       case Some(arg) => 
         if (arg.startsWith("-cS"))
@@ -944,11 +944,7 @@ object Runner {
       case None      => 0
     }
     
-    val ssrOption = concurrentList.find(_.indexOf("S") >= 0)
-    val enableSuiteSortingReporter = ssrOption match {
-      case Some(ssr) => true
-      case None => false
-    }
+    val enableSuiteSortingReporter = concurrentList.find(_.startsWith("-cS")).isDefined
     
     ConcurrentConfig(numThreads, enableSuiteSortingReporter)
   }
