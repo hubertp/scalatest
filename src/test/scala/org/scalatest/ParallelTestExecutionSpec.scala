@@ -9,6 +9,8 @@ import org.scalatest.tools.SuiteRunner
 import org.scalatest.tools.SuiteSortingReporter
 import org.scalatest.events.SuiteStarting
 import org.scalatest.events.SuiteCompleted
+import java.util.concurrent.Future
+import java.util.concurrent.LinkedBlockingQueue
 
 class ParallelTestExecutionSpec extends FunSpec with ShouldMatchers with EventHelpers {
   /*
@@ -48,6 +50,8 @@ class ParallelTestExecutionSpec extends FunSpec with ShouldMatchers with EventHe
     }
     
     class ControlledOrderConcurrentDistributor(poolSize: Int) extends Distributor {
+      private val futureQueue = new LinkedBlockingQueue[Future[T] forSome { type T }]
+      
       val buf = ListBuffer.empty[SuiteRunner]
       val execSvc: ExecutorService = Executors.newFixedThreadPool(2)
       def apply(suite: Suite, args: Args) {
@@ -55,13 +59,19 @@ class ParallelTestExecutionSpec extends FunSpec with ShouldMatchers with EventHe
       }
       def executeInOrder() {
         for (suiteRunner <- buf) {
-          execSvc.submit(suiteRunner)
+          val future: Future[_] = execSvc.submit(suiteRunner)
+          futureQueue.put(future)
         }
+        while (futureQueue.peek != null) 
+          futureQueue.poll().get()
       }
       def executeInReverseOrder() {
         for (suiteRunner <- buf.reverse) {
-          execSvc.submit(suiteRunner)
+          val future: Future[_] = execSvc.submit(suiteRunner)
+          futureQueue.put(future)
         }
+        while (futureQueue.peek != null)
+          futureQueue.poll().get()
       }
 
       def apply(suite: Suite, tracker: Tracker) {
@@ -155,7 +165,6 @@ class ParallelTestExecutionSpec extends FunSpec with ShouldMatchers with EventHe
         val outOfOrderConcurrentDistributor = new ControlledOrderConcurrentDistributor(2)
         (new ExampleTimeoutParallelSpec).run(None, Args(recordingReporter, distributor = Some(outOfOrderConcurrentDistributor)))
         fun(outOfOrderConcurrentDistributor)
-        Thread.sleep(3000)  // Get enough time for the timeout to reach, and the missing event to fire.
 
         val eventRecorded = recordingReporter.eventsReceived
         assert(eventRecorded.size === 16)
@@ -186,7 +195,7 @@ class ParallelTestExecutionSpec extends FunSpec with ShouldMatchers with EventHe
     }
 
     // TODO: Check with Chee Seng. I'm not sure what this is supposed to be testing, and it fails.
-    ignore("should have the events reported in correct order when multiple suite's tests are executed in parallel") {
+    it("should have the events reported in correct order when multiple suite's tests are executed in parallel") {
       def withDistributor(fun: ControlledOrderConcurrentDistributor => Unit) = {
         val recordingReporter = new EventRecordingReporter
         val outOfOrderConcurrentDistributor = new ControlledOrderConcurrentDistributor(2)
