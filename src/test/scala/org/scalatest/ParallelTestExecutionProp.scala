@@ -9,12 +9,18 @@ import java.util.concurrent.Future
 import org.scalatest.tools.SuiteRunner
 import java.util.concurrent.Executors
 import java.util.concurrent.ExecutorService
+import org.scalatest.tools.SuiteSortingReporter
+import org.scalatest.time.Span
+import org.scalatest.time.Seconds
+import org.scalatest.events.SuiteStarting
+import org.scalatest.events.SuiteCompleted
 
 class ParallelTestExecutionProp extends FunSuite 
   with TableDrivenPropertyChecks with SharedHelpers  
   with ParallelTestExecutionOrderExamples 
   with ParallelTestExecutionInfoExamples 
-  with ParallelTestExecutionTestTimeoutExamples {
+  with ParallelTestExecutionTestTimeoutExamples
+  with ParallelTestExecutionParallelSuiteExamples {
   
   class ControlledOrderDistributor extends Distributor {
     val buf = ListBuffer.empty[(Suite, Args)]
@@ -86,6 +92,26 @@ class ParallelTestExecutionProp extends FunSuite
     recordingReporter.eventsReceived
   }
   
+  def withConcurrentDistributor(suite1: Suite, suite2: Suite, fun: ControlledOrderConcurrentDistributor => Unit) = {
+    val recordingReporter = new EventRecordingReporter
+    val outOfOrderConcurrentDistributor = new ControlledOrderConcurrentDistributor(2)
+    val suiteSortingReporter = new SuiteSortingReporter(recordingReporter, Span(5, Seconds))
+    
+    val tracker = new Tracker()
+    suiteSortingReporter(SuiteStarting(tracker.nextOrdinal, suite1.suiteName, suite1.suiteId, Some(suite1.getClass.getName), None))
+    suiteSortingReporter(SuiteStarting(tracker.nextOrdinal, suite2.suiteName, suite2.suiteId, Some(suite2.getClass.getName), None))
+        
+    suite1.run(None, Args(suiteSortingReporter, distributor = Some(outOfOrderConcurrentDistributor), distributedSuiteSorter = Some(suiteSortingReporter)))
+    suite2.run(None, Args(suiteSortingReporter, distributor = Some(outOfOrderConcurrentDistributor), distributedSuiteSorter = Some(suiteSortingReporter)))
+        
+    suiteSortingReporter(SuiteCompleted(tracker.nextOrdinal, suite1.suiteName, suite1.suiteId, Some(suite1.getClass.getName), None))
+    suiteSortingReporter(SuiteCompleted(tracker.nextOrdinal, suite2.suiteName, suite2.suiteId, Some(suite2.getClass.getName), None))
+        
+    fun(outOfOrderConcurrentDistributor)
+        
+    recordingReporter.eventsReceived
+  }
+  
   test("ParallelTestExecution should have the events reported in correct order when tests are executed in parallel") {
     forAll(orderExamples) { example =>
       val inOrderEvents = withDistributor(example, _.executeInOrder)
@@ -110,6 +136,15 @@ class ParallelTestExecutionProp extends FunSuite
       example.assertTestTimeoutTest(inOrderEvents)
       val reverseOrderEvents = withConcurrentDistributor(example, _.executeInReverseOrder)
       example.assertTestTimeoutTest(reverseOrderEvents)
+    }
+  }
+  
+  test("ParallelTestExecution should have the events reported in correct order when multiple suite's tests are executed in parallel") {
+    forAll(parallelExamples) { example => 
+      val inOrderEvents = withConcurrentDistributor(example.suite1, example.suite2, _.executeInOrder)
+      example.assertParallelSuites(inOrderEvents)
+      val reverseOrderEvents = withConcurrentDistributor(example.suite1, example.suite2, _.executeInReverseOrder)
+      example.assertParallelSuites(reverseOrderEvents)
     }
   }
 }
