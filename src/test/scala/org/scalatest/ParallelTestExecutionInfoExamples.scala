@@ -48,6 +48,7 @@ trait ParallelTestExecutionInfoExamples extends Tables {
     )
 }
 
+@DoNotDiscover
 class ExampleParallelTestExecutionInfoSuite extends Suite with InfoExpectedResults with BeforeAndAfter with ParallelTestExecution {
   before {}  // how to fire info here?
   def testMethod1() {}
@@ -66,6 +67,7 @@ class ExampleParallelTestExecutionInfoSuite extends Suite with InfoExpectedResul
   }
 }
 
+@DoNotDiscover
 class ExampleParallelTestExecutionInfoFixtureSuite extends fixture.Suite with InfoExpectedResults with BeforeAndAfter with ParallelTestExecution with StringFixture {
   before {}  // how to fire info here?
   def testMethod1() {}
@@ -84,6 +86,7 @@ class ExampleParallelTestExecutionInfoFixtureSuite extends fixture.Suite with In
   }
 }
 
+@DoNotDiscover
 class ExampleParallelTestExecutionInfoFunSuite extends FunSuite with InfoExpectedResults with BeforeAndAfter with ParallelTestExecution {
   before { info("In Before") }
   after { info("In After") }
@@ -108,6 +111,7 @@ class ExampleParallelTestExecutionInfoFunSuite extends FunSuite with InfoExpecte
   }
 }
 
+@DoNotDiscover
 class ExampleParallelTestExecutionInfoFixtureFunSuite extends fixture.FunSuite with InfoExpectedResults with BeforeAndAfter with ParallelTestExecution with StringFixture {
   before { info("In Before") }
   after { info("In After") }
@@ -132,6 +136,7 @@ class ExampleParallelTestExecutionInfoFixtureFunSuite extends fixture.FunSuite w
   }
 }
 
+@DoNotDiscover
 class ExampleParallelTestExecutionInfoFunSpec extends FunSpec with InfoExpectedResults with BeforeAndAfter with ParallelTestExecution {
   before { info("In Before") }
   after { info("In After") }
@@ -169,6 +174,7 @@ class ExampleParallelTestExecutionInfoFunSpec extends FunSpec with InfoExpectedR
   }
 }
 
+@DoNotDiscover
 class ExampleParallelTestExecutionInfoFixtureFunSpec extends fixture.FunSpec with InfoExpectedResults with BeforeAndAfter with ParallelTestExecution with StringFixture {
   before { info("In Before") }
   after { info("In After") }
@@ -206,6 +212,7 @@ class ExampleParallelTestExecutionInfoFixtureFunSpec extends fixture.FunSpec wit
   }
 }
 
+@DoNotDiscover
 class ExampleParallelTestExecutionInfoFeatureSpec extends FeatureSpec with InfoExpectedResults with BeforeAndAfter with ParallelTestExecution {
   before { info("In Before") }
   after { info("In After") }
@@ -243,6 +250,7 @@ class ExampleParallelTestExecutionInfoFeatureSpec extends FeatureSpec with InfoE
   }
 }
 
+@DoNotDiscover
 class ExampleParallelTestExecutionInfoFixtureFeatureSpec extends fixture.FeatureSpec with InfoExpectedResults with BeforeAndAfter with ParallelTestExecution with StringFixture {
   before { info("In Before") }
   after { info("In After") }
@@ -280,6 +288,7 @@ class ExampleParallelTestExecutionInfoFixtureFeatureSpec extends fixture.Feature
   }
 }
 
+@DoNotDiscover
 class ExampleParallelTestExecutionInfoFlatSpec extends FlatSpec with InfoExpectedResults with BeforeAndAfter with ParallelTestExecution {
   before { info("In Before") }
   after { info("In After") }
@@ -316,6 +325,7 @@ class ExampleParallelTestExecutionInfoFlatSpec extends FlatSpec with InfoExpecte
   }
 }
 
+@DoNotDiscover
 class ExampleParallelTestExecutionInfoFixtureFlatSpec extends fixture.FlatSpec with InfoExpectedResults with BeforeAndAfter with ParallelTestExecution with StringFixture {
   before { info("In Before") }
   after { info("In After") }
@@ -352,6 +362,7 @@ class ExampleParallelTestExecutionInfoFixtureFlatSpec extends fixture.FlatSpec w
   }
 }
 
+@DoNotDiscover
 class ExampleParallelTestExecutionInfoFreeSpec extends FreeSpec with InfoExpectedResults with BeforeAndAfter with ParallelTestExecution {
   before { info("In Before") }
   after { info("In After") }
@@ -390,6 +401,7 @@ class ExampleParallelTestExecutionInfoFreeSpec extends FreeSpec with InfoExpecte
   }
 }
 
+@DoNotDiscover
 class ExampleParallelTestExecutionInfoFixtureFreeSpec extends fixture.FreeSpec with InfoExpectedResults with BeforeAndAfter with ParallelTestExecution with StringFixture {
   before { info("In Before") }
   after { info("In After") }
@@ -428,6 +440,7 @@ class ExampleParallelTestExecutionInfoFixtureFreeSpec extends fixture.FreeSpec w
   }
 }
 
+@DoNotDiscover
 class ExampleParallelTestExecutionInfoPropSpec extends PropSpec with InfoExpectedResults with BeforeAndAfter with ParallelTestExecution {
   before { info("In Before") }
   after { info("In After") }
@@ -452,6 +465,7 @@ class ExampleParallelTestExecutionInfoPropSpec extends PropSpec with InfoExpecte
   }
 }
 
+@DoNotDiscover
 class ExampleParallelTestExecutionInfoFixturePropSpec extends fixture.PropSpec with InfoExpectedResults with BeforeAndAfter with ParallelTestExecution with StringFixture {
   before { info("In Before") }
   after { info("In After") }
@@ -476,6 +490,7 @@ class ExampleParallelTestExecutionInfoFixturePropSpec extends fixture.PropSpec w
   }
 }
 
+@DoNotDiscover
 class ExampleParallelTestExecutionInfoWordSpec extends WordSpec with InfoExpectedResults with BeforeAndAfter with ParallelTestExecution {
   before { info("In Before") }
   after { info("In After") }
@@ -513,7 +528,7 @@ class ExampleParallelTestExecutionInfoWordSpec extends WordSpec with InfoExpecte
     checkScopeClosed(events(19), "Scope 2")
   }
 }
-
+@DoNotDiscover
 class ExampleParallelTestExecutionInfoFixtureWordSpec extends fixture.WordSpec with InfoExpectedResults with BeforeAndAfter with ParallelTestExecution with StringFixture {
   before { info("In Before") }
   after { info("In After") }
