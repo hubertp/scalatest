@@ -14,13 +14,15 @@ import org.scalatest.time.Span
 import org.scalatest.time.Seconds
 import org.scalatest.events.SuiteStarting
 import org.scalatest.events.SuiteCompleted
+import org.scalatest.time.Millis
 
 class ParallelTestExecutionProp extends FunSuite 
   with TableDrivenPropertyChecks with SharedHelpers  
   with ParallelTestExecutionOrderExamples 
   with ParallelTestExecutionInfoExamples 
   with ParallelTestExecutionTestTimeoutExamples
-  with ParallelTestExecutionParallelSuiteExamples {
+  with ParallelTestExecutionParallelSuiteExamples 
+  with ParallelTestExecutionSuiteTimeoutExamples {
   
   class ControlledOrderDistributor extends Distributor {
     val buf = ListBuffer.empty[(Suite, Args)]
@@ -92,10 +94,10 @@ class ParallelTestExecutionProp extends FunSuite
     recordingReporter.eventsReceived
   }
   
-  def withConcurrentDistributor(suite1: Suite, suite2: Suite, fun: ControlledOrderConcurrentDistributor => Unit) = {
+  def withConcurrentDistributor(suite1: Suite, suite2: Suite, timeout: Span, fun: ControlledOrderConcurrentDistributor => Unit) = {
     val recordingReporter = new EventRecordingReporter
     val outOfOrderConcurrentDistributor = new ControlledOrderConcurrentDistributor(2)
-    val suiteSortingReporter = new SuiteSortingReporter(recordingReporter, Span(5, Seconds))
+    val suiteSortingReporter = new SuiteSortingReporter(recordingReporter, timeout)
     
     val tracker = new Tracker()
     suiteSortingReporter(SuiteStarting(tracker.nextOrdinal, suite1.suiteName, suite1.suiteId, Some(suite1.getClass.getName), None))
@@ -141,10 +143,17 @@ class ParallelTestExecutionProp extends FunSuite
   
   test("ParallelTestExecution should have the events reported in correct order when multiple suite's tests are executed in parallel") {
     forAll(parallelExamples) { example => 
-      val inOrderEvents = withConcurrentDistributor(example.suite1, example.suite2, _.executeInOrder)
+      val inOrderEvents = withConcurrentDistributor(example.suite1, example.suite2, Span(5, Seconds), _.executeInOrder)
       example.assertParallelSuites(inOrderEvents)
-      val reverseOrderEvents = withConcurrentDistributor(example.suite1, example.suite2, _.executeInReverseOrder)
+      val reverseOrderEvents = withConcurrentDistributor(example.suite1, example.suite2, Span(5, Seconds), _.executeInReverseOrder)
       example.assertParallelSuites(reverseOrderEvents)
+    }
+  }
+  
+  test("ParallelTestExecution should have the blocking suite's events fired without waiting when timeout reaches, and when the missing event finally reach later, it should just get fired") {
+    forAll(suiteTimeoutExamples) { example =>
+      val events = withConcurrentDistributor(example.suite1, example.suite2, Span(100, Millis), _.executeInOrder)
+      example.assertSuiteTimeoutTest(events)
     }
   }
 }
