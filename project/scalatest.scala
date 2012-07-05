@@ -23,45 +23,15 @@ object ScalatestBuild extends Build {
                               "org.scalatest.events.TestLocationMethodJUnitSuite", 
                               "org.scalatest.events.TestLocationMethodTestNGSuite", 
                               "org.scalatest.events.TestLocationTestNGSuite", 
-                              "org.scalatest.tools.SomeApiClassRunner")
-                              
-   /*val stsettings = Defaults.emptySettings ++ Seq(
-     organization := "org.scalatest",
-     version := "2.0-SNAPSHOT",
-     crossScalaVersions := Seq("2.8.1", "2.8.2","2.9.0","2.9.0-1","2.9.1-1-RC1","2.10.0-M4"),
-     libraryDependencies ++= simpledependencies,
-     libraryDependencies <+= scalaVersion apply {
-       //TODO -1.7
-       case sv @ ("2.8.2"|"2.8.1") => "org.scala-tools.testing" % ("scalacheck_"+sv) % "1.8"
-       //case _                      => "org.scala-tools.testing" % "scalacheck_2.9.0" % "1.9"
-       case _                      => "org.scala-tools.testing" % "scalacheck_2.9.0" % "1.8"
-     },
-     sourceGenerators in Compile <+= 
-         (baseDirectory, sourceManaged in Compile) map genGenMain,
-     sourceGenerators in Test <+= 
-         (baseDirectory, sourceManaged in Test) map genGenTest,
-     sourceGenerators in Compile <+= 
-         (baseDirectory, sourceManaged in Compile) map genTableMain,
-     sourceGenerators in Test <+= 
-         (baseDirectory, sourceManaged in Test) map genTableTest, 
-     testOptions in Test := Seq(Tests.Filter(className => isIncludedTest(className)))
-   )
-
-   lazy val root = Project("scalatest", 
-                           file("."), 
-                           settings = stsettings ++ Seq(genCodeTask))*/
+                              "org.scalatest.tools.SomeApiClassRunner", 
+                              "org.scalatest.PackageAccessConstructorSuite")
                               
    lazy val root = Project("scalatest", file(".")) settings(
      organization := "org.scalatest",
      version := "1.9-2.10.0-M4-B2",
      scalaVersion := "2.10.0-M4",
      libraryDependencies ++= simpledependencies,
-     libraryDependencies <+= scalaVersion apply {
-       //TODO -1.7
-       case sv @ ("2.8.2"|"2.8.1") => "org.scala-tools.testing" % ("scalacheck_"+sv) % "1.8"
-       case _                      => "org.scala-tools.testing" % "scalacheck_2.9.0" % "1.9"
-       //case _                      => "org.scala-tools.testing" % "scalacheck_2.9.0" % "1.8"
-     },
+     resolvers += "Sonatype Public" at "https://oss.sonatype.org/content/groups/public",
      genCodeTask, 
      sourceGenerators in Compile <+= 
          (baseDirectory, sourceManaged in Compile) map genGenMain,
@@ -89,6 +59,7 @@ object ScalatestBuild extends Build {
    def simpledependencies = Seq(
      "org.scala-lang" % "scala-actors" % "2.10.0-M4",
      "org.scala-tools.testing" % "test-interface" % "0.5",  // TODO optional
+     "org.scalacheck" % "scalacheck_2.10.0-M4" % "1.10-SNAPSHOT",   // TODO optional
      "org.easymock" % "easymockclassextension" % "3.1",   // TODO optional
      "org.jmock" % "jmock-legacy" % "2.5.1", // TODO optional
      "org.mockito" % "mockito-all" % "1.9.0", // TODO optional

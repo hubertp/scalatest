@@ -1833,19 +1833,15 @@ $lengthAssertions$
   // set minSize == maxSize with (param, param) (ensure always passed with that size)
   test("generator-driven property that takes $n$ args and generators, with minSize == maxSize, specified as (param, param)") {
 
-    pendingUntilFixed {
-      forAll ($fiveFiveArgs$, minSize(5), maxSize(5)) { ($namesAndTypes$) =>
+    forAll ($fiveFiveArgs$, minSize(5), maxSize(5)) { ($namesAndTypes$) =>
 $okayAssertions$
-      }
     }
   }
 
   test("generator-driven property that takes $n$ named args and generators, with minSize == maxSize, specified as (param, param)") {
 
-    pendingUntilFixed {
-      forAll ($fiveFiveNameGenTuples$, minSize(5), maxSize(5)) { ($namesAndTypes$) =>
+    forAll ($fiveFiveNameGenTuples$, minSize(5), maxSize(5)) { ($namesAndTypes$) =>
 $okayAssertions$
-      }
     }
   }
 
@@ -1855,10 +1851,8 @@ $okayAssertions$
     // Hides the member
     implicit val generatorDrivenConfig = PropertyCheckConfig(maxSize = 5)
 
-    pendingUntilFixed {
-      forAll ($fiveFiveArgs$, minSize(5)) { ($namesAndTypes$) =>
+    forAll ($fiveFiveArgs$, minSize(5)) { ($namesAndTypes$) =>
 $okayAssertions$
-      }
     }
   }
 
@@ -1867,10 +1861,8 @@ $okayAssertions$
     // Hides the member
     implicit val generatorDrivenConfig = PropertyCheckConfig(maxSize = 5)
 
-    pendingUntilFixed {
-      forAll ($fiveFiveNameGenTuples$, minSize(5)) { ($namesAndTypes$) =>
+    forAll ($fiveFiveNameGenTuples$, minSize(5)) { ($namesAndTypes$) =>
 $okayAssertions$
-      }
     }
   }
 
@@ -1880,10 +1872,8 @@ $okayAssertions$
     // Hides the member
     implicit val generatorDrivenConfig = PropertyCheckConfig(minSize = 5)
 
-    pendingUntilFixed {
-      forAll ($fiveFiveArgs$, maxSize(5)) { ($namesAndTypes$) =>
+    forAll ($fiveFiveArgs$, maxSize(5)) { ($namesAndTypes$) =>
 $okayAssertions$
-      }
     }
   }
 
@@ -1892,10 +1882,8 @@ $okayAssertions$
     // Hides the member
     implicit val generatorDrivenConfig = PropertyCheckConfig(minSize = 5)
 
-    pendingUntilFixed {
-      forAll ($fiveFiveNameGenTuples$, maxSize(5)) { ($namesAndTypes$) =>
+    forAll ($fiveFiveNameGenTuples$, maxSize(5)) { ($namesAndTypes$) =>
 $okayAssertions$
-      }
     }
   }
 
@@ -1905,10 +1893,8 @@ $okayAssertions$
     // Hides the member
     implicit val generatorDrivenConfig = PropertyCheckConfig(minSize = 5, maxSize = 5)
 
-    pendingUntilFixed {
-      forAll ($fiveFiveArgs$) { ($namesAndTypes$) =>
+    forAll ($fiveFiveArgs$) { ($namesAndTypes$) =>
 $okayAssertions$
-      }
     }
   }
 
@@ -1917,29 +1903,23 @@ $okayAssertions$
     // Hides the member
     implicit val generatorDrivenConfig = PropertyCheckConfig(minSize = 5, maxSize = 5)
 
-    pendingUntilFixed {
-      forAll ($fiveFiveNameGenTuples$) { ($namesAndTypes$) =>
+    forAll ($fiveFiveNameGenTuples$) { ($namesAndTypes$) =>
 $okayAssertions$
-      }
     }
   }
 
   // set minSize to 7 and maxSize to 11 with (param, param) (ensure always passed with that size)
   test("generator-driven property that takes $n$ args and generators, with minSize to 7 and maxSize to 11, specified as (param, param)") {
 
-    pendingUntilFixed {
-      forAll ($sevenElevenArgs$, minSize(7), maxSize(11)) { ($namesAndTypes$) =>
+    forAll ($sevenElevenArgs$, minSize(7), maxSize(11)) { ($namesAndTypes$) =>
 $okayAssertions$
-      }
     }
   }
 
   test("generator-driven property that takes $n$ named args and generators, with minSize to 7 and maxSize to 11, specified as (param, param)") {
 
-    pendingUntilFixed {
-      forAll ($sevenElevenNameGenTuples$, minSize(7), maxSize(11)) { ($namesAndTypes$) =>
+    forAll ($sevenElevenNameGenTuples$, minSize(7), maxSize(11)) { ($namesAndTypes$) =>
 $okayAssertions$
-      }
     }
   }
 
@@ -1949,10 +1929,8 @@ $okayAssertions$
     // Hides the member
     implicit val generatorDrivenConfig = PropertyCheckConfig(maxSize = 11)
 
-    pendingUntilFixed {
-      forAll ($sevenElevenArgs$, minSize(7)) { ($namesAndTypes$) =>
+    forAll ($sevenElevenArgs$, minSize(7)) { ($namesAndTypes$) =>
 $okayAssertions$
-      }
     }
   }
 
@@ -1961,10 +1939,8 @@ $okayAssertions$
     // Hides the member
     implicit val generatorDrivenConfig = PropertyCheckConfig(maxSize = 11)
 
-    pendingUntilFixed {
-      forAll ($sevenElevenNameGenTuples$, minSize(7)) { ($namesAndTypes$) =>
+    forAll ($sevenElevenNameGenTuples$, minSize(7)) { ($namesAndTypes$) =>
 $okayAssertions$
-      }
     }
   }
 
@@ -1974,10 +1950,8 @@ $okayAssertions$
     // Hides the member
     implicit val generatorDrivenConfig = PropertyCheckConfig(minSize = 7)
 
-    pendingUntilFixed {
-      forAll ($sevenElevenArgs$, maxSize(11)) { ($namesAndTypes$) =>
+    forAll ($sevenElevenArgs$, maxSize(11)) { ($namesAndTypes$) =>
 $okayAssertions$
-      }
     }
   }
 
@@ -1986,10 +1960,8 @@ $okayAssertions$
     // Hides the member
     implicit val generatorDrivenConfig = PropertyCheckConfig(minSize = 7)
 
-    pendingUntilFixed {
-      forAll ($sevenElevenNameGenTuples$, maxSize(11)) { ($namesAndTypes$) =>
+    forAll ($sevenElevenNameGenTuples$, maxSize(11)) { ($namesAndTypes$) =>
 $okayAssertions$
-      }
     }
   }
 
@@ -1999,10 +1971,8 @@ $okayAssertions$
     // Hides the member
     implicit val generatorDrivenConfig = PropertyCheckConfig(minSize = 7, maxSize = 11)
 
-    pendingUntilFixed {
-      forAll ($sevenElevenArgs$) { ($namesAndTypes$) =>
+    forAll ($sevenElevenArgs$) { ($namesAndTypes$) =>
 $okayAssertions$
-      }
     }
   }
 
@@ -2011,10 +1981,8 @@ $okayAssertions$
     // Hides the member
     implicit val generatorDrivenConfig = PropertyCheckConfig(minSize = 7, maxSize = 11)
 
-    pendingUntilFixed {
-      forAll ($sevenElevenNameGenTuples$) { ($namesAndTypes$) =>
+    forAll ($sevenElevenNameGenTuples$) { ($namesAndTypes$) =>
 $okayAssertions$
-      }
     }
   }
 """
@@ -2417,12 +2385,10 @@ $lengthExpressions$
   // set minSize == maxSize with (param, param) (ensure always passed with that size)
   test("ScalaCheck property that takes $n$ args and generators, with minSize == maxSize, specified as (param, param)") {
 
-    pendingUntilFixed {
-      val prop = forAll ($fiveFiveArgs$) { ($namesAndTypes$) =>
+    val prop = forAll ($fiveFiveArgs$) { ($namesAndTypes$) =>
 $okayExpressions$
-      }
-      check(prop, minSize(5), maxSize(5))
     }
+    check(prop, minSize(5), maxSize(5))
   }
 
   // set minSize == maxSize with (param, default) (ensure always passed with that size)
@@ -2431,12 +2397,10 @@ $okayExpressions$
     // Hides the member
     implicit val generatorDrivenConfig = PropertyCheckConfig(maxSize = 5)
 
-    pendingUntilFixed {
-      val prop = forAll ($fiveFiveArgs$) { ($namesAndTypes$) =>
+    val prop = forAll ($fiveFiveArgs$) { ($namesAndTypes$) =>
 $okayExpressions$
-      }
-      check(prop, minSize(5))
     }
+    check(prop, minSize(5))
   }
 
   // set minSize == maxSize with (default, param) (ensure always passed with that size)
@@ -2445,12 +2409,10 @@ $okayExpressions$
     // Hides the member
     implicit val generatorDrivenConfig = PropertyCheckConfig(minSize = 5)
 
-    pendingUntilFixed {
-      val prop = forAll ($fiveFiveArgs$) { ($namesAndTypes$) =>
+    val prop = forAll ($fiveFiveArgs$) { ($namesAndTypes$) =>
 $okayExpressions$
-      }
-      check(prop, maxSize(5))
     }
+    check(prop, maxSize(5))
   }
 
   // set minSize == maxSize with (default, default) (ensure always passed with that size)
@@ -2459,23 +2421,19 @@ $okayExpressions$
     // Hides the member
     implicit val generatorDrivenConfig = PropertyCheckConfig(minSize = 5, maxSize = 5)
 
-    pendingUntilFixed {
-      val prop = forAll ($fiveFiveArgs$) { ($namesAndTypes$) =>
+    val prop = forAll ($fiveFiveArgs$) { ($namesAndTypes$) =>
 $okayExpressions$
-      }
-      check(prop)
     }
+    check(prop)
   }
 
   // set minSize to 7 and maxSize to 11 with (param, param) (ensure always passed with that size)
   test("ScalaCheck property that takes $n$ args and generators, with minSize to 7 and maxSize to 11, specified as (param, param)") {
 
-    pendingUntilFixed {
-      val prop = forAll ($sevenElevenArgs$) { ($namesAndTypes$) =>
+    val prop = forAll ($sevenElevenArgs$) { ($namesAndTypes$) =>
 $okayExpressions$
-      }
-      check(prop, minSize(7), maxSize(11))
     }
+    check(prop, minSize(7), maxSize(11))
   }
 
   // set minSize to 7 and maxSize to 11 with (param, default) (ensure always passed with that size)
@@ -2484,12 +2442,10 @@ $okayExpressions$
     // Hides the member
     implicit val generatorDrivenConfig = PropertyCheckConfig(maxSize = 11)
 
-    pendingUntilFixed {
-      val prop = forAll ($sevenElevenArgs$) { ($namesAndTypes$) =>
+    val prop = forAll ($sevenElevenArgs$) { ($namesAndTypes$) =>
 $okayExpressions$
-      }
-      check(prop, minSize(7))
     }
+    check(prop, minSize(7))
   }
 
   // set minSize to 7 and maxSize to 11 with (default, param) (ensure always passed with that size)
@@ -2498,12 +2454,10 @@ $okayExpressions$
     // Hides the member
     implicit val generatorDrivenConfig = PropertyCheckConfig(minSize = 7)
 
-    pendingUntilFixed {
-      val prop = forAll ($sevenElevenArgs$) { ($namesAndTypes$) =>
+    val prop = forAll ($sevenElevenArgs$) { ($namesAndTypes$) =>
 $okayExpressions$
-      }
-      check(prop, maxSize(11))
     }
+    check(prop, maxSize(11))
   }
 
   // set minSize to 7 and maxSize to 11 with (default, default) (ensure always passed with that size)
@@ -2512,12 +2466,10 @@ $okayExpressions$
     // Hides the member
     implicit val generatorDrivenConfig = PropertyCheckConfig(minSize = 7, maxSize = 11)
 
-    pendingUntilFixed {
-      val prop = forAll ($sevenElevenArgs$) { ($namesAndTypes$) =>
+    val prop = forAll ($sevenElevenArgs$) { ($namesAndTypes$) =>
 $okayExpressions$
-      }
-      check(prop)
     }
+    check(prop)
   }
 """
 // 1712  2205
