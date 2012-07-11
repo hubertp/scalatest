@@ -4,6 +4,7 @@ import org.scalatest.FunSpec
 import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.OptionValues
 import org.scalatest.time.Span
+import org.scalatest.time.Milliseconds
 import akka.actor.Actor
 import akka.actor.ActorSystem
 import akka.actor.Props
@@ -40,17 +41,16 @@ class AkkaFuturesSpec extends FunSpec with ShouldMatchers with OptionValues with
   
   describe("With a akka.dispatch.Future") {
     
-    describe("when using the isCompleted method") {
+    describe("when using the isReadyWithin method") {
       
       it("can be queried to make sure it is completed") {
         val future = sleeper ? 10L
-        Thread.sleep(20L)
-        future.isCompleted should be (true)
+        future.isReadyWithin(Span(20, Milliseconds)) should be (true)
       }
       
       it("should eventually return false if the future is never ready") {
-        val future = sleeper ? 10L
-        future.isCompleted should be (false)
+        val future = sleeper ? 20L
+        future.isReadyWithin(Span(10, Milliseconds)) should be (false)
       }
       
       
