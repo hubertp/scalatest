@@ -1,6 +1,5 @@
-package org.scalatest.akka
+package org.scalatest.concurrent
 
-import org.scalatest.concurrent.Futures
 import akka.dispatch.{Future => FutureOfAkka}
 import org.scalatest.exceptions.TestFailedException
 import org.scalatest.Resources
@@ -12,15 +11,18 @@ import org.scalatest.exceptions.TimeoutField
 import org.scalatest.time.Span
 import org.scalatest.Suite.anErrorThatShouldCauseAnAbort
 import org.scalatest.exceptions.TestPendingException
-import scala.annotation.tailrec
+import akka.dispatch.{Future => FutureOfAkka}
+import akka.dispatch.Promise
+import org.scalatest.exceptions.TestCanceledException
 
 trait AkkaFutures extends Futures {
 
   implicit def convertAkkaFuture[T](akkaFuture: FutureOfAkka[T]): FutureConcept[T] = 
-    new FutureConcept[T] {
+    new FutureConcept[T] {    
       def isExpired = false
       def isCanceled = false
       def eitherValue = akkaFuture.value
+      
       override def futureValue(implicit config: PatienceConfig): T = {
         
         val st = Thread.currentThread.getStackTrace
@@ -44,6 +46,28 @@ trait AkkaFutures extends Futures {
           else
             0
             
+        def wrapActorFailure(e: Throwable) = {
+          val cause = e.getCause
+            val exToReport = if (cause == null) e else cause // TODO: in 2.0 add TestCanceledException here
+            if (anErrorThatShouldCauseAnAbort(exToReport) || exToReport.isInstanceOf[TestPendingException] || exToReport.isInstanceOf[TestCanceledException]) 
+              exToReport
+            else
+              new TestFailedException(
+                sde => Some {
+                  if (exToReport.getMessage == null)
+                    Resources("futureReturnedAnException", exToReport.getClass.getName)
+                  else
+                    Resources("futureReturnedAnExceptionWithMessage", exToReport.getClass.getName, exToReport.getMessage)
+                },
+                Some(exToReport),
+                getStackDepthFun("AkkaFutures.scala", methodName, adjustment)
+              ) 
+        }
+            
+        akkaFuture onFailure {
+          case e: Throwable => throw wrapActorFailure(e)
+        }
+            
         try {
           Await.result(akkaFuture, Duration(config.timeout.totalNanos, TimeUnit.NANOSECONDS))
         }
@@ -52,26 +76,13 @@ trait AkkaFutures extends Futures {
             throw new TestFailedException(
               sde => Some(Resources("wasNeverReady")),
               None,
-              getStackDepthFun("JavaFutures.scala", methodName, adjustment)
+              getStackDepthFun("AkkaFutures.scala", methodName, adjustment)
             ) with TimeoutField {
               val timeout: Span = config.timeout
             }
-          case e: java.util.concurrent.ExecutionException =>
-            val cause = e.getCause
-            val exToReport = if (cause == null) e else cause // TODO: in 2.0 add TestCanceledException here
-            if (anErrorThatShouldCauseAnAbort(exToReport) || exToReport.isInstanceOf[TestPendingException]) {
-              throw exToReport
-            }
-            throw new TestFailedException(
-              sde => Some {
-                if (exToReport.getMessage == null)
-                  Resources("futureReturnedAnException", exToReport.getClass.getName)
-                else
-                  Resources("futureReturnedAnExceptionWithMessage", exToReport.getClass.getName, exToReport.getMessage)
-              },
-              Some(exToReport),
-              getStackDepthFun("JavaFutures.scala", methodName, adjustment)
-            )
+          case e: Throwable =>
+            // Should not reach here (as it should be handled by onFailure above), but added just in case
+            throw wrapActorFailure(e)
         }
       }
     }
