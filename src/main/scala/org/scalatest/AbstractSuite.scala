@@ -20,10 +20,10 @@ package org.scalatest
  * be overridden in stackable modification traits.
  *
  * <p>
- * The main purpose of <code>AbstractSuite</code> is to differentiate core <code>Suite</code>
+ * The main purpose of <code>AbstractStyle</code> is to differentiate core <code>Suite</code>
  * traits, such as <code>Suite</code>, <code>FunSuite</code>, and <code>FunSpec</code> from stackable
  * modification traits for <code>Suite</code>s such as <code>BeforeAndAfterEach</code>, <code>OneInstancePerTest</code>,
- * and <code>SequentialNestedSuiteExecution</code>. Because these stackable traits extend <code>AbstractSuite</code>
+ * and <code>SequentialNestedSuiteExecution</code>. Because these stackable traits extend <code>AbstractStyle</code>
  * instead of <code>Suite</code>, you can't define a suite by simply extending one of the stackable traits:
  * </p>
  *
@@ -42,7 +42,7 @@ package org.scalatest
  *
  * @author Bill Venners
  */
-trait AbstractSuite { this: Suite =>
+trait AbstractStyle { this: Suite =>
 
   /**
    * Runs the passed test function with a fixture established by this method.
