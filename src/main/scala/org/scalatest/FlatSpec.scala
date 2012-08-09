@@ -1525,7 +1525,7 @@ import Suite.autoTagClassAnnotations
  *
  * @author Bill Venners
  */
-@Style("org.scalatest.finders.FlatSpecFinder")
+@Finders(Array("org.scalatest.finders.FlatSpecFinder"))
 trait FlatSpec extends Suite with ShouldVerb with MustVerb with CanVerb { thisSuite =>
 
   private final val engine = new Engine("concurrentSpecMod", "Spec")

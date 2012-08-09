@@ -1622,7 +1622,7 @@ import exceptions._
  *
  * @author Bill Venners
  */
-@Style("org.scalatest.finders.MethodFinder")
+@Finders(Array("org.scalatest.finders.MethodFinder"))
 trait Suite extends Assertions with AbstractSuite with Serializable { thisSuite =>
 
   import Suite.TestMethodPrefix, Suite.InformerInParens, Suite.IgnoreAnnotation

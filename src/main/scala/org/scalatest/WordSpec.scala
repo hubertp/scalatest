@@ -1708,7 +1708,7 @@ import Suite.autoTagClassAnnotations
  *
  * @author Bill Venners
  */
-@Style("org.scalatest.finders.WordSpecFinder")
+@Finders(Array("org.scalatest.finders.WordSpecFinder"))
 trait WordSpec extends Suite with ShouldVerb with MustVerb with CanVerb { thisSuite =>
 
   private final val engine = new Engine("concurrentWordSpecMod", "WordSpec")

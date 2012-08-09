@@ -1673,7 +1673,7 @@ import Suite.autoTagClassAnnotations
  *
  * @author Bill Venners
  */
-@Style("org.scalatest.finders.FeatureSpecFinder")
+@Finders(Array("org.scalatest.finders.FeatureSpecFinder"))
 trait FeatureSpec extends Suite { thisSuite =>
 
   private final val engine = new Engine("concurrentFeatureSpecMod", "FeatureSpec")
