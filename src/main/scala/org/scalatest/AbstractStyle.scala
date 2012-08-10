@@ -196,3 +196,11 @@ trait AbstractStyle { this: Suite =>
     run(testName, Args(reporter, stopper, filter, configMap, distributor, tracker, Set.empty))
   } 
 }
+
+/**
+ * <strong>AbstractSuite has been deprecated and will be removed in a future version of ScalaTest. Please change all occurances of
+ * AbstractSuite to AbstractStyle. (This is just a name change.)</strong>
+ */
+@deprecated("Please use AbstractStyle instead")
+trait AbstractSuite extends AbstractStyle { this: Suite => }
+
