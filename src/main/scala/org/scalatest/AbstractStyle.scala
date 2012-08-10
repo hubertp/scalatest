@@ -199,8 +199,9 @@ trait AbstractStyle { this: Suite =>
 
 /**
  * <strong>AbstractSuite has been deprecated and will be removed in a future version of ScalaTest. Please change all occurances of
- * AbstractSuite to AbstractStyle. (This is just a name change.)</strong>
+ * AbstractSuite to AbstractStyle. (This is just a name change.) Also, if you were defining a stackable trait with Suite as
+ * the self-type, please change <code>this: Suite =&gt;</code> to <code>this: Style =&gt;</code>.</strong>
  */
-@deprecated("Please use AbstractStyle instead")
+@deprecated("Please use AbstractStyle instead, and change any Suite self type to a Style self type. For more info, see Scaladoc for AbstractSuite.")
 trait AbstractSuite extends AbstractStyle { this: Suite => }
 
