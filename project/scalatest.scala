@@ -28,19 +28,19 @@ object ScalatestBuild extends Build {
                               
    lazy val root = Project("scalatest", file(".")) settings(
      organization := "org.scalatest",
-     version := "1.9-2.10.0-M4-B2",
-     scalaVersion := "2.10.0-M4",
+     version := "1.9-2.10.0-M6-B2",
+     scalaVersion := "2.10.0-M6",
      libraryDependencies ++= simpledependencies,
      resolvers += "Sonatype Public" at "https://oss.sonatype.org/content/groups/public",
      genCodeTask, 
      sourceGenerators in Compile <+= 
-         (baseDirectory, sourceManaged in Compile) map genGenMain,
+         (baseDirectory, sourceManaged in Compile) map genFiles("gen-main")(GenGen.genMain),
      sourceGenerators in Test <+= 
-         (baseDirectory, sourceManaged in Test) map genGenTest,
+         (baseDirectory, sourceManaged in Test) map genFiles("gen-test")(GenGen.genTest),
      sourceGenerators in Compile <+= 
-         (baseDirectory, sourceManaged in Compile) map genTableMain,
+         (baseDirectory, sourceManaged in Compile) map genFiles("tables-main")(GenTable.genMain),
      sourceGenerators in Test <+= 
-         (baseDirectory, sourceManaged in Test) map genTableTest, 
+         (baseDirectory, sourceManaged in Test) map genFiles("tables-test")(GenTable.genTest), 
      testOptions in Test := Seq(Tests.Filter(className => isIncludedTest(className)))
    )
 
@@ -57,9 +57,9 @@ object ScalatestBuild extends Build {
    }
 
    def simpledependencies = Seq(
-     "org.scala-lang" % "scala-actors" % "2.10.0-M4",
+     "org.scala-lang" % "scala-actors" % "2.10.0-M6",
      "org.scala-tools.testing" % "test-interface" % "0.5",  // TODO optional
-     "org.scalacheck" % "scalacheck_2.10.0-M4" % "1.10-SNAPSHOT",   // TODO optional
+     "org.scalacheck" % "scalacheck_2.10.0-M6" % "1.10.0",   // TODO optional
      "org.easymock" % "easymockclassextension" % "3.1",   // TODO optional
      "org.jmock" % "jmock-legacy" % "2.5.1", // TODO optional
      "org.mockito" % "mockito-all" % "1.9.0", // TODO optional
@@ -70,42 +70,14 @@ object ScalatestBuild extends Build {
      "net.sourceforge.cobertura" % "cobertura" % "1.9.1" % "test",
      "commons-io" % "commons-io" % "1.3.2" % "test"
   )
-
-  def genGenMain(basedir: File, dir: File): Seq[File] = {
-    val gengenSource = basedir / "project" / "GenGen.scala"
-    def results = (dir ** "*.scala").get
-    if(results.isEmpty || results.exists(_.lastModified < gengenSource.lastModified)) {
-      dir.mkdirs()
-      GenGen.genMain(dir)
-    }
-    results
-  }
-  def genGenTest(basedir: File, dir: File): Seq[File] = {
-    val gengenSource = basedir / "project" / "GenGen.scala"
-    def results = (dir ** "*.scala").get
-    if (results.isEmpty || results.exists(_.lastModified < gengenSource.lastModified)) {
-      dir.mkdirs()
-      GenGen.genTest(dir)
-    }
-    results
-  }
-
-  def genTableMain(basedir: File, dir: File): Seq[File] = {
+  
+  def genFiles(name: String)(gen: File => Unit)(basedir: File, outDir: File): Seq[File] = {
+    val tdir = outDir / name
     val genTableSource = basedir / "project" / "GenTable.scala"
-    def results = (dir ** "*.scala").get
+    def results = (tdir ** "*.scala").get
     if (results.isEmpty || results.exists(_.lastModified < genTableSource.lastModified)) {
-      dir.mkdirs()
-      GenTable.genMain(dir)
-    }
-    results
-  }
-
-  def genTableTest(basedir: File, dir: File): Seq[File] = {
-    val genTableSource = basedir / "project" / "GenTable.scala"    
-    def results = (dir ** "Table*.scala").get
-    if (results.isEmpty || results.exists(_.lastModified < genTableSource.lastModified)) {
-      dir.mkdirs()
-      GenTable.genTest(dir)
+      tdir.mkdirs()
+      gen(tdir)
     }
     results
   }
