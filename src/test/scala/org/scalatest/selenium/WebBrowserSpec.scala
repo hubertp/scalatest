@@ -35,6 +35,7 @@ import org.openqa.selenium.firefox.FirefoxProfile
 import org.openqa.selenium.safari.SafariDriver
 import org.openqa.selenium.chrome.ChromeDriver
 import org.openqa.selenium.ie.InternetExplorerDriver
+import org.openqa.selenium.Cookie
 
 class WebBrowserSpec extends JettySpec with ShouldMatchers with SpanSugar with WebBrowser with HtmlUnit {
 
@@ -806,6 +807,13 @@ class WebBrowserSpec extends JettySpec with ShouldMatchers with SpanSugar with W
       switch to frame(0)
       switch to frame("name")
       switch to window(windowHandle)
+    }
+  }
+  
+  describe("WrappedCookie") {
+    it("should wrap null expiry in an option") {
+      val cookie = new WrappedCookie(new Cookie("name", "value", "path", null))
+      cookie.expiry should be (None)
     }
   }
   

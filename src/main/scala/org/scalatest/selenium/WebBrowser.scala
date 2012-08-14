@@ -851,7 +851,6 @@ trait WebBrowser {
      * @return the expire date of this cookie
      */
     def expiry: Option[Date] = Option(underlying.getExpiry)
-    // TODO: A test that makes sure null expiry gets wrapped in an option
 
     /**
      * The name of this cookie.
