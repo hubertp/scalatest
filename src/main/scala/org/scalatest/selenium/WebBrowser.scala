@@ -518,8 +518,8 @@ import org.scalatest.ScreenshotCapturer
  * cookie(name: String, value: String)
  * cookie(name: String, value: String, path: String)
  * cookie(name: String, value: String, path: String, expiry: Date)
- * cookie(name: String, value: String, domain: String, path: String, expiry: Date)
- * cookie(name: String, value: String, domain: String, path: String, expiry: Date, secure: Boolean)
+ * cookie(name: String, value: String, path: String, expiry: Date, domain: String)
+ * cookie(name: String, value: String, path: String, expiry: Date, domain: String, secure: Boolean)
  * </pre>
  * 
  * and to read those extra fields:
@@ -1552,28 +1552,13 @@ trait WebBrowser {
     driver.navigate.refresh()
   }
   
-  // TODO: Maybe use a single cookie method with default param values instead of overloading
   object add {
     private def addCookie(cookie: Cookie)(implicit driver: WebDriver) {
       driver.manage.addCookie(cookie)
     }
- 
-    def cookie(name: String, value: String)(implicit driver: WebDriver) {
-      addCookie(new Cookie(name, value))
-    }
- 
-    def cookie(name: String, value: String, path: String)(implicit driver: WebDriver) { 
-      addCookie(new Cookie(name, value, path))
-    }
     
-    def cookie(name: String, value: String, path: String, expiry: Date)(implicit driver: WebDriver) { 
-      addCookie(new Cookie(name, value, path, expiry))
-    }
-    
-    def cookie(name: String, value: String, domain: String, path: String, expiry: Date)(implicit driver: WebDriver) { 
-      addCookie(new Cookie(name, value, domain, path, expiry))
-    }
-    def cookie(name: String, value: String, domain: String, path: String, expiry: Date, secure: Boolean)(implicit driver: WebDriver) { 
+    // Default values determined from http://code.google.com/p/selenium/source/browse/trunk/java/client/src/org/openqa/selenium/Cookie.java
+    def cookie(name: String, value: String, path: String = "/", expiry: Date = null, domain: String = null, secure: Boolean = false)(implicit driver: WebDriver) { 
       addCookie(new Cookie(name, value, domain, path, expiry, secure))
     }
   }
