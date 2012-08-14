@@ -1008,6 +1008,7 @@ trait WebBrowser {
   // in case a user has a WebElement.) Maybe we offer a factory method that gets an element given a WebElement?
   // Also, return type of ActiveElementTarget's switch method should be the subclass of Element that it is. if
   // the element is a text field, returned class should be TextField.
+  // Chee Seng: Can't do much for alert and window, since user don't provide WebElement for it currently.  For frame, see my comments near FrameWebElementTarget.
 
   final class AlertTarget extends SwitchTarget[Alert] {
     def switch(driver: WebDriver): Alert = { 
@@ -1039,7 +1040,7 @@ trait WebBrowser {
   final class FrameNameOrIdTarget(nameOrId: String) extends SwitchTarget[WebDriver] {
     def switch(driver: WebDriver): WebDriver = 
       try {
-        driver.switchTo.frame(nameOrId) // TODO: Verify this works. Does Selenium itself first try name then id?
+        driver.switchTo.frame(nameOrId) // TODO: Verify this works. Does Selenium itself first try name then id?  Chee Seng: Yes, we just forward it to selenium call actually (http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebDriver.TargetLocator.html#frame%28java.lang.String%29)
       }
       catch {
         case e: org.openqa.selenium.NoSuchFrameException => 
@@ -1052,6 +1053,7 @@ trait WebBrowser {
   }
   
   // TODO: Why isn't this an Element?
+  // Chee Seng: Because we don't have an Element mapping for frame, I think it is possible to have lookup for frame, e.g. frame(0), frame("frame1"), but not sure if it is a good idea.
   final class FrameWebElementTarget(element: WebElement) extends SwitchTarget[WebDriver] {
     def switch(driver: WebDriver): WebDriver = 
       try {
