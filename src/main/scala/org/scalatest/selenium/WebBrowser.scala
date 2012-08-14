@@ -998,9 +998,9 @@ trait WebBrowser {
    * name or id, or enclosed element), and window.
    * </p>
    */
-  final class ActiveElementTarget extends SwitchTarget[WebElement] {
-    def switch(driver: WebDriver): WebElement = {
-      driver.switchTo.activeElement
+  final class ActiveElementTarget extends SwitchTarget[Element] {
+    def switch(driver: WebDriver): Element = {
+      createTypedElement(driver.switchTo.activeElement)
     }
   }
 
@@ -1530,7 +1530,7 @@ trait WebBrowser {
   }
   
   def submit()(implicit driver: WebDriver) {
-    (switch to activeElement).submit()
+    (switch to activeElement).underlying.submit()
   }
   
   def implicitlyWait(timeout: Span)(implicit driver: WebDriver) {
