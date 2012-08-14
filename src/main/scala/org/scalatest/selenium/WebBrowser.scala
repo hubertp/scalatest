@@ -795,6 +795,30 @@ trait WebBrowser {
      * The underlying <code>WebElement</code> wrapped by this <code>Element</code>
      */
     val underlying: WebElement
+    
+    /**
+     * Returns the result of invoking <code>equals</code> on the underlying <code>Element</code>, passing
+     * in the specified <code>other</code> object.
+     *
+     * @param other the object with which to compare for equality
+     *
+     * @return true if the passed object is equal to this one
+     */
+    override def equals(other: Any): Boolean = underlying.equals(other)
+
+    /**
+     * Returns the result of invoking <code>hashCode</code> on the underlying <code>Element</code>.
+     *
+     * @return a hash code for this object
+     */
+    override def hashCode: Int = underlying.hashCode
+
+    /**
+     * Returns the result of invoking <code>toString</code> on the underlying <code>Element</code>.
+     *
+     * @return a string representation of this object
+     */
+    override def toString: String = underlying.toString 
   }
 
   /**
@@ -1071,6 +1095,7 @@ trait WebBrowser {
     webElement.getTagName == "input" && webElement.getAttribute("type") == "radio"
       
   // TODO: Equals, hashcode, and toString (forward to underlying) on these Element subclasses.
+  // Chee Seng: Added in the Element traits, which forward to underlying equals, hashCode and toString call.
   /**
    * This class is part of ScalaTest's Selenium DSL. Please see the documentation for
    * <a href="WebBrowser.html"><code>WebBrowser</code></a> for an overview of the Selenium DSL.
