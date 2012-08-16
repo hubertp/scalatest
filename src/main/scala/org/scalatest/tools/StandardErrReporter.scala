@@ -25,9 +25,9 @@ import org.scalatest._
  */
 private[scalatest] class StandardErrReporter(presentAllDurations: Boolean,
     presentInColor: Boolean, presentShortStackTraces: Boolean, presentFullStackTraces: Boolean,
-    presentUnformatted: Boolean)
+    presentUnformatted: Boolean, presentMarkup: Boolean)
     extends PrintReporter(Console.err, presentAllDurations,
-      presentInColor, presentShortStackTraces, presentFullStackTraces, presentUnformatted) {
+      presentInColor, presentShortStackTraces, presentFullStackTraces, presentUnformatted, presentMarkup) {
 
   // def this() = this(false, true, false, false)
 

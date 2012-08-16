@@ -42,7 +42,7 @@ import org.scalatest.exceptions.StackDepth
  */
 private[scalatest] abstract class StringReporter(presentAllDurations: Boolean,
         presentInColor: Boolean, presentShortStackTraces: Boolean, presentFullStackTraces: Boolean,
-        presentUnformatted: Boolean) extends ResourcefulReporter {
+        presentUnformatted: Boolean, presentMarkup: Boolean) extends ResourcefulReporter {
 
   private def withPossibleLineNumber(stringToPrint: String, throwable: Option[Throwable]): String = {
     throwable match {
@@ -532,23 +532,25 @@ org.scalatest.prop.TableDrivenPropertyCheckFailedException: TestFailedException 
   }
 
   private def handleMarkupProvided(event: MarkupProvided, ansiColor: String) {
-    val (suiteName, testName) =
-      event.nameInfo match {
-        case Some(NameInfo(suiteName, _, _, _, testNameInfo)) =>
-          (Some(suiteName),
-           testNameInfo match {
-            case Some(tnInfo) => Some(tnInfo.testName)
-            case None => None  
-          })
-        case None => (None, None)
+    if (presentMarkup) {
+      val (suiteName, testName) =
+        event.nameInfo match {
+          case Some(NameInfo(suiteName, _, _, _, testNameInfo)) =>
+            (Some(suiteName),
+             testNameInfo match {
+              case Some(tnInfo) => Some(tnInfo.testName)
+              case None => None  
+            })
+          case None => (None, None)
+        }
+
+      val stringToPrint =
+        stringToPrintWhenMarkup(event.formatter, suiteName, testName, event.text)
+
+      stringToPrint match {
+        case Some(string) => printPossiblyInColor(string, ansiColor)
+        case None =>
       }
-
-    val stringToPrint =
-      stringToPrintWhenMarkup(event.formatter, suiteName, testName, event.text)
-
-    stringToPrint match {
-      case Some(string) => printPossiblyInColor(string, ansiColor)
-      case None =>
     }
   }
   

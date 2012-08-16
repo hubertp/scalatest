@@ -35,3 +35,4 @@ private[tools] case object PresentFullStackTraces extends ReporterConfigParam("F
 private[tools] case object PresentWithoutColor extends ReporterConfigParam("W")
 private[tools] case object PresentAllDurations extends ReporterConfigParam("D")
 private[tools] case object PresentUnformatted extends ReporterConfigParam("U")
+private[tools] case object PresentMarkup extends ReporterConfigParam("M")

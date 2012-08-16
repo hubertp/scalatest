@@ -265,6 +265,7 @@ private[scalatest] case class ConcurrentConfig(numThreads: Int, enableSuiteSorti
  * <li> <code><b>S</b></code> - show short stack traces</li>
  * <li> <code><b>F</b></code> - show full stack traces</li>
  * <li> <code><b>U</b></code> - unformatted mode</li>
+ * <li> <code><b>M</b></code> - show markup</li>
  * </ul>
  *
  * <p>
@@ -296,6 +297,11 @@ private[scalatest] case class ConcurrentConfig(numThreads: Int, enableSuiteSorti
  * you are trying to debug.
  * </p>
  *
+ * <p>
+ * The 'M' show-markup configuration adds output of markup in the standard
+ * output, error, and file reporters, which ordinarily do not display
+ * markup text.
+ * </p>
  *
  * <p>
  * By default, a standard output, error, or file reporter inserts ansi escape codes into the output printed to change and later reset
@@ -1228,6 +1234,7 @@ object Runner {
         case 'S' => set += PresentShortStackTraces
         case 'D' => set += PresentAllDurations
         case 'U' => set += PresentUnformatted
+        case 'M' => set += PresentMarkup
         case c: Char => { 
 
           // this should be moved to the checker, and just throw an exception here with a debug message. Or allow a MatchError.
@@ -1396,6 +1403,8 @@ object Runner {
             throw new IllegalArgumentException("Cannot specify a D (present all durations) configuration parameter for the graphic reporter (because it shows them all anyway): " + dashGString)
           if (configSet.contains(PresentUnformatted))
             throw new IllegalArgumentException("Cannot specify a U (present unformatted) configuration parameter for the graphic reporter: " + dashGString)
+          if (configSet.contains(PresentMarkup))
+            throw new IllegalArgumentException("Cannot specify a M (present markup) configuration parameter for the graphic reporter: " + dashGString)
           Some(new GraphicReporterConfiguration(configSet))
         case None => None
       }
@@ -1509,6 +1518,8 @@ object Runner {
             throw new IllegalArgumentException("Cannot specify a D (present all durations) configuration parameter for a custom reporter: " + dashRString + " " + customReporterClassName)
           if (configSet.contains(PresentUnformatted))
             throw new IllegalArgumentException("Cannot specify a U (present unformatted) configuration parameter for a custom reporter: " + dashRString + " " + customReporterClassName)
+          if (configSet.contains(PresentMarkup))
+            throw new IllegalArgumentException("Cannot specify a M (present markup) configuration parameter for a custom reporter: " + dashRString + " " + customReporterClassName)
           lb += new CustomReporterConfiguration(configSet, customReporterClassName)
         }
       }

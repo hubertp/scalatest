@@ -34,8 +34,8 @@ import java.io.IOException
  */
 private[scalatest] class FileReporter(val filename: String, presentAllDurations: Boolean,
     presentInColor: Boolean, presentShortStackTraces: Boolean, presentFullStackTraces: Boolean,
-    presentUnformatted: Boolean)
+    presentUnformatted: Boolean, presentMarkup: Boolean)
     extends PrintReporter(filename, presentAllDurations, presentInColor, presentShortStackTraces, presentFullStackTraces,
-    presentUnformatted) {
-  def this(filename: String) = this(filename, false, true, false, false, false)
+    presentUnformatted, presentMarkup) {
+  def this(filename: String) = this(filename, false, true, false, false, false, false)
 }

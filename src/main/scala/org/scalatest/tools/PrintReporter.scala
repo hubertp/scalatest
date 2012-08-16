@@ -39,9 +39,9 @@ import StringReporter.colorizeLinesIndividually
  */
 private[scalatest] abstract class PrintReporter(pw: PrintWriter, presentAllDurations: Boolean,
         presentInColor: Boolean, presentShortStackTraces: Boolean, presentFullStackTraces: Boolean,
-        presentUnformatted: Boolean) extends StringReporter(
+        presentUnformatted: Boolean, presentMarkup: Boolean) extends StringReporter(
 presentAllDurations, presentInColor, presentShortStackTraces, presentFullStackTraces,
-presentUnformatted) {
+presentUnformatted, presentMarkup) {
 
   /**
   * Construct a <code>PrintReporter</code> with passed
@@ -58,7 +58,8 @@ presentUnformatted) {
     presentInColor: Boolean,
     presentShortStackTraces: Boolean,
     presentFullStackTraces: Boolean,
-    presentUnformatted: Boolean
+    presentUnformatted: Boolean,
+    presentMarkup: Boolean
   ) =
     this(
       new PrintWriter(
@@ -70,7 +71,8 @@ presentUnformatted) {
       presentInColor,
       presentShortStackTraces,
       presentFullStackTraces,
-      presentUnformatted
+      presentUnformatted,
+      presentMarkup
     )
 
   /**
@@ -89,7 +91,8 @@ presentUnformatted) {
     presentInColor: Boolean,
     presentShortStackTraces: Boolean,
     presentFullStackTraces: Boolean,
-    presentUnformatted: Boolean
+    presentUnformatted: Boolean,
+    presentMarkup: Boolean
   ) =
     this(
       new PrintWriter(new BufferedOutputStream(new FileOutputStream(new File(filename)), BufferSize)),
@@ -97,7 +100,8 @@ presentUnformatted) {
       presentInColor,
       presentShortStackTraces,
       presentFullStackTraces,
-      presentUnformatted
+      presentUnformatted,
+      presentMarkup
     )
 
   protected def printPossiblyInColor(text: String, ansiColor: String) {

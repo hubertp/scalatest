@@ -54,7 +54,8 @@ private[scalatest] class ReporterFactory {
         !configSet.contains(PresentWithoutColor),
         configSet.contains(PresentShortStackTraces) || configSet.contains(PresentFullStackTraces),
         configSet.contains(PresentFullStackTraces), // If they say both S and F, F overrules
-        configSet.contains(PresentUnformatted)
+        configSet.contains(PresentUnformatted),
+        configSet.contains(PresentMarkup)
       )
     else
       new FilterReporter(
@@ -63,7 +64,8 @@ private[scalatest] class ReporterFactory {
           !configSet.contains(PresentWithoutColor),
           configSet.contains(PresentShortStackTraces) || configSet.contains(PresentFullStackTraces),
           configSet.contains(PresentFullStackTraces), // If they say both S and F, F overrules
-          configSet.contains(PresentUnformatted)
+          configSet.contains(PresentUnformatted),
+          configSet.contains(PresentMarkup)
         ),
         configSet
       )
@@ -76,7 +78,8 @@ private[scalatest] class ReporterFactory {
         !configSet.contains(PresentWithoutColor),
         configSet.contains(PresentShortStackTraces) || configSet.contains(PresentFullStackTraces),
         configSet.contains(PresentFullStackTraces), // If they say both S and F, F overrules
-        configSet.contains(PresentUnformatted)
+        configSet.contains(PresentUnformatted),
+        configSet.contains(PresentMarkup)
       )
       else
         new FilterReporter(
@@ -85,7 +88,8 @@ private[scalatest] class ReporterFactory {
             !configSet.contains(PresentWithoutColor),
             configSet.contains(PresentShortStackTraces) || configSet.contains(PresentFullStackTraces),
             configSet.contains(PresentFullStackTraces), // If they say both S and F, F overrules
-            configSet.contains(PresentUnformatted)
+            configSet.contains(PresentUnformatted),
+            configSet.contains(PresentMarkup)
           ),
           configSet
         )
@@ -99,7 +103,8 @@ private[scalatest] class ReporterFactory {
         !configSet.contains(PresentWithoutColor),
         configSet.contains(PresentShortStackTraces) || configSet.contains(PresentFullStackTraces),
         configSet.contains(PresentFullStackTraces), // If they say both S and F, F overrules
-        configSet.contains(PresentUnformatted)
+        configSet.contains(PresentUnformatted),
+        configSet.contains(PresentMarkup)
       )
       else
         new FilterReporter(
@@ -109,7 +114,8 @@ private[scalatest] class ReporterFactory {
             !configSet.contains(PresentWithoutColor),
             configSet.contains(PresentShortStackTraces) || configSet.contains(PresentFullStackTraces),
             configSet.contains(PresentFullStackTraces), // If they say both S and F, F overrules
-            configSet.contains(PresentUnformatted)
+            configSet.contains(PresentUnformatted),
+            configSet.contains(PresentMarkup)
           ),
           configSet
         )
