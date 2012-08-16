@@ -2636,11 +2636,12 @@ $okayExpressions$
   }
   
   def main(args: Array[String]) {
-    val mainDir = new File("target/generated/src/main/scala/org/scalatest/prop")
+    val targetDir = args(0)
+    val mainDir = new File(targetDir + "/main/scala/org/scalatest/prop")
     mainDir.mkdirs()
     genMain(mainDir)
     
-    val testDir = new File("target/generated/src/test/scala/org/scalatest/prop")
+    val testDir = new File("gen/" + targetDir + "/test/scala/org/scalatest/prop")
     testDir.mkdirs()
     genTest(testDir)
   }

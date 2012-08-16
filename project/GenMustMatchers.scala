@@ -77,8 +77,9 @@ import Helper._
 object GenMustMatchers {
   
   def main(args: Array[String]) {
-    genMain(new File("target/scala-2.9.0/src_managed/main/mustmachers"))
-    genTest(new File("target/scala-2.9.0/src_managed/test/mustmachers"))
+    val targetDir = args(0)
+    genMain(new File(targetDir + "/main/scala/org/scalatest/"))
+    genTest(new File("gen/" + targetDir + "/test/scala/org/scalatest/"))
   }
   
   def genMain(targetBaseDir: File) {

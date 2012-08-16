@@ -105,7 +105,7 @@ object ScalatestBuild extends Build {
   )
   
   def genFiles(name: String, generatorSource: String)(gen: File => Unit)(basedir: File, outDir: File): Seq[File] = {
-    val tdir = outDir / name
+    val tdir = outDir / "scala" / name
     val genSource = basedir / "project" / generatorSource
     def results = (tdir ** "*.scala").get
     if (results.isEmpty || results.exists(_.lastModified < genSource.lastModified)) {
@@ -123,14 +123,14 @@ object ScalatestBuild extends Build {
   
   val genGen = TaskKey[Unit]("gengen", "Generate Property Checks")
   val genGenTask = genGen <<= (sourceManaged in Compile, sourceManaged in Test) map { (mainTargetDir: File, testTargetDir: File) =>
-    GenGen.genMain(new File("target/scala-" + scalaVersionToUse + "/src_managed/main/gen"))
-    GenGen.genTest(new File("target/scala-" + scalaVersionToUse + "/src_managed/test/gen"))
+    GenGen.genMain(new File("gen/target/scala-" + scalaVersionToUse + "/src_managed/main/gen"))
+    GenGen.genTest(new File("gen/target/scala-" + scalaVersionToUse + "/src_managed/test/gen"))
   }
   
   val genTables = TaskKey[Unit]("gentables", "Generate Tables")
   val genTablesTask = genTables <<= (sourceManaged in Compile, sourceManaged in Test) map { (mainTargetDir: File, testTargetDir: File) =>
-    GenTable.genMain(new File("target/scala-" + scalaVersionToUse + "/src_managed/main/gentables"))
-    GenTable.genTest(new File("target/scala-" + scalaVersionToUse + "/src_managed/test/gentables"))
+    GenTable.genMain(new File("gen/target/scala-" + scalaVersionToUse + "/src_managed/main/gentables"))
+    GenTable.genTest(new File("gen/target/scala-" + scalaVersionToUse + "/src_managed/test/gentables"))
   }
   
   val genTheyWord = TaskKey[Unit]("genthey", "Generate They Word tests")

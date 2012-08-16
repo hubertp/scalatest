@@ -27,10 +27,10 @@ object DeprecatedShouldMatcherTestsHelper {
     shouldLine.replaceAll("Should", "DeprecatedShould")
   }
 
-  def generateFile(srcFileName: String, targetFileName: String) {
-    val matchersDir = new File("target/generated/src/main/scala/org/scalatest/matchers")
+  def generateFile(targetDir: String, srcFileName: String, targetFileName: String) {
+    val matchersDir = new File(targetDir + "/main/scala/org/scalatest/matchers")
     matchersDir.mkdirs()
-    val writer = new BufferedWriter(new FileWriter("target/generated/src/main/scala/org/scalatest/" + targetFileName))
+    val writer = new BufferedWriter(new FileWriter(targetDir + "/main/scala/org/scalatest/" + targetFileName))
     try {
       val shouldLines = Source.fromFile("src/main/scala/org/scalatest/" + srcFileName).getLines().toList
       for (shouldLine <- shouldLines) {
@@ -47,54 +47,57 @@ object DeprecatedShouldMatcherTestsHelper {
 
 import DeprecatedShouldMatcherTestsHelper._
 
-object GenDeprecatedShouldMatchersTests extends Application {
+object GenDeprecatedShouldMatchersTests {
 
-  val matchersDir = new File("target/generated/src/test/scala/org/scalatest/matchers")
-  matchersDir.mkdirs()
-  val shouldFileNames = 
-    List(
-      "ShouldBehaveLikeSpec.scala",
-      "ShouldContainElementSpec.scala",
-      "ShouldContainKeySpec.scala",
-      "ShouldContainValueSpec.scala",
-      "ShouldEqualSpec.scala",
-      "ShouldHavePropertiesSpec.scala",
-      "ShouldLengthSpec.scala",
-      "ShouldOrderedSpec.scala",
-      "ShouldSizeSpec.scala",
-      "ShouldBeASymbolSpec.scala",
-      "ShouldBeAnSymbolSpec.scala",
-      "ShouldBeMatcherSpec.scala",
-      "ShouldBePropertyMatcherSpec.scala",
-      "ShouldBeSymbolSpec.scala",
-      "ShouldEndWithRegexSpec.scala",
-      "ShouldEndWithSubstringSpec.scala",
-      "ShouldFullyMatchSpec.scala",
-      "ShouldIncludeRegexSpec.scala",
-      "ShouldIncludeSubstringSpec.scala",
-      "ShouldLogicalMatcherExprSpec.scala",
-      "ShouldMatcherSpec.scala",
-      "ShouldPlusOrMinusSpec.scala",
-      "ShouldSameInstanceAsSpec.scala",
-      "ShouldStartWithRegexSpec.scala",
-      "ShouldStartWithSubstringSpec.scala",
-      "ShouldBeNullSpec.scala"
-    )
+  def main(args: Array[String]) {
+    val targetDir = args(0)
+    val matchersDir = new File("gen/" + targetDir + "/test/scala/org/scalatest/matchers")
+    matchersDir.mkdirs()
+    val shouldFileNames = 
+      List(
+        "ShouldBehaveLikeSpec.scala",
+        "ShouldContainElementSpec.scala",
+        "ShouldContainKeySpec.scala",
+        "ShouldContainValueSpec.scala",
+        "ShouldEqualSpec.scala",
+        "ShouldHavePropertiesSpec.scala",
+        "ShouldLengthSpec.scala",
+        "ShouldOrderedSpec.scala",
+        "ShouldSizeSpec.scala",
+        "ShouldBeASymbolSpec.scala",
+        "ShouldBeAnSymbolSpec.scala",
+        "ShouldBeMatcherSpec.scala",
+        "ShouldBePropertyMatcherSpec.scala",
+        "ShouldBeSymbolSpec.scala",
+        "ShouldEndWithRegexSpec.scala",
+        "ShouldEndWithSubstringSpec.scala",
+        "ShouldFullyMatchSpec.scala",
+        "ShouldIncludeRegexSpec.scala",
+        "ShouldIncludeSubstringSpec.scala",
+        "ShouldLogicalMatcherExprSpec.scala",
+        "ShouldMatcherSpec.scala",
+        "ShouldPlusOrMinusSpec.scala",
+        "ShouldSameInstanceAsSpec.scala",
+        "ShouldStartWithRegexSpec.scala",
+        "ShouldStartWithSubstringSpec.scala",
+        "ShouldBeNullSpec.scala"
+      )
 
-  for (shouldFileName <- shouldFileNames) {
+    for (shouldFileName <- shouldFileNames) {
 
-    val deprecatedShouldFileName = shouldFileName.replace("Should", "DeprecatedShould")
-    val writer = new BufferedWriter(new FileWriter("target/generated/src/test/scala/org/scalatest/matchers/" + deprecatedShouldFileName))
-    try {
-      val shouldLines = Source.fromFile("src/test/scala/org/scalatest/matchers/" + shouldFileName).getLines().toList // for 2.8
-      for (shouldLine <- shouldLines) {
-        val deprecatedShouldLine = translateShouldToDeprecatedShould(shouldLine)
-        writer.write(deprecatedShouldLine.toString)
-        writer.newLine() // add for 2.8
+      val deprecatedShouldFileName = shouldFileName.replace("Should", "DeprecatedShould")
+      val writer = new BufferedWriter(new FileWriter("gen/" + targetDir + "/test/scala/org/scalatest/matchers/" + deprecatedShouldFileName))
+      try {
+        val shouldLines = Source.fromFile("src/test/scala/org/scalatest/matchers/" + shouldFileName).getLines().toList // for 2.8
+        for (shouldLine <- shouldLines) {
+          val deprecatedShouldLine = translateShouldToDeprecatedShould(shouldLine)
+          writer.write(deprecatedShouldLine.toString)
+          writer.newLine() // add for 2.8
+        }
       }
-    }
-    finally {
-      writer.close()
+      finally {
+        writer.close()
+      }
     }
   }
 }
