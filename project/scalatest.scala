@@ -45,6 +45,8 @@ object ScalatestBuild extends Build {
      genMustMatchersTask, 
      genGenTask, 
      genTablesTask, 
+     genTheyWordTask, 
+     genCodeTask, 
      sourceGenerators in Compile <+= 
          (baseDirectory, sourceManaged in Compile) map genFiles("gen", "GenGen.scala")(GenGen.genMain),
      sourceGenerators in Compile <+= 
@@ -67,6 +69,8 @@ object ScalatestBuild extends Build {
          (baseDirectory, sourceManaged in Test) map genFiles("gentables", "GenTable.scala")(GenTable.genTest), 
      sourceGenerators in Test <+= 
          (baseDirectory, sourceManaged in Test) map genFiles("mustmatchers", "GenMustMatchers.scala")(GenMustMatchers.genTest),
+     sourceGenerators in Test <+= 
+         (baseDirectory, sourceManaged in Test) map genFiles("genthey", "GenTheyWord.scala")(GenTheyWord.genTest),
      testOptions in Test := Seq(Tests.Filter(className => isIncludedTest(className)))
    ).dependsOn(scalatest  % "test->test")
 
@@ -127,5 +131,17 @@ object ScalatestBuild extends Build {
   val genTablesTask = genTables <<= (sourceManaged in Compile, sourceManaged in Test) map { (mainTargetDir: File, testTargetDir: File) =>
     GenTable.genMain(new File("target/scala-" + scalaVersionToUse + "/src_managed/main/gentables"))
     GenTable.genTest(new File("target/scala-" + scalaVersionToUse + "/src_managed/test/gentables"))
+  }
+  
+  val genTheyWord = TaskKey[Unit]("genthey", "Generate They Word tests")
+  val genTheyWordTask = genTheyWord <<= (sourceManaged in Compile, sourceManaged in Test) map { (mainTargetDir: File, testTargetDir: File) =>
+    GenTheyWord.genTest(new File("gen/target/scala-" + scalaVersionToUse + "/src_managed/test/genthey"))
+  }
+  
+  val genCode = TaskKey[Unit]("gencode", "Generate Code, includes Must Matchers and They Word tests.")
+  val genCodeTask = genCode <<= (sourceManaged in Compile, sourceManaged in Test) map { (mainTargetDir: File, testTargetDir: File) =>
+    GenMustMatchers.genMain(new File("gen/target/scala-" + scalaVersionToUse + "/src_managed/main/mustmachers"))
+    GenMustMatchers.genTest(new File("gen/target/scala-" + scalaVersionToUse + "/src_managed/test/mustmachers"))
+    GenTheyWord.genTest(new File("gen/target/scala-" + scalaVersionToUse + "/src_managed/test/genthey"))
   }
 }
