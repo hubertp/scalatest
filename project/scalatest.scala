@@ -3,6 +3,8 @@ import Keys._
 
 object ScalatestBuild extends Build {
 
+   val scalaVersionToUse = "2.9.0"
+  
    val includeTestPackageSet = Set("org.scalatest", 
                                    "org.scalatest.fixture", 
                                    "org.scalatest.concurrent", 
@@ -37,10 +39,12 @@ object ScalatestBuild extends Build {
    .settings(
      organization := "org.scalatest",
      version := "2.0-M3",
-     scalaVersion := "2.9.0",
+     scalaVersion := scalaVersionToUse,
      libraryDependencies ++= simpledependencies,
      resolvers += "Sonatype Public" at "https://oss.sonatype.org/content/groups/public",
-     genCodeTask, 
+     genMustMatchersTask, 
+     genGenTask, 
+     genTablesTask, 
      sourceGenerators in Compile <+= 
          (baseDirectory, sourceManaged in Compile) map genFiles("gen", "GenGen.scala")(GenGen.genMain),
      sourceGenerators in Compile <+= 
@@ -54,7 +58,7 @@ object ScalatestBuild extends Build {
    .settings(
      organization := "org.scalatest",
      version := "2.0-M3",
-     scalaVersion := "2.9.0",
+     scalaVersion := scalaVersionToUse,
      libraryDependencies ++= simpledependencies,
      resolvers += "Sonatype Public" at "https://oss.sonatype.org/content/groups/public",
      sourceGenerators in Test <+= 
@@ -107,9 +111,21 @@ object ScalatestBuild extends Build {
     results
   }
   
-  val genCode = TaskKey[Unit]("gencode", "Generate Code")
-  val genCodeTask = genCode <<= (sourceManaged in Compile, sourceManaged in Test) map { (mainTargetDir: File, testTargetDir: File) =>
-    GenMustMatchers.genMain(new File("target/scala-2.9.0/src_managed/main/mustmachers"))
-    GenMustMatchers.genTest(new File("target/scala-2.9.0/src_managed/test/mustmachers"))
+  val genMustMatchers = TaskKey[Unit]("genmustmatchers", "Generate Must Matchers")
+  val genMustMatchersTask = genMustMatchers <<= (sourceManaged in Compile, sourceManaged in Test) map { (mainTargetDir: File, testTargetDir: File) =>
+    GenMustMatchers.genMain(new File("gen/target/scala-" + scalaVersionToUse + "/src_managed/main/mustmachers"))
+    GenMustMatchers.genTest(new File("gen/target/scala-" + scalaVersionToUse + "/src_managed/test/mustmachers"))
+  }
+  
+  val genGen = TaskKey[Unit]("gengen", "Generate Property Checks")
+  val genGenTask = genGen <<= (sourceManaged in Compile, sourceManaged in Test) map { (mainTargetDir: File, testTargetDir: File) =>
+    GenGen.genMain(new File("target/scala-" + scalaVersionToUse + "/src_managed/main/gen"))
+    GenGen.genTest(new File("target/scala-" + scalaVersionToUse + "/src_managed/test/gen"))
+  }
+  
+  val genTables = TaskKey[Unit]("gentables", "Generate Tables")
+  val genTablesTask = genTables <<= (sourceManaged in Compile, sourceManaged in Test) map { (mainTargetDir: File, testTargetDir: File) =>
+    GenTable.genMain(new File("target/scala-" + scalaVersionToUse + "/src_managed/main/gentables"))
+    GenTable.genTest(new File("target/scala-" + scalaVersionToUse + "/src_managed/test/gentables"))
   }
 }

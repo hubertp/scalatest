@@ -1161,12 +1161,14 @@ $columnsOfIndexes$
   }
   
   def genMain(dir: File) {
+    dir.mkdirs()
     genTableForNs(dir)
     genPropertyChecks(dir)
     genTables(dir)
   }
   
   def genTest(dir: File) {
+    dir.mkdirs()
     genTableSuite(dir)
   }
 }
