@@ -34,13 +34,13 @@ object ScalatestBuild extends Build {
      resolvers += "Sonatype Public" at "https://oss.sonatype.org/content/groups/public",
      genCodeTask, 
      sourceGenerators in Compile <+= 
-         (baseDirectory, sourceManaged in Compile) map genFiles("gen-main")(GenGen.genMain),
+         (baseDirectory, sourceManaged in Compile) map genFiles("gen-main", "GenGen.scala")(GenGen.genMain),
      sourceGenerators in Test <+= 
-         (baseDirectory, sourceManaged in Test) map genFiles("gen-test")(GenGen.genTest),
+         (baseDirectory, sourceManaged in Test) map genFiles("gen-test", "GenGen.scala")(GenGen.genTest),
      sourceGenerators in Compile <+= 
-         (baseDirectory, sourceManaged in Compile) map genFiles("tables-main")(GenTable.genMain),
+         (baseDirectory, sourceManaged in Compile) map genFiles("tables-main", "GenTable.scala")(GenTable.genMain),
      sourceGenerators in Test <+= 
-         (baseDirectory, sourceManaged in Test) map genFiles("tables-test")(GenTable.genTest), 
+         (baseDirectory, sourceManaged in Test) map genFiles("tables-test", "GenTable.scala")(GenTable.genTest), 
      testOptions in Test := Seq(Tests.Filter(className => isIncludedTest(className)))
    )
 
@@ -71,9 +71,9 @@ object ScalatestBuild extends Build {
      "commons-io" % "commons-io" % "1.3.2" % "test"
   )
   
-  def genFiles(name: String)(gen: File => Unit)(basedir: File, outDir: File): Seq[File] = {
+  def genFiles(name: String, generatorSource: String)(gen: File => Unit)(basedir: File, outDir: File): Seq[File] = {
     val tdir = outDir / name
-    val genTableSource = basedir / "project" / "GenTable.scala"
+    val genTableSource = basedir / "project" / generatorSource
     def results = (tdir ** "*.scala").get
     if (results.isEmpty || results.exists(_.lastModified < genTableSource.lastModified)) {
       tdir.mkdirs()
