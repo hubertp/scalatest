@@ -1679,77 +1679,51 @@ trait WebBrowser {
       new NameQuery(queryString).findAllElements
   }
   
+  private def tryQueries[T](queryString: String)(f: Query => T)(implicit driver: WebDriver): T = {
+    try {
+      f(IdQuery(queryString))
+    }
+    catch {
+      case _ => f(NameQuery(queryString))
+    }
+  }
+  
   def textField(query: Query)(implicit driver: WebDriver): TextField = new TextField(query.webElement)
   
   def textField(queryString: String)(implicit driver: WebDriver): TextField = 
-    try {
-      new TextField(new IdQuery(queryString).webElement)
-    }
-    catch {
-      case _ => new TextField(new NameQuery(queryString).webElement)
-    }
+    tryQueries(queryString)(q => new TextField(q.webElement))
   
   def textArea(query: Query)(implicit driver: WebDriver) = new TextArea(query.webElement)
   
   def textArea(queryString: String)(implicit driver: WebDriver): TextArea = 
-    try {
-      new TextArea(new IdQuery(queryString).webElement)
-    }
-    catch {
-      case _ => new TextArea(new NameQuery(queryString).webElement)
-    }
+    tryQueries(queryString)(q => new TextArea(q.webElement))
   
   def radioButtonGroup(groupName: String)(implicit driver: WebDriver) = new RadioButtonGroup(groupName, driver)
   
   def radioButton(query: Query)(implicit driver: WebDriver) = new RadioButton(query.webElement)
   
   def radioButton(queryString: String)(implicit driver: WebDriver): RadioButton = 
-    try {
-      new RadioButton(new IdQuery(queryString).webElement)
-    }
-    catch {
-      case _ => new RadioButton(new NameQuery(queryString).webElement)
-    }
+    tryQueries(queryString)(q => new RadioButton(q.webElement))
   
   def checkbox(query: Query)(implicit driver: WebDriver) = new Checkbox(query.webElement)
   
   def checkbox(queryString: String)(implicit driver: WebDriver): Checkbox = 
-    try {
-      new Checkbox(new IdQuery(queryString).webElement)
-    }
-    catch {
-      case _ => new Checkbox(new NameQuery(queryString).webElement)
-    }
+    tryQueries(queryString)(q => new Checkbox(q.webElement))
   
   def singleSel(query: Query)(implicit driver: WebDriver) = new SingleSel(query.webElement)
   
   def singleSel(queryString: String)(implicit driver: WebDriver): SingleSel = 
-    try {
-      new SingleSel(new IdQuery(queryString).webElement)
-    }
-    catch {
-      case _ => new SingleSel(new NameQuery(queryString).webElement)
-    }
+    tryQueries(queryString)(q => new SingleSel(q.webElement))
   
   def multiSel(query: Query)(implicit driver: WebDriver) = new MultiSel(query.webElement)
   
   def multiSel(queryString: String)(implicit driver: WebDriver): MultiSel = 
-    try {
-      new MultiSel(new IdQuery(queryString).webElement)
-    }
-    catch {
-      case _ => new MultiSel(new NameQuery(queryString).webElement)
-    }
+    tryQueries(queryString)(q => new MultiSel(q.webElement))
     
   def button(webElement: WebElement): WebElement = webElement  // enable syntax 'click on aButton', where aButton is a WebElement.
   
   def button(queryString: String)(implicit driver: WebDriver): WebElement = 
-    try {
-      new IdQuery(queryString).webElement
-    }
-    catch {
-      case _ => new NameQuery(queryString).webElement
-    }
+    tryQueries(queryString)(q => q.webElement)
   
   object click {
     def on(element: WebElement) {
@@ -1762,12 +1736,7 @@ trait WebBrowser {
   
     def on(queryString: String)(implicit driver: WebDriver) {
       // stack depth is not correct if just call the button("...") directly.
-      val target = try {
-        new IdQuery(queryString).webElement
-      }
-      catch {
-        case _ => new NameQuery(queryString).webElement
-      }
+      val target = tryQueries(queryString)(q => q.webElement)
       on(target)
     }
     
