@@ -797,6 +797,11 @@ trait WebBrowser {
     val underlying: WebElement
     
     /**
+     * The attribute value of the given attribute name of this element.
+     */
+    def attribute(name: String): String = underlying.getAttribute(name)
+    
+    /**
      * Returns the result of invoking <code>equals</code> on the underlying <code>Element</code>, passing
      * in the specified <code>other</code> object.
      *
@@ -1232,7 +1237,6 @@ trait WebBrowser {
       underlying.sendKeys(value)
     }
     def text: String = underlying.getText
-    def attribute(name: String): String = underlying.getAttribute(name)
   }
   
   /**
@@ -1261,7 +1265,6 @@ trait WebBrowser {
       webElement.sendKeys(value)
     }
     def text: String = webElement.getText
-    def attribute(name: String): String = webElement.getAttribute(name)
     val underlying: WebElement = webElement
   }
   
