@@ -1556,7 +1556,7 @@ trait WebBrowser {
         case e: org.openqa.selenium.NoSuchElementException => None
       }
     
-    def findAllElements(implicit driver: WebDriver): Seq[Element] = driver.findElements(by).toSeq.map(createTypedElement(_))
+    def findAllElements(implicit driver: WebDriver): Iterable[Element] = driver.findElements(by).toIterable.map { e => createTypedElement(e) }
     
     def webElement(implicit driver: WebDriver): WebElement = {
       try {
@@ -1634,9 +1634,9 @@ trait WebBrowser {
       }
     }
   
-  def findAll(query: Query)(implicit driver: WebDriver): Seq[Element] = query.findAllElements
+  def findAll(query: Query)(implicit driver: WebDriver): Iterable[Element] = query.findAllElements
   
-  def findAll(queryString: String)(implicit driver: WebDriver): Seq[Element] = {
+  def findAll(queryString: String)(implicit driver: WebDriver): Iterable[Element] = {
     val byIdSeq = new IdQuery(queryString).findAllElements
     if (byIdSeq.size > 0)
       byIdSeq
