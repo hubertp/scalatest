@@ -1523,6 +1523,14 @@ trait WebBrowser {
     }
   }
   
+  def goTo(url: String)(implicit driver: WebDriver) {
+    go to url
+  }
+  
+  def goTo(page: Page)(implicit driver: WebDriver) {
+    go to page
+  }
+  
   def close()(implicit driver: WebDriver) {
     driver.close()
   }
@@ -1584,6 +1592,7 @@ trait WebBrowser {
    captureTo(...)
    setCaptureDir(...) // I think this should replace not augment capture set "dir name"
   */
+  // Chee Seng: Added the alternatives.
 
   case class IdQuery(queryString: String) extends Query { val by = By.id(queryString)}
   case class NameQuery(queryString: String) extends Query { val by = By.name(queryString) }
@@ -1735,6 +1744,26 @@ trait WebBrowser {
       }
       on(target)
     }
+    
+    def on(element: Element) {
+      element.underlying.click()
+    }
+  }
+  
+  def clickOn(element: WebElement) {
+    click on element
+  }
+  
+  def clickOn(query: Query)(implicit driver: WebDriver) {
+    click on query
+  }
+  
+  def clickOn(queryString: String)(implicit driver: WebDriver) {
+    click on queryString
+  }
+  
+  def clickOn(element: Element) {
+    click on element
   }
   
   def submit()(implicit driver: WebDriver) {
@@ -1774,6 +1803,8 @@ trait WebBrowser {
   def frame(element: WebElement) = new FrameWebElementTarget(element)
   def frame(query: Query)(implicit driver: WebDriver) = new FrameWebElementTarget(query.webElement)
   def window(nameOrHandle: String) = new WindowTarget(nameOrHandle)
+  
+  def switchTo[T](target: SwitchTarget[T])(implicit driver: WebDriver): T = switch to target
   
   def goBack()(implicit driver: WebDriver) {
     driver.navigate.back()
@@ -1832,6 +1863,18 @@ trait WebBrowser {
     }
   }
   
+  def addCookie(name: String, value: String, path: String = "/", expiry: Date = null, domain: String = null, secure: Boolean = false)(implicit driver: WebDriver) {
+    add cookie (name, value, path, expiry, domain, secure)
+  }
+  
+  def deleteCookie(name: String)(implicit driver: WebDriver) {
+    delete cookie name
+  }
+  
+  def deleteAllCookies()(implicit driver: WebDriver) {
+    delete all cookies
+  }
+  
   def isScreenshotSupported(implicit driver: WebDriver): Boolean = driver.isInstanceOf[TakesScreenshot]
   
   object capture {
@@ -1873,6 +1916,14 @@ trait WebBrowser {
           throw new UnsupportedOperationException("Screen capture is not support by " + driver.getClass.getName)
       }
     }
+  }
+  
+  def captureTo(fileName: String)(implicit driver: WebDriver) {
+    capture to fileName
+  }
+  
+  def setCaptureDir(targetDirPath: String) {
+    capture set targetDirPath
   }
   
   def withScreenshot(fun: => Unit)(implicit driver: WebDriver) {
