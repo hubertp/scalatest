@@ -1139,8 +1139,9 @@ trait WebBrowser {
   }
 
   // TODO: I'm not sure how people would use this one. with a find followed by an underlying?
+  // Chee Seng: I think it still can be used in case when the user has a reference to WebElement, anyway, I have added one that takes Element as well below. 
   /**
-   * This class supports switching to a frame by name or ID in ScalaTest's Selenium DSL.
+   * This class supports switching to a frame by web element in ScalaTest's Selenium DSL.
    * Please see the documentation for <a href="WebBrowser.html"><code>WebBrowser</code></a> for an overview of the Selenium DSL.
    */
   final class FrameWebElementTarget(element: WebElement) extends SwitchTarget[WebDriver] {
@@ -1153,6 +1154,31 @@ trait WebBrowser {
     def switch(driver: WebDriver): WebDriver = 
       try {
         driver.switchTo.frame(element)
+      }
+      catch {
+        case e: org.openqa.selenium.NoSuchFrameException => 
+          throw new TestFailedException(
+                     sde => Some("Frame element '" + element + "' not found."),
+                     None,
+                     getStackDepthFun("WebBrowser.scala", "switch", 1)
+                   )
+      }
+  }
+  
+  /**
+   * This class supports switching to a frame by web element in ScalaTest's Selenium DSL.
+   * Please see the documentation for <a href="WebBrowser.html"><code>WebBrowser</code></a> for an overview of the Selenium DSL.
+   */
+  final class FrameElementTarget(element: Element) extends SwitchTarget[WebDriver] {
+
+    /**
+     * Switches the driver to the frame containing the <code>WebElement</code> that was passed to the constructor.
+     *
+     * @param driver the <code>WebDriver</code> with which to perform the switch
+     */
+    def switch(driver: WebDriver): WebDriver = 
+      try {
+        driver.switchTo.frame(element.underlying)
       }
       catch {
         case e: org.openqa.selenium.NoSuchFrameException => 
@@ -1801,6 +1827,7 @@ trait WebBrowser {
   def frame(index: Int) = new FrameIndexTarget(index)
   def frame(nameOrId: String) = new FrameNameOrIdTarget(nameOrId)
   def frame(element: WebElement) = new FrameWebElementTarget(element)
+  def frame(element: Element) = new FrameElementTarget(element)
   def frame(query: Query)(implicit driver: WebDriver) = new FrameWebElementTarget(query.webElement)
   def window(nameOrHandle: String) = new WindowTarget(nameOrHandle)
   

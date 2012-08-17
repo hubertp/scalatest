@@ -282,6 +282,11 @@ class WebBrowserSpec extends JettySpec with ShouldMatchers with SpanSugar with W
       switch to frame(id("frame2"))
       
       switch to window(win)
+      switch to frame(id("frame1").element)
+      switch to window(win)
+      switch to frame(id("frame2").element)
+      
+      switch to window(win)
       val caught1= intercept[TestFailedException] {
         switch to frame("frame3")
       }
@@ -877,6 +882,8 @@ class WebBrowserSpec extends JettySpec with ShouldMatchers with SpanSugar with W
       switch to defaultContent
       switch to frame(0)
       switch to frame("name")
+      switch to frame(name("name"))
+      switch to frame(name("name").element)
       switch to window(windowHandle)
     }
     
@@ -886,6 +893,8 @@ class WebBrowserSpec extends JettySpec with ShouldMatchers with SpanSugar with W
       switchTo(defaultContent)
       switchTo(frame(0))
       switchTo(frame("name"))
+      switchTo(frame(name("name")))
+      switchTo(frame(name("name").element))
       switchTo(window(windowHandle))
     }
   }
@@ -969,6 +978,11 @@ class WebBrowserSpec extends JettySpec with ShouldMatchers with SpanSugar with W
       switchTo(frame(id("frame1")))
       switchTo(window(win))
       switchTo(frame(id("frame2")))
+      
+      switchTo(window(win))
+      switchTo(frame(id("frame1").element))
+      switchTo(window(win))
+      switchTo(frame(id("frame2").element))
       
       switchTo(window(win))
       val caught1= intercept[TestFailedException] {
