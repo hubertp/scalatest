@@ -84,7 +84,7 @@ object GenMustMatchers {
   
   def genMain(targetBaseDir: File) {
     val sourceBaseDir = new File("src/main/scala/org/scalatest")
-    generateFile(new File(sourceBaseDir, "matchers/ShouldMatchers.scala"), new File(targetBaseDir, "matchers/MustMatchers.scala"))
+    generateFile(new File(sourceBaseDir, "matchers/ShouldMatchers.template"), new File(targetBaseDir, "matchers/MustMatchers.scala"))
     generateFile(new File(sourceBaseDir, "junit/ShouldMatchersForJUnit.scala"), new File(targetBaseDir, "junit/MustMatchersForJUnit.scala"))
   }
   
