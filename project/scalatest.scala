@@ -32,7 +32,6 @@ object ScalatestBuild extends Build {
      scalaVersion := "2.10.0-M6",
      libraryDependencies ++= simpledependencies,
      resolvers += "Sonatype Public" at "https://oss.sonatype.org/content/groups/public",
-     genCodeTask, 
      sourceGenerators in Compile <+= 
          (baseDirectory, sourceManaged in Compile) map genFiles("gen-main", "GenGen.scala")(GenGen.genMain),
      sourceGenerators in Test <+= 
@@ -41,6 +40,10 @@ object ScalatestBuild extends Build {
          (baseDirectory, sourceManaged in Compile) map genFiles("tables-main", "GenTable.scala")(GenTable.genMain),
      sourceGenerators in Test <+= 
          (baseDirectory, sourceManaged in Test) map genFiles("tables-test", "GenTable.scala")(GenTable.genTest), 
+     sourceGenerators in Compile <+=
+         (baseDirectory, scalaSource in Compile, sourceManaged in Compile) map genCode("gen-must-matchers", "GenMustMatchers.scala")(GenMustMatchers.genMain),
+     sourceGenerators in Test <+=
+         (baseDirectory, scalaSource in Test, sourceManaged in Test) map genCode("gen-must-matcher-tests", "GenMustMatchers.scala")(GenMustMatchers.genTest),
      testOptions in Test := Seq(Tests.Filter(className => isIncludedTest(className)))
    )
 
@@ -82,9 +85,14 @@ object ScalatestBuild extends Build {
     results
   }
   
-  val genCode = TaskKey[Unit]("gencode", "Generate Code")
-  val genCodeTask = genCode <<= (sourceManaged in Compile, sourceManaged in Test) map { (mainTargetDir: File, testTargetDir: File) =>
-    GenMustMatchers.genMain(new File("src/main/scala/org/scalatest"), new File(mainTargetDir, "org/scalatest"))
-    GenMustMatchers.genTest(new File("src/test/scala/org/scalatest"), new File(testTargetDir, "org/scalatest"))
+  def genCode(name: String, generatorSource: String)(gen: (File,File) => Unit)(basedir: File, sourceDir: File, outDir: File): Seq[File] = {
+    val tdir = outDir / name
+    val genTableSource = basedir / "project" / generatorSource
+    def results = (tdir ** "*.scala").get
+    if (results.isEmpty || results.exists(_.lastModified < genTableSource.lastModified)) {
+      tdir.mkdirs()
+      gen(sourceDir / "org/scalatest", tdir / "org/scalatest")
+    }
+    results
   }
 }
