@@ -1438,7 +1438,7 @@ import Suite.autoTagClassAnnotations
 @Finders(Array("org.scalatest.finders.FunSpecFinder"))
 trait FunSpec extends Suite { thisSuite =>
 
-  private final val engine = new Engine("concurrentSpecMod", "Spec")
+  private final val engine = new Engine("concurrentSpecMod", "FunSpec")
   import engine._
 
   // TODO: Probably make this private final val sourceFileName in a singleton object so it gets compiled in rather than carried around in each instance

@@ -242,7 +242,7 @@ import org.scalatest.exceptions.TestRegistrationClosedException
  */
 trait FunSpec extends Suite { thisSuite =>
 
-  private final val engine = new FixtureEngine[FixtureParam]("concurrentFixtureSpecMod", "FixtureSpec")
+  private final val engine = new FixtureEngine[FixtureParam]("concurrentFixtureSpecMod", "FixtureFunSpec")
   import engine._
   
   private[scalatest] val sourceFileName = "FunSpec.scala"

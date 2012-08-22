@@ -204,7 +204,7 @@ private[scalatest] sealed abstract class SuperEngine[T](concurrentBundleModResou
 
     val theTest = atomic.get.testsMap(testName)
 
-    reportTestStarting(theSuite, report, tracker, testName, theTest.testText, None, theSuite.rerunner, theTest.lineInFile)
+    reportTestStarting(theSuite, report, tracker, testName, theTest.testText, getDecodedName(testName), theSuite.rerunner, theTest.lineInFile)
 
     val testTextWithOptionalPrefix = prependChildPrefix(theTest.parent, theTest.testText)
     val formatter = getIndentedTextForTest(testTextWithOptionalPrefix, theTest.indentationLevel, includeIcon)
@@ -238,7 +238,7 @@ private[scalatest] sealed abstract class SuperEngine[T](concurrentBundleModResou
                             theTest.recordedMessages.get.recordedEvents(false, theSuite, report, tracker, testName, theTest.indentationLevel + 1, includeIcon)
                           else
                             Vector.empty)
-      reportTestSucceeded(theSuite, report, tracker, testName, theTest.testText, None, recordEvents, durationToReport, formatter, theSuite.rerunner, theTest.lineInFile)
+      reportTestSucceeded(theSuite, report, tracker, testName, theTest.testText, getDecodedName(testName), recordEvents, durationToReport, formatter, theSuite.rerunner, theTest.lineInFile)
     }
     catch { // XXX
       case _: TestPendingException =>
@@ -249,7 +249,7 @@ private[scalatest] sealed abstract class SuperEngine[T](concurrentBundleModResou
                              theTest.recordedMessages.get.recordedEvents(true, theSuite, report, tracker, testName, theTest.indentationLevel + 1, includeIcon)
                            else
                              Vector.empty)
-        reportTestPending(theSuite, report, tracker, testName, theTest.testText, None, recordEvents, duration, formatter, theTest.lineInFile)
+        reportTestPending(theSuite, report, tracker, testName, theTest.testText, getDecodedName(testName), recordEvents, duration, formatter, theTest.lineInFile)
       case e: TestCanceledException =>
         val duration = System.currentTimeMillis - testStartTime
         // testWasCanceled = true so info's printed out in the finally clause show up yellow
@@ -258,7 +258,7 @@ private[scalatest] sealed abstract class SuperEngine[T](concurrentBundleModResou
                              theTest.recordedMessages.get.recordedEvents(false, theSuite, report, tracker, testName, theTest.indentationLevel + 1, includeIcon)
                            else
                              Vector.empty)
-        reportTestCanceled(theSuite, report, e, testName, theTest.testText, None, recordEvents, theSuite.rerunner, tracker, duration, getIndentedTextForTest(theTest.testText, theTest.indentationLevel, includeIcon), theTest.lineInFile)
+        reportTestCanceled(theSuite, report, e, testName, theTest.testText, getDecodedName(testName), recordEvents, theSuite.rerunner, tracker, duration, getIndentedTextForTest(theTest.testText, theTest.indentationLevel, includeIcon), theTest.lineInFile)
       case e if !anErrorThatShouldCauseAnAbort(e) =>
         val duration = System.currentTimeMillis - testStartTime
         val durationToReport = theTest.recordedDuration.getOrElse(duration)
@@ -267,7 +267,7 @@ private[scalatest] sealed abstract class SuperEngine[T](concurrentBundleModResou
                              theTest.recordedMessages.get.recordedEvents(false, theSuite, report, tracker, testName, theTest.indentationLevel + 1, includeIcon)
                            else
                              Vector.empty)
-        reportTestFailed(theSuite, report, e, testName, theTest.testText, None, recordEvents, theSuite.rerunner, tracker, durationToReport, getIndentedTextForTest(theTest.testText, theTest.indentationLevel, includeIcon),  Some(SeeStackDepthException))
+        reportTestFailed(theSuite, report, e, testName, theTest.testText, getDecodedName(testName), recordEvents, theSuite.rerunner, tracker, durationToReport, getIndentedTextForTest(theTest.testText, theTest.indentationLevel, includeIcon),  Some(SeeStackDepthException))
       case e: Throwable => throw e
     }
     finally {
@@ -316,7 +316,7 @@ private[scalatest] sealed abstract class SuperEngine[T](concurrentBundleModResou
                 if (ignoreTest) {
                   val testTextWithOptionalPrefix = prependChildPrefix(branch, testText)
                   val theTest = atomic.get.testsMap(testName)
-                  reportTestIgnored(theSuite, args.reporter, args.tracker, testName, testTextWithOptionalPrefix, None, getIndentedTextForTest(testText, testLeaf.indentationLevel, true), theTest.lineInFile)
+                  reportTestIgnored(theSuite, args.reporter, args.tracker, testName, testTextWithOptionalPrefix, getDecodedName(testName), getIndentedTextForTest(testText, testLeaf.indentationLevel, true), theTest.lineInFile)
                 }
                 else
                   runTest(testName, args)
