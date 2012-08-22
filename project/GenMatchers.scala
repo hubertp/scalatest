@@ -36,8 +36,12 @@ object GenMatchers {
 
   def genMain(targetDir: File, scalaVersion: String) {
     targetDir.mkdirs()
+    val matchersDir = new File(targetDir, "matchers")
+    matchersDir.mkdirs()
+    val junitDir = new File(targetDir, "junit")
+    junitDir.mkdirs()
 
-    val matchersFile = new File(targetDir, "Matchers.scala")
+    val matchersFile = new File(matchersDir, "Matchers.scala")
     val matchersWriter = new BufferedWriter(new FileWriter(matchersFile))
     try {
       val lines = Source.fromFile(new File("project/Matchers.template")).getLines.toList
@@ -55,7 +59,7 @@ object GenMatchers {
       println("Generated " + matchersFile.getAbsolutePath)
     }
 
-    val shouldMatchersFile = new File(targetDir, "ShouldMatchers.scala")
+    val shouldMatchersFile = new File(matchersDir, "ShouldMatchers.scala")
     val shouldMatchersWriter = new BufferedWriter(new FileWriter(shouldMatchersFile))
     try {
       val lines = Source.fromFile(new File("project/ShouldMatchers.template")).getLines.toList
@@ -73,7 +77,7 @@ object GenMatchers {
       println("Generated " + shouldMatchersFile.getAbsolutePath)
     }
 
-    val mustMatchersFile = new File(targetDir, "MustMatchers.scala")
+    val mustMatchersFile = new File(matchersDir, "MustMatchers.scala")
     val mustMatchersWriter = new BufferedWriter(new FileWriter(mustMatchersFile))
     try {
       val lines = Source.fromFile(new File("project/ShouldMatchers.template")).getLines.toList
@@ -92,7 +96,7 @@ object GenMatchers {
       println("Generated " + mustMatchersFile.getAbsolutePath)
     }
 
-    val mustMatchersForJUnitFile = new File(targetDir, "MustMatchersForJUnit.scala")
+    val mustMatchersForJUnitFile = new File(junitDir, "MustMatchersForJUnit.scala")
     val mustMatchersForJUnitWriter = new BufferedWriter(new FileWriter(mustMatchersForJUnitFile))
     try {
       val lines = Source.fromFile(new File("src/main/scala/org/scalatest/junit/ShouldMatchersForJUnit.scala")).getLines.toList
@@ -148,7 +152,8 @@ object GenMatchers {
     for (shouldFileName <- shouldFileNames) {
 
       val mustFileName = shouldFileName.replace("Should", "Must")
-      val writer = new BufferedWriter(new FileWriter(new File(matchersDir, mustFileName)))
+      val mustFile = new File(matchersDir, mustFileName)
+      val writer = new BufferedWriter(new FileWriter(mustFile))
       try {
         val shouldLines = Source.fromFile(new File(sourceBaseDir, "matchers/" + shouldFileName)).getLines().toList // for 2.8
         for (shouldLine <- shouldLines) {
@@ -159,12 +164,14 @@ object GenMatchers {
       }
       finally {
         writer.close()
+        println("Generated " + mustFile.getAbsolutePath)
       }
     }
 
     val junitDir = new File(targetBaseDir, "junit")
     junitDir.mkdirs()
-    val writer = new BufferedWriter(new FileWriter(new File(junitDir, "MustMatchersForJUnitWordSpec.scala")))
+    val mustMatchersForJUnitWordSpecFile = new File(junitDir, "MustMatchersForJUnitWordSpec.scala")
+    val writer = new BufferedWriter(new FileWriter(mustMatchersForJUnitWordSpecFile))
     try {
       val shouldLines = Source.fromFile(new File(sourceBaseDir, "junit/" + "ShouldMatchersForJUnitWordSpec.scala")).getLines().toList // for 2.8
       for (shouldLine <- shouldLines) {
@@ -175,6 +182,14 @@ object GenMatchers {
     }
     finally {
       writer.close()
+      println("Generated " + mustMatchersForJUnitWordSpecFile.getAbsolutePath)
     }
+  }
+
+  def main(args: Array[String]) {
+    val targetDir = args(0)
+    val scalaVersion = args(1)
+    genMain(new File(targetDir + "/main/scala/org/scalatest/"), scalaVersion)
+    genTest(new File("gen/" + targetDir + "/test/scala/org/scalatest/"), scalaVersion)
   }
 }
