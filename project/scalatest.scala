@@ -3,7 +3,7 @@ import Keys._
 
 object ScalatestBuild extends Build {
 
-   val scalaVersionToUse = "2.10.0-M6"
+   val scalaVersionToUse = "2.10.0-M7"
   
    val includeTestPackageSet = Set("org.scalatest", 
                                    "org.scalatest.fixture", 
