@@ -23,6 +23,7 @@ import Suite.testMethodTakesAnInformer
 import java.lang.reflect.Method
 import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Modifier
+import org.scalatest.events.TopOfMethod
 
 trait Spec extends Suite { thisSuite =>
 
@@ -59,15 +60,16 @@ trait Spec extends Suite { thisSuite =>
             throw ite.getTargetException
         }
       }
-      //val (filterTest, ignoreTest) = filter(tn, tags, suiteId)
+      
+      val location = TopOfMethod(getClass.getName, m.toGenericString)
       val isIgnore = testTags.get(testName) match {
         case Some(tagSet) => tagSet.contains(Suite.IgnoreAnnotation) || methodTags.contains(Suite.IgnoreAnnotation)
         case None => methodTags.contains(Suite.IgnoreAnnotation)
       }
       if (isIgnore)
-        registerIgnoredTest(testName, testFun, "registrationAlreadyClosed", sourceFileName, "discoveryAndRegisterTests", 3, 0, methodTags.map(new Tag(_)): _*)
+        registerIgnoredTest(testName, testFun, "registrationAlreadyClosed", sourceFileName, "discoveryAndRegisterTests", 3, 0, Some(location), methodTags.map(new Tag(_)): _*)
       else
-        registerTest(testName, testFun, "registrationAlreadyClosed", sourceFileName, "discoveryAndRegisterTests", 2, 0, None, None, methodTags.map(new Tag(_)): _*)
+        registerTest(testName, testFun, "registrationAlreadyClosed", sourceFileName, "discoveryAndRegisterTests", 2, 0, None, Some(location), None, methodTags.map(new Tag(_)): _*)
     }
   }
 

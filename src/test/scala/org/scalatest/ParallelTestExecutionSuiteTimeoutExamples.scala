@@ -15,6 +15,7 @@ trait ParallelTestExecutionSuiteTimeoutExamples extends Tables {
     Table(
       "pair", 
       new ExampleParallelTestExecutionSuiteTimeoutSuitePair, 
+      //new ExampleParallelTestExecutionSuiteTimeoutSpecPair, 
       new ExampleParallelTestExecutionSuiteTimeoutFunSuitePair, 
       new ExampleParallelTestExecutionSuiteTimeoutFunSpecPair, 
       new ExampleParallelTestExecutionSuiteTimeoutFeatureSpecPair,
@@ -53,6 +54,34 @@ class ExampleParallelTestExecutionSuiteTimeoutSuitePair extends SuiteTimeoutSuit
   }
 }
 
+class ExampleParallelTestExecutionSuiteTimeoutSpecPair extends SuiteTimeoutSuites {
+  def suite1 = new ExampleParallelTestExecutionSuiteTimeoutSpec
+  def suite2 = new ExampleParallelTestExecutionSuiteTimeoutSuite
+  
+  def assertSuiteTimeoutTest(events: List[Event]) {
+    assert(events.size === 16)
+    
+    checkSuiteStarting(events(0), suite1.suiteId)
+    checkTestStarting(events(1), "test$u00201")
+    checkTestSucceeded(events(2), "test$u00201")
+    checkTestStarting(events(3), "test$u00202")
+    checkTestSucceeded(events(4), "test$u00202")
+    checkSuiteCompleted(events(5), suite1.suiteId)
+    
+    checkSuiteStarting(events(6), suite2.suiteId)
+    checkTestStarting(events(7), "testMethod1")
+    checkTestSucceeded(events(8), "testMethod1")
+    checkTestStarting(events(9), "testMethod2")
+    checkTestSucceeded(events(10), "testMethod2")
+    checkTestStarting(events(11), "testMethod3")
+    checkTestSucceeded(events(12), "testMethod3")
+    checkSuiteCompleted(events(13), suite2.suiteId)
+    
+    checkTestStarting(events(14), "test$u00203")
+    checkTestSucceeded(events(15), "test$u00203")
+  }
+}
+
 @DoNotDiscover
 class ExampleParallelTestExecutionSuiteTimeoutSuite extends Suite with ParallelTestExecution {
   def testMethod1() {}
@@ -65,6 +94,13 @@ class ExampleParallelTestExecutionSuiteTimeoutFixtureSuite extends fixture.Suite
   def testFixtureMethod1() {}
   def testFixtureMethod2() {}
   def testFixtureMethod3() {}
+}
+
+@DoNotDiscover
+class ExampleParallelTestExecutionSuiteTimeoutSpec extends Spec with ParallelTestExecution {
+  def `test 1` {}
+  def `test 2` {}
+  def `test 3` { Thread.sleep(300) }
 }
 
 class ExampleParallelTestExecutionSuiteTimeoutFunSuitePair extends SuiteTimeoutSuites {
