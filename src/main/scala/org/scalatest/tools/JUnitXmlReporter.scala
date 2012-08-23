@@ -418,8 +418,7 @@ private[scalatest] class JUnitXmlReporter(directory: String) extends Reporter {
       try {
         InetAddress.getLocalHost();
       } catch {
-      case e: UnknownHostException =>
-        throw new RuntimeException("unexpected unknown host")
+        case e: UnknownHostException => "unknown"
       }
     localMachine.getHostName
   }
