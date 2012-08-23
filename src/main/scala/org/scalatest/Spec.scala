@@ -17,27 +17,20 @@ package org.scalatest
 
 import scala.collection.immutable.ListSet
 import Suite.autoTagClassAnnotations
-import Suite.isTestMethodGoodies
+import Spec.isTestMethod
 import Suite.takesInformer
-import Suite.takesCommunicator
-import Suite.testMethodTakesAnInformer
 import Suite.InformerInParens
+import Suite.testMethodTakesAnInformer
 import java.lang.reflect.Method
 import java.lang.reflect.InvocationTargetException
+import java.lang.reflect.Modifier
 
 trait Spec extends Suite { thisSuite =>
-  
+
   private final val engine = new Engine("concurrentSpecMod", "Spec")
   import engine._
   
   private def discoveryAndRegisterTests() {
-    def isTestMethod(m: Method) = {
-
-      // Factored out to share code with fixture.Suite.testNames
-      val (isInstanceMethod, simpleName, firstFour, paramTypes, hasNoParams, isTestNames, isTestTags) = isTestMethodGoodies(m)
-
-      isInstanceMethod && (firstFour == "test") && ((hasNoParams && !isTestNames && !isTestTags) || takesInformer(m) || takesCommunicator(m))
-    }
     
     def getTestTags(testName: String) =
       for {
@@ -50,19 +43,19 @@ trait Spec extends Suite { thisSuite =>
       val paramTypes = method.getParameterTypes
       (paramTypes.size == 1) && (paramTypes(0) eq classOf[Rep])
     }
-      
+ 
     class RepImpl(val info: Informer, val markup: Documenter) extends Rep
-    
+
     object MethodNameEncodedOrdering extends Ordering[Method] {
       import scala.reflect.NameTransformer.decode
       def compare(x: Method, y: Method): Int = {
         decode(x.getName) compareTo decode(y.getName)
       }
     }
-    
+ 
     val testTags = tags
     val testMethods = getClass.getMethods.filter(isTestMethod(_)).sorted(MethodNameEncodedOrdering)
-    
+
     testMethods.foreach { m =>
       val testName = if (takesInformer(m)) m.getName + InformerInParens else m.getName
       val methodTags = getTestTags(testName)
@@ -93,9 +86,9 @@ trait Spec extends Suite { thisSuite =>
         registerTest(testName, testFun, "registrationAlreadyClosed", sourceFileName, "discoveryAndRegisterTests", 2, 0, None, None, methodTags.map(new Tag(_)): _*)
     }
   }
-  
+
   discoveryAndRegisterTests()
-  
+
   // TODO: Probably make this private final val sourceFileName in a singleton object so it gets compiled in rather than carried around in each instance
   private[scalatest] val sourceFileName = "Spec.scala"
 
@@ -228,3 +221,21 @@ trait Spec extends Suite { thisSuite =>
    */
   final override val styleName: String = "org.scalatest.Spec"
 }
+
+private[scalatest] object Spec {
+
+  def isTestMethod(m: Method): Boolean = {
+
+    val isInstanceMethod = !Modifier.isStatic(m.getModifiers())
+
+    val hasNoParams = m.getParameterTypes.isEmpty
+
+    // name must have at least one encoded space: "$u0220"
+    val includesEncodedSpace = m.getName.indexOf("$u0020") >= 0
+
+    // def maybe(b: Boolean) = if (b) "" else "!"
+    // println("m.getName: " + m.getName + ": " + maybe(isInstanceMethod) + "isInstanceMethod, " + maybe(hasNoParams) + "hasNoParams, " + maybe(includesEncodedSpace) + "includesEncodedSpace")
+    isInstanceMethod && hasNoParams && includesEncodedSpace
+  }
+}
+

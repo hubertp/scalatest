@@ -21,7 +21,7 @@ import collection.immutable.TreeSet
 
 class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
 
-  describe("A Suite") {
+  describe("A Spec") {
     /*
     it("should send InfoProvided events with aboutAPendingTest set to true and aboutACanceledTest set to false for info " +
             "calls made from a test that is pending") {
@@ -93,11 +93,11 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
     
     it("should return the test names in alphabetical order from testNames") {
       val a = new Spec {
-        def `test: this`() {}
-        def `test: that`() {}
+        def `it should do this`() {}
+        def `it should do that`() {}
       }
 
-      expectResult(List(encode("test: that"), encode("test: this"))) {
+      expectResult(List(encode("it should do that"), encode("it should do this"))) {
         a.testNames.iterator.toList
       }
 
@@ -116,19 +116,7 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
         c.testNames.iterator.toList
       }
     }
-    
-    it("should return the proper testNames for test methods whether or not they take a Rep") {
-
-      val a = new Spec {
-        def `test: this`() = ()
-        def `test: that`(r: Rep) = ()
-      }
-      assert(a.testNames === TreeSet(encode("test: that"), encode("test: this")))
-
-      val b = new Suite {}
-      assert(b.testNames === TreeSet[String]())
-    }
-    
+ 
     class TestWasCalledSpec extends Spec {
       var theTestThisCalled = false
       var theTestThatCalled = false
@@ -158,7 +146,7 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
         var theTestThisCalled = false
         var theTestThatCalled = false
         def `test: this`() { theTestThisCalled = true }
-        def `test: that`(r: Rep) { theTestThatCalled = true }
+        def `test: that` { theTestThatCalled = true }
       }
 
       val repA = new TestIgnoredTrackingReporter
@@ -172,7 +160,7 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
         var theTestThatCalled = false
         @Ignore
         def `test: this`() { theTestThisCalled = true }
-        def `test: that`(r: Rep) { theTestThatCalled = true }
+        def `test: that` { theTestThatCalled = true }
       }
 
       val repB = new TestIgnoredTrackingReporter
@@ -188,7 +176,7 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
         var theTestThatCalled = false
         def `test: this`() { theTestThisCalled = true }
         @Ignore
-        def `test: that`(r: Rep) { theTestThatCalled = true }
+        def `test: that` { theTestThatCalled = true }
       }
 
       val repC = new TestIgnoredTrackingReporter
@@ -205,7 +193,7 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
         @Ignore
         def `test: this`() { theTestThisCalled = true }
         @Ignore
-        def `test: that`(r: Rep) { theTestThatCalled = true }
+        def `test: that` { theTestThatCalled = true }
       }
 
       val repD = new TestIgnoredTrackingReporter
@@ -224,7 +212,7 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
         var theTestThatCalled = false
         @Ignore
         def `test: this`() { theTestThisCalled = true }
-        def `test: that`(r: Rep) { theTestThatCalled = true }
+        def `test: that` { theTestThatCalled = true }
       }
 
       val repE = new TestIgnoredTrackingReporter
@@ -241,7 +229,7 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
         var theTestThatCalled = false
         @SlowAsMolasses
         def `test: this`() { theTestThisCalled = true }
-        def `test: that`(r: Rep) { theTestThatCalled = true }
+        def `test: that` { theTestThatCalled = true }
       }
 
       val repE = new TestIgnoredTrackingReporter
@@ -256,7 +244,7 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
         var theTestThisCalled = false
         var theTestThatCalled = false
         def `test: this`() { theTestThisCalled = true }
-        def `test: that`(r: Rep) { theTestThatCalled = true }
+        def `test: that` { theTestThatCalled = true }
       }
 
       intercept[IllegalArgumentException] {
@@ -273,7 +261,7 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
         var theTestThatCalled = false
         @SlowAsMolasses
         def `test: this`() { theTestThisCalled = true }
-        def `test: that`(r: Rep) { theTestThatCalled = true }
+        def `test: that` { theTestThatCalled = true }
       }
       val repA = new TestIgnoredTrackingReporter
       a.run(None, Args(repA, new Stopper {}, Filter(), Map(), None, new Tracker, Set.empty))
@@ -287,7 +275,7 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
         var theTestThatCalled = false
         @SlowAsMolasses
         def `test: this`() { theTestThisCalled = true }
-        def `test: that`(r: Rep) { theTestThatCalled = true }
+        def `test: that` { theTestThatCalled = true }
       }
       val repB = new TestIgnoredTrackingReporter
       b.run(None, Args(repB, new Stopper {}, Filter(Some(Set("org.scalatest.SlowAsMolasses")), Set()), Map(), None, new Tracker, Set.empty))
@@ -302,7 +290,7 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
         @SlowAsMolasses
         def `test: this`() { theTestThisCalled = true }
         @SlowAsMolasses
-        def `test: that`(r: Rep) { theTestThatCalled = true }
+        def `test: that` { theTestThatCalled = true }
       }
       val repC = new TestIgnoredTrackingReporter
       c.run(None, Args(repB, new Stopper {}, Filter(Some(Set("org.scalatest.SlowAsMolasses")), Set()), Map(), None, new Tracker, Set.empty))
@@ -318,7 +306,7 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
         @SlowAsMolasses
         def `test: this`() { theTestThisCalled = true }
         @SlowAsMolasses
-        def `test: that`(r: Rep) { theTestThatCalled = true }
+        def `test: that` { theTestThatCalled = true }
       }
       val repD = new TestIgnoredTrackingReporter
       d.run(None, Args(repD, new Stopper {}, Filter(Some(Set("org.scalatest.SlowAsMolasses")), Set("org.scalatest.Ignore")), Map(), None, new Tracker, Set.empty))
@@ -335,8 +323,8 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
         @SlowAsMolasses
         def `test: this`() { theTestThisCalled = true }
         @SlowAsMolasses
-        def `test: that`(r: Rep) { theTestThatCalled = true }
-        def `test: the other`(r: Rep) { theTestTheOtherCalled = true }
+        def `test: that` { theTestThatCalled = true }
+        def `test: the other` { theTestTheOtherCalled = true }
       }
       val repE = new TestIgnoredTrackingReporter
       e.run(None, Args(repE, new Stopper {}, Filter(Some(Set("org.scalatest.SlowAsMolasses")), Set("org.scalatest.FastAsLight")),
@@ -356,8 +344,8 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
         @SlowAsMolasses
         def `test: this`() { theTestThisCalled = true }
         @SlowAsMolasses
-        def `test: that`(r: Rep) { theTestThatCalled = true }
-        def `test: the other`(r: Rep) { theTestTheOtherCalled = true }
+        def `test: that` { theTestThatCalled = true }
+        def `test: the other` { theTestTheOtherCalled = true }
       }
       val repF = new TestIgnoredTrackingReporter
       f.run(None, Args(repF, new Stopper {}, Filter(Some(Set("org.scalatest.SlowAsMolasses")), Set("org.scalatest.FastAsLight")),
@@ -376,9 +364,9 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
         @SlowAsMolasses
         def `test: this`() { theTestThisCalled = true }
         @SlowAsMolasses
-        def `test: that`(r: Rep) { theTestThatCalled = true }
+        def `test: that` { theTestThatCalled = true }
         @Ignore
-        def `test: the other`(r: Rep) { theTestTheOtherCalled = true }
+        def `test: the other` { theTestTheOtherCalled = true }
       }
       val repG = new TestIgnoredTrackingReporter
       g.run(None, Args(repG, new Stopper {}, Filter(Some(Set("org.scalatest.SlowAsMolasses")), Set("org.scalatest.FastAsLight")),
@@ -397,8 +385,8 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
         @SlowAsMolasses
         def `test: this`() { theTestThisCalled = true }
         @SlowAsMolasses
-        def `test: that`(r: Rep) { theTestThatCalled = true }
-        def `test: the other`(r: Rep) { theTestTheOtherCalled = true }
+        def `test: that` { theTestThatCalled = true }
+        def `test: the other` { theTestTheOtherCalled = true }
       }
       val repH = new TestIgnoredTrackingReporter
       h.run(None, Args(repH, new Stopper {}, Filter(None, Set("org.scalatest.FastAsLight")), Map(), None, new Tracker, Set.empty))
@@ -416,8 +404,8 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
         @SlowAsMolasses
         def `test: this`() { theTestThisCalled = true }
         @SlowAsMolasses
-        def `test: that`(r: Rep) { theTestThatCalled = true }
-        def `test: the other`(r: Rep) { theTestTheOtherCalled = true }
+        def `test: that` { theTestThatCalled = true }
+        def `test: the other` { theTestTheOtherCalled = true }
       }
       val repI = new TestIgnoredTrackingReporter
       i.run(None, Args(repI, new Stopper {}, Filter(None, Set("org.scalatest.SlowAsMolasses")), Map(), None, new Tracker, Set.empty))
@@ -437,8 +425,8 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
         def `test: this`() { theTestThisCalled = true }
         @Ignore
         @SlowAsMolasses
-        def `test: that`(r: Rep) { theTestThatCalled = true }
-        def `test: the other`(r: Rep) { theTestTheOtherCalled = true }
+        def `test: that` { theTestThatCalled = true }
+        def `test: the other` { theTestTheOtherCalled = true }
       }
       val repJ = new TestIgnoredTrackingReporter
       j.run(None, Args(repJ, new Stopper {}, Filter(None, Set("org.scalatest.SlowAsMolasses")), Map(), None, new Tracker, Set.empty))
@@ -458,9 +446,9 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
         def `test: this`() { theTestThisCalled = true }
         @Ignore
         @SlowAsMolasses
-        def `test: that`(r: Rep) { theTestThatCalled = true }
+        def `test: that` { theTestThatCalled = true }
         @Ignore
-        def `test: the other`(r: Rep) { theTestTheOtherCalled = true }
+        def `test: the other` { theTestTheOtherCalled = true }
       }
       val repK = new TestIgnoredTrackingReporter
       k.run(None, Args(repK, new Stopper {}, Filter(None, Set("org.scalatest.SlowAsMolasses", "org.scalatest.Ignore")), Map(), None, new Tracker, Set.empty))
@@ -474,21 +462,21 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
 
       val a = new Spec {
         def `test: this`() = ()
-        def `test: that`(r: Rep) = ()
+        def `test: that` = ()
       }
       assert(a.expectedTestCount(Filter()) === 2)
 
       val b = new Spec {
         @Ignore
         def `test: this`() = ()
-        def `test: that`(r: Rep) = ()
+        def `test: that` = ()
       }
       assert(b.expectedTestCount(Filter()) === 1)
 
       val c = new Spec {
         @FastAsLight
         def `test: this`() = ()
-        def `test: that`(r: Rep) = ()
+        def `test: that` = ()
       }
       assert(c.expectedTestCount(Filter(Some(Set("org.scalatest.FastAsLight")), Set())) === 1)
       assert(c.expectedTestCount(Filter(None, Set("org.scalatest.FastAsLight"))) === 1)
@@ -498,8 +486,8 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
         @SlowAsMolasses
         def `test: this`() = ()
         @SlowAsMolasses
-        def `test: that`(r: Rep) = ()
-        def `test: the other thing`(r: Rep) = ()
+        def `test: that` = ()
+        def `test: the other thing` = ()
       }
       assert(d.expectedTestCount(Filter(Some(Set("org.scalatest.FastAsLight")), Set())) === 1)
       assert(d.expectedTestCount(Filter(Some(Set("org.scalatest.SlowAsMolasses")), Set("org.scalatest.FastAsLight"))) === 1)
@@ -511,9 +499,9 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
         @SlowAsMolasses
         def `test: this`() = ()
         @SlowAsMolasses
-        def `test: that`(r: Rep) = ()
+        def `test: that` = ()
         @Ignore
-        def `test: the other thing`(r: Rep) = ()
+        def `test: the other thing` = ()
       }
       assert(e.expectedTestCount(Filter(Some(Set("org.scalatest.FastAsLight")), Set())) === 1)
       assert(e.expectedTestCount(Filter(Some(Set("org.scalatest.SlowAsMolasses")), Set("org.scalatest.FastAsLight"))) === 1)
@@ -624,23 +612,6 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
       assert(a.theTestWasInvoked)
     }
     
-    it("should invoke withFixture from runTest for a test method that takes a Rep") {
-      val a = new Spec {
-        var withFixtureWasInvoked = false
-        var theTestWasInvoked = false
-        override def withFixture(test: NoArgTest) {
-          withFixtureWasInvoked = true
-          super.withFixture(test)
-        }
-        def `test: something`(r: Rep) {
-          theTestWasInvoked = true
-        }
-      }
-      a.run(None, Args(SilentReporter, new Stopper {}, Filter(), Map(), None, new Tracker(), Set.empty))
-      assert(a.withFixtureWasInvoked)
-      assert(a.theTestWasInvoked)
-    }
-    
     it("should pass the correct test name in the NoArgTest passed to withFixture") {
       val a = new Spec {
         var correctTestNameWasPassed = false
@@ -648,12 +619,12 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
           correctTestNameWasPassed = test.name == encode("test: something")
           super.withFixture(test)
         }
-        def `test: something`(r: Rep) {}
+        def `test: something` {}
       }
       a.run(None, Args(SilentReporter, new Stopper {}, Filter(), Map(), None, new Tracker(), Set.empty))
       assert(a.correctTestNameWasPassed)
     }
-    
+
     it("should pass the correct config map in the NoArgTest passed to withFixture") {
       val a = new Spec {
         var correctConfigMapWasPassed = false
@@ -661,17 +632,17 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
           correctConfigMapWasPassed = (test.configMap == Map("hi" -> 7))
           super.withFixture(test)
         }
-        def `test: something`(r: Rep) {}
+        def `test: something` {}
       }
       a.run(None, Args(SilentReporter, new Stopper {}, Filter(), Map("hi" -> 7), None, new Tracker(), Set.empty))
       assert(a.correctConfigMapWasPassed)
     }
     
-    it("should, when a test method takes a Rep and writes to its Informer, report the info in test completion event") {
+    it("should, when a test method writes to the Informer, report the info in test completion event") {
       val msg = "hi there dude"
       class MySpec extends Spec {
-        def `test: with Informer`(r: Rep) {
-          r.info(msg)
+        def `test: with Informer` {
+          info(msg)
         }
       }
       val myRep = new EventRecordingReporter
