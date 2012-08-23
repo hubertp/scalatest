@@ -17,10 +17,10 @@ package org.scalatest
 
 import org.scalatest.events._
 
-class SpecSuite extends Spec with PrivateMethodTester with SharedHelpers with SeveredStackTraces {
+class SpecSuite extends FunSpec with PrivateMethodTester with SharedHelpers with SeveredStackTraces {
 
   // TODO: ensure spec aborts if same name is used with and without communicator
-  def `test: Spec should discover method names and tags` {
+  it("should discover method names and tags") {
 
     val a = new Spec {
       def `some test name`: Unit = ()
@@ -32,7 +32,7 @@ class SpecSuite extends Spec with PrivateMethodTester with SharedHelpers with Se
     assert(gResult.keySet.size === 0)
   }
   
-  def `test: test methods with no tags should not show up in tags map` {
+  it("should not return tests with no tags in the tags map") {
     
     val a = new Spec {
       def `test: not tagged` = ()
@@ -40,7 +40,7 @@ class SpecSuite extends Spec with PrivateMethodTester with SharedHelpers with Se
     assert(a.tags.keySet.size === 0)
   }
   
-  def `test: test methods that return non-Unit should be discovered` {
+  it("should discover methods that return non-Unit") {
     val a = new Spec {
       def `test: this`: Int = 1
       def `test: that`(): String = "hi"
@@ -50,45 +50,11 @@ class SpecSuite extends Spec with PrivateMethodTester with SharedHelpers with Se
     assert(a.tags.keySet.size === 0)
   }
   
-  def testThatInterceptCatchesSubtypes() {
-    class MyException extends RuntimeException
-    class MyExceptionSubClass extends MyException
-    intercept[MyException] {
-      throw new MyException
-      new AnyRef // This is needed because right now Nothing doesn't overload as an Any
-    }
-    intercept[MyException] {
-      throw new MyExceptionSubClass
-      new AnyRef // This is needed because right now Nothing doesn't overload as an Any
-    }
-    // Try with a trait
-    trait MyTrait {
-      def someRandomMethod() {}
-    }
-    class AnotherException extends RuntimeException with MyTrait
-    val caught = intercept[MyTrait] {
-      throw new AnotherException
-      new AnyRef // This is needed because right now Nothing doesn't overload as an Any
-    }
-    // Make sure the result type is the type passed in, so I can 
-    // not cast and still invoke any method on it I want
-    caught.someRandomMethod()
-  }
-  
-  def testThatInterceptReturnsTheCaughtException() {
-    val e = new RuntimeException
-    val result = intercept[RuntimeException] {
-      throw e
-      new AnyRef // This is needed because right now Nothing doesn't overload as an Any
-    }
-    assert(result eq e)
-  }
-  
-  def testTestDurations() {
+  it("should send defined durations") {
 
     class MySpec extends Spec {
-      def testSucceeds() = ()
-      def testFails() { fail() }
+      def `test succeeds` = ()
+      def `test fails` { fail() }
     }
 
     val mySpec = new MySpec
@@ -98,7 +64,13 @@ class SpecSuite extends Spec with PrivateMethodTester with SharedHelpers with Se
     assert(myReporter.testFailedWasFiredAndHadADuration)
   }
   
-  def testSpecDurations() {
+  class SpecThatAborts extends Spec {
+    override def run(testName: Option[String], args: Args) {
+      throw new RuntimeException("Aborting for testing purposes")
+    }
+  }
+
+  it("should fire a defined duration in a SuiteCompleted event") {
 
     // the spec duration is sent by runNestedSuites, so MySpec needs a
     // nested suite
@@ -113,11 +85,9 @@ class SpecSuite extends Spec with PrivateMethodTester with SharedHelpers with Se
     mySpec.run(None, Args(myReporter, new Stopper {}, Filter(), Map(), None, new Tracker(new Ordinal(99)), Set.empty))
     assert(myReporter.suiteCompletedWasFiredAndHadADuration)
 
-    class SpecThatAborts extends Spec {
-      override def run(testName: Option[String], args: Args) {
-        throw new RuntimeException("Aborting for testing purposes")
-      }
-    }
+  }
+
+  it("should fire a defined duration in a SuiteAborted event") {
 
     // the suite duration is sent by runNestedSuites, so MySuite needs a
     // nested suite
@@ -132,11 +102,11 @@ class SpecSuite extends Spec with PrivateMethodTester with SharedHelpers with Se
     myOtherSpec.run(None, Args(myOtherReporter, new Stopper {}, Filter(), Map(), None, new Tracker(new Ordinal(99)), Set.empty))
     assert(myOtherReporter.suiteAbortedWasFiredAndHadADuration)
   }
-  
-  def testPending() {
+
+  it("should fire TestPending event for a pending test") {
 
     class MySpec extends Spec {
-      def testPending() { pending }
+      def `this is a pending test` { pending }
     }
 
     val mySpec = new MySpec
@@ -144,7 +114,7 @@ class SpecSuite extends Spec with PrivateMethodTester with SharedHelpers with Se
     mySpec.run(None, Args(myReporter, new Stopper {}, Filter(), Map(), None, new Tracker(new Ordinal(99)), Set.empty))
     assert(myReporter.testPendingWasFired)
   }
-  
+
   class TestWasCalledSpec extends Spec {
     var theTestThisCalled = false
     var theTestThatCalled = false
@@ -167,65 +137,78 @@ class SpecSuite extends Spec with PrivateMethodTester with SharedHelpers with Se
     def `test the other`() { theTestTheOtherCalled = true }
   }
   
-  def testExecute() {
+  describe("when its execute method is invoked") {
 
-    val s1 = new TestWasCalledSpec
-    s1.execute()
-    assert(s1.theTestThisCalled)
-    assert(s1.theTestThatCalled)
-    assert(s1.theTestTheOtherCalled)
-    assert(s1.theTestThisConfigMapWasEmpty)
-    assert(s1.theTestThatConfigMapWasEmpty)
-    assert(s1.theTestTheOtherConfigMapWasEmpty)
+    it("should run all tests, passing an empty config map, if no arguments are passed") {
+      val s1 = new TestWasCalledSpec
+      s1.execute()
+      assert(s1.theTestThisCalled)
+      assert(s1.theTestThatCalled)
+      assert(s1.theTestTheOtherCalled)
+      assert(s1.theTestThisConfigMapWasEmpty)
+      assert(s1.theTestThatConfigMapWasEmpty)
+      assert(s1.theTestTheOtherConfigMapWasEmpty)
+    }
 
-    val s2 = new TestWasCalledSpec
-    s2.execute("test this")
-    assert(s2.theTestThisCalled)
-    assert(!s2.theTestThatCalled)
-    assert(!s2.theTestTheOtherCalled)
-    assert(s2.theTestThisConfigMapWasEmpty)
-    assert(s2.theTestThatConfigMapWasEmpty)
-    assert(s2.theTestTheOtherConfigMapWasEmpty)
+    it("should run just the specified test, passing an empty config map, if a full test name is passed") {
+      val s2 = new TestWasCalledSpec
+      s2.execute("test this")
+      assert(s2.theTestThisCalled)
+      assert(!s2.theTestThatCalled)
+      assert(!s2.theTestTheOtherCalled)
+      assert(s2.theTestThisConfigMapWasEmpty)
+      assert(s2.theTestThatConfigMapWasEmpty)
+      assert(s2.theTestTheOtherConfigMapWasEmpty)
+    }
 
-    val s3 = new TestWasCalledSpec
-    s3.execute(configMap = Map("s" -> "s"))
-    assert(s3.theTestThisCalled)
-    assert(s3.theTestThatCalled)
-    assert(s3.theTestTheOtherCalled)
-    assert(!s3.theTestThisConfigMapWasEmpty)
-    assert(!s3.theTestThatConfigMapWasEmpty)
-    assert(!s3.theTestTheOtherConfigMapWasEmpty)
+    it("should pass a non-empty config map into all tests if a just a config map is specified") {
+      val s3 = new TestWasCalledSpec
+      s3.execute(configMap = Map("s" -> "s"))
+      assert(s3.theTestThisCalled)
+      assert(s3.theTestThatCalled)
+      assert(s3.theTestTheOtherCalled)
+      assert(!s3.theTestThisConfigMapWasEmpty)
+      assert(!s3.theTestThatConfigMapWasEmpty)
+      assert(!s3.theTestTheOtherConfigMapWasEmpty)
+    }
 
-    val s4 = new TestWasCalledSpec
-    s4.execute("test this", Map("s" -> "s"))
-    assert(s4.theTestThisCalled)
-    assert(!s4.theTestThatCalled)
-    assert(!s4.theTestTheOtherCalled)
-    assert(!s4.theTestThisConfigMapWasEmpty)
-    assert(s4.theTestThatConfigMapWasEmpty)
-    assert(s4.theTestTheOtherConfigMapWasEmpty)
+    it("should pass a non-empty config map into just the specified test if a full test name and a config map is specified") {
+      val s4 = new TestWasCalledSpec
+      s4.execute("test this", Map("s" -> "s"))
+      assert(s4.theTestThisCalled)
+      assert(!s4.theTestThatCalled)
+      assert(!s4.theTestTheOtherCalled)
+      assert(!s4.theTestThisConfigMapWasEmpty)
+      assert(s4.theTestThatConfigMapWasEmpty)
+      assert(s4.theTestTheOtherConfigMapWasEmpty)
+    }
 
-    val s5 = new TestWasCalledSpec
-    s5.execute(testName = "test this")
-    assert(s5.theTestThisCalled)
-    assert(!s5.theTestThatCalled)
-    assert(!s5.theTestTheOtherCalled)
-    assert(s5.theTestThisConfigMapWasEmpty)
-    assert(s5.theTestThatConfigMapWasEmpty)
-    assert(s5.theTestTheOtherConfigMapWasEmpty)
+    it("should run just the specified test, passing an empty config map, if a full test name is passed via a named parameter") {
+      val s5 = new TestWasCalledSpec
+      s5.execute(testName = "test this")
+      assert(s5.theTestThisCalled)
+      assert(!s5.theTestThatCalled)
+      assert(!s5.theTestTheOtherCalled)
+      assert(s5.theTestThisConfigMapWasEmpty)
+      assert(s5.theTestThatConfigMapWasEmpty)
+      assert(s5.theTestTheOtherConfigMapWasEmpty)
+    }
 
-    val s6 = new TestWasCalledSpec
-    s6.execute(testName = "test this", configMap = Map("s" -> "s"))
-    assert(s6.theTestThisCalled)
-    assert(!s6.theTestThatCalled)
-    assert(!s6.theTestTheOtherCalled)
-    assert(!s6.theTestThisConfigMapWasEmpty)
-    assert(s6.theTestThatConfigMapWasEmpty)
-    assert(s6.theTestTheOtherConfigMapWasEmpty)
+    it("should pass a non-empty config map into just the specified test if a full test name and a config map is specified via named parameters") {
+      val s6 = new TestWasCalledSpec
+      s6.execute(testName = "test this", configMap = Map("s" -> "s"))
+      assert(s6.theTestThisCalled)
+      assert(!s6.theTestThatCalled)
+      assert(!s6.theTestTheOtherCalled)
+      assert(!s6.theTestThisConfigMapWasEmpty)
+      assert(s6.theTestThatConfigMapWasEmpty)
+      assert(s6.theTestTheOtherConfigMapWasEmpty)
+    }
   }
+  describe("when its execute method is invoked and a wildcard is passed for the selected test names") {
   
-  def `test: execute should use dynamic tagging to enable Doenitz wildcards for encoded test names` {
 
+/* Remove if indeed don't need
     class TestWasCalledSpec extends Spec {
       var theTestThisCalled = false
       var theTestThatCalled = false
@@ -247,63 +230,76 @@ class SpecSuite extends Spec with PrivateMethodTester with SharedHelpers with Se
       def `test that` { theTestThatCalled = true }
       def `test the other` { theTestTheOtherCalled = true }
     }
+*/
 
-    val s1 = new TestWasCalledSpec
-    s1.execute(" th")
-    assert(s1.theTestThisCalled)
-    assert(s1.theTestThatCalled)
-    assert(s1.theTestTheOtherCalled)
-    assert(s1.theTestThisConfigMapWasEmpty)
-    assert(s1.theTestThatConfigMapWasEmpty)
-    assert(s1.theTestTheOtherConfigMapWasEmpty)
+    it("should run all tests, passing in an empty config map, if a wildcard selecting all tests is passed") {
+      val s1 = new TestWasCalledSpec
+      s1.execute(" th")
+      assert(s1.theTestThisCalled)
+      assert(s1.theTestThatCalled)
+      assert(s1.theTestTheOtherCalled)
+      assert(s1.theTestThisConfigMapWasEmpty)
+      assert(s1.theTestThatConfigMapWasEmpty)
+      assert(s1.theTestTheOtherConfigMapWasEmpty)
+    }
 
-    val s2 = new TestWasCalledSpec
-    s2.execute(" this")
-    assert(s2.theTestThisCalled)
-    assert(!s2.theTestThatCalled)
-    assert(!s2.theTestTheOtherCalled)
-    assert(s2.theTestThisConfigMapWasEmpty)
-    assert(s2.theTestThatConfigMapWasEmpty)
-    assert(s2.theTestTheOtherConfigMapWasEmpty)
+    it("should run just one test, passing in an empty config map, if a wildcard selecting only that test is passed") {
+      val s2 = new TestWasCalledSpec
+      s2.execute(" this")
+      assert(s2.theTestThisCalled)
+      assert(!s2.theTestThatCalled)
+      assert(!s2.theTestTheOtherCalled)
+      assert(s2.theTestThisConfigMapWasEmpty)
+      assert(s2.theTestThatConfigMapWasEmpty)
+      assert(s2.theTestTheOtherConfigMapWasEmpty)
+    }
 
-    val s3 = new TestWasCalledSpec
-    s3.execute(" th", configMap = Map("s" -> "s"))
-    assert(s3.theTestThisCalled)
-    assert(s3.theTestThatCalled)
-    assert(s3.theTestTheOtherCalled)
-    assert(!s3.theTestThisConfigMapWasEmpty)
-    assert(!s3.theTestThatConfigMapWasEmpty)
-    assert(!s3.theTestTheOtherConfigMapWasEmpty)
+    it("should run all tests, passing in a non-empty config map, if a wildcard selecting all tests and a config map is passed (with config map specified via a named parameter)") {
+      val s3 = new TestWasCalledSpec
+      s3.execute(" th", configMap = Map("s" -> "s"))
+      assert(s3.theTestThisCalled)
+      assert(s3.theTestThatCalled)
+      assert(s3.theTestTheOtherCalled)
+      assert(!s3.theTestThisConfigMapWasEmpty)
+      assert(!s3.theTestThatConfigMapWasEmpty)
+      assert(!s3.theTestTheOtherConfigMapWasEmpty)
+    }
 
-    val s4 = new TestWasCalledSpec
-    s4.execute(" th", Map("s" -> "s"))
-    assert(s4.theTestThisCalled)
-    assert(s4.theTestThatCalled)
-    assert(s4.theTestTheOtherCalled)
-    assert(!s4.theTestThisConfigMapWasEmpty)
-    assert(!s4.theTestThatConfigMapWasEmpty)
-    assert(!s4.theTestTheOtherConfigMapWasEmpty)
+    it("should run all tests, passing in a non-empty config map, if a wildcard selecting all tests and a config map is passed") {
+      val s4 = new TestWasCalledSpec
+      s4.execute(" th", Map("s" -> "s"))
+      assert(s4.theTestThisCalled)
+      assert(s4.theTestThatCalled)
+      assert(s4.theTestTheOtherCalled)
+      assert(!s4.theTestThisConfigMapWasEmpty)
+      assert(!s4.theTestThatConfigMapWasEmpty)
+      assert(!s4.theTestTheOtherConfigMapWasEmpty)
+    }
 
-    val s5 = new TestWasCalledSpec
-    s5.execute(testName = " th")
-    assert(s5.theTestThisCalled)
-    assert(s5.theTestThatCalled)
-    assert(s5.theTestTheOtherCalled)
-    assert(s5.theTestThisConfigMapWasEmpty)
-    assert(s5.theTestThatConfigMapWasEmpty)
-    assert(s5.theTestTheOtherConfigMapWasEmpty)
+    it("should run all tests, passing in an empty config map, if a wildcard selecting all tests is passed with a named parameter") {
+      val s5 = new TestWasCalledSpec
+      s5.execute(testName = " th")
+      assert(s5.theTestThisCalled)
+      assert(s5.theTestThatCalled)
+      assert(s5.theTestTheOtherCalled)
+      assert(s5.theTestThisConfigMapWasEmpty)
+      assert(s5.theTestThatConfigMapWasEmpty)
+      assert(s5.theTestTheOtherConfigMapWasEmpty)
+    }
 
-    val s6 = new TestWasCalledSpec
-    s6.execute(testName = " this", configMap = Map("s" -> "s"))
-    assert(s6.theTestThisCalled)
-    assert(!s6.theTestThatCalled)
-    assert(!s6.theTestTheOtherCalled)
-    assert(!s6.theTestThisConfigMapWasEmpty)
-    assert(s6.theTestThatConfigMapWasEmpty)
-    assert(s6.theTestTheOtherConfigMapWasEmpty)
+    it("should run all tests, passing in a non-empty config map, if a wildcard selecting all tests and a config map are passed with named parameters") {
+      val s6 = new TestWasCalledSpec
+      s6.execute(testName = " this", configMap = Map("s" -> "s"))
+      assert(s6.theTestThisCalled)
+      assert(!s6.theTestThatCalled)
+      assert(!s6.theTestTheOtherCalled)
+      assert(!s6.theTestThisConfigMapWasEmpty)
+      assert(s6.theTestThatConfigMapWasEmpty)
+      assert(s6.theTestTheOtherConfigMapWasEmpty)
+    }
   }
-  
-  def `test: Suite should order encoded names in alphabetical decoded order` {
+
+  it("should return the test names in alphabetical order from testNames even if the encoded name would sort in the opposite order") {
 
     // + comes before -
     // but $plus comes after $minus
@@ -327,14 +323,15 @@ class SpecSuite extends Spec with PrivateMethodTester with SharedHelpers with Se
     )
     assert(a.testNames.iterator.toList === expectedTestNames)
   }
-  
-  def testDecodedSuiteName() {
+
+  it("should send a defined decoded suite name for a class whose name is given in backticks") {
     expectResult("My Spec") { new My$u0020Spec().decodedSuiteName.get }
     expectResult(None) { new SpecSuite().decodedSuiteName }
   }
-  
-  def testDecodedTestName() {
-    
+
+  it("should send defined decoded test names") {
+ 
+/*
     class NormalSpec extends Spec {
       def testSucceed() = {}
       def testFail() = { fail }
@@ -342,7 +339,7 @@ class SpecSuite extends Spec with PrivateMethodTester with SharedHelpers with Se
       @Ignore
       def testIgnore() = {}
     }
-    
+
     val normalSpec = new NormalSpec
     val normalReporter = new EventRecordingReporter
     normalSpec.run(None, Args(normalReporter, new Stopper {}, Filter(), Map(), None, new Tracker(new Ordinal(99)), Set.empty))
@@ -368,6 +365,7 @@ class SpecSuite extends Spec with PrivateMethodTester with SharedHelpers with Se
         case _ =>
       }
     }
+*/
     
     class DecodedSpec extends Spec {
       def `test Succeed`() {}
@@ -406,7 +404,7 @@ class SpecSuite extends Spec with PrivateMethodTester with SharedHelpers with Se
       }
     }
   }
-  
+
   def testTestTags() {
     class TagSpec extends Spec {  
       def testNoTagMethod() {}
@@ -421,121 +419,128 @@ class SpecSuite extends Spec with PrivateMethodTester with SharedHelpers with Se
     assert(tagSet.toList(0) === classOf[SlowAsMolasses].getName)
   }
   
-  def testRunNestedSuite() {
+  describe("when annotations are applied at the class level") {
+    it("should propate those annotations to all tests in the class") {
     
-    class NoTagSpec extends Spec
-    @Ignore
-    class IgnoreSpec extends Spec {
-      def testMethod1() {}
-      def testMethod2() {}
-      def testMethod3() {}
-    }
-    @SlowAsMolasses
-    class SlowAsMolassesSpec extends Spec
-    @FastAsLight
-    class FastAsLightSpec extends Spec
-    
-    class MasterSpec extends Spec {
-      override def nestedSuites = Vector(new NoTagSpec(), new IgnoreSpec(), new SlowAsMolassesSpec(), new FastAsLightSpec())
-      override def runNestedSuites(args: Args) {
-        super.runNestedSuites(args)
+      class NoTagSpec extends Spec
+      @Ignore
+      class IgnoreSpec extends Spec {
+        def `test method 1` {}
+        def `test method 2` {}
+        def `test method 3` {}
       }
-    }
+      @SlowAsMolasses
+      class SlowAsMolassesSpec extends Spec
+      @FastAsLight
+      class FastAsLightSpec extends Spec
     
-    class CounterDistributor extends Distributor {
-      var count = 0
-      def apply(suite: Suite, args: Args) {
-        count += 1
+      class MasterSpec extends Spec {
+        override def nestedSuites = Vector(new NoTagSpec(), new IgnoreSpec(), new SlowAsMolassesSpec(), new FastAsLightSpec())
+        override def runNestedSuites(args: Args) {
+          super.runNestedSuites(args)
+        }
       }
-      def apply(suite: Suite, tracker: Tracker) {
-        count += 1
+    
+      class CounterDistributor extends Distributor {
+        var count = 0
+        def apply(suite: Suite, args: Args) {
+          count += 1
+        }
+        def apply(suite: Suite, tracker: Tracker) {
+          count += 1
+        }
       }
+
+      val masterSpec = new MasterSpec()
+
+      val defaultFilter = new Filter(None, Set.empty)
+      val defaultReporter = new EventRecordingReporter
+      masterSpec.runNestedSuites(Args(defaultReporter, new Stopper {}, defaultFilter, Map.empty, None, new Tracker(new Ordinal(99)), Set.empty))
+      assert(defaultReporter.suiteStartingEventsReceived.size === 4)
+      assert(defaultReporter.testIgnoredEventsReceived.size === 3)
+      val defaultReporterDist = new EventRecordingReporter
+      val defaultDistributor = new CounterDistributor
+      masterSpec.runNestedSuites(Args(defaultReporterDist, new Stopper {}, defaultFilter, Map.empty, Some(defaultDistributor), new Tracker(new Ordinal(99)), Set.empty))
+      assert(defaultDistributor.count === 4)
+
+      val includeFilter = new Filter(Some(Set("org.scalatest.FastAsLight")), Set.empty)
+      val includeReporter = new EventRecordingReporter
+      masterSpec.runNestedSuites(Args(includeReporter, new Stopper {}, includeFilter, Map.empty, None, new Tracker(new Ordinal(99)), Set.empty))
+      assert(includeReporter.suiteStartingEventsReceived.size === 4) 
+      assert(includeReporter.testIgnoredEventsReceived.size === 0) 
+      val includeReporterDist = new EventRecordingReporter
+      val includeDistributor = new CounterDistributor
+      masterSpec.runNestedSuites(Args(includeReporterDist, new Stopper {}, includeFilter, Map.empty, Some(includeDistributor), new Tracker(new Ordinal(99)), Set.empty))
+      assert(includeDistributor.count === 4) 
+
+      val excludeFilter = new Filter(None, Set("org.scalatest.SlowAsMolasses"))
+      val excludeReporter = new EventRecordingReporter
+      masterSpec.runNestedSuites(Args(excludeReporter, new Stopper {}, excludeFilter, Map.empty, None, new Tracker(new Ordinal(99)), Set.empty))
+      assert(excludeReporter.suiteStartingEventsReceived.size === 4)
+      assert(excludeReporter.testIgnoredEventsReceived.size === 3)
+      val excludeReporterDist = new EventRecordingReporter
+      val excludeDistributor = new CounterDistributor
+      masterSpec.runNestedSuites(Args(excludeReporterDist, new Stopper {}, excludeFilter, Map.empty, Some(excludeDistributor), new Tracker(new Ordinal(99)), Set.empty))
+      assert(excludeDistributor.count === 4)
     }
-    
-    val masterSpec = new MasterSpec()
-    
-    val defaultFilter = new Filter(None, Set.empty)
-    val defaultReporter = new EventRecordingReporter
-    masterSpec.runNestedSuites(Args(defaultReporter, new Stopper {}, defaultFilter, Map.empty, None, new Tracker(new Ordinal(99)), Set.empty))
-    assert(defaultReporter.suiteStartingEventsReceived.size === 4)
-    assert(defaultReporter.testIgnoredEventsReceived.size === 3)
-    val defaultReporterDist = new EventRecordingReporter
-    val defaultDistributor = new CounterDistributor
-    masterSpec.runNestedSuites(Args(defaultReporterDist, new Stopper {}, defaultFilter, Map.empty, Some(defaultDistributor), new Tracker(new Ordinal(99)), Set.empty))
-    assert(defaultDistributor.count === 4)
-    
-    val includeFilter = new Filter(Some(Set("org.scalatest.FastAsLight")), Set.empty)
-    val includeReporter = new EventRecordingReporter
-    masterSpec.runNestedSuites(Args(includeReporter, new Stopper {}, includeFilter, Map.empty, None, new Tracker(new Ordinal(99)), Set.empty))
-    assert(includeReporter.suiteStartingEventsReceived.size === 4) 
-    assert(includeReporter.testIgnoredEventsReceived.size === 0) 
-    val includeReporterDist = new EventRecordingReporter
-    val includeDistributor = new CounterDistributor
-    masterSpec.runNestedSuites(Args(includeReporterDist, new Stopper {}, includeFilter, Map.empty, Some(includeDistributor), new Tracker(new Ordinal(99)), Set.empty))
-    assert(includeDistributor.count === 4) 
-    
-    val excludeFilter = new Filter(None, Set("org.scalatest.SlowAsMolasses"))
-    val excludeReporter = new EventRecordingReporter
-    masterSpec.runNestedSuites(Args(excludeReporter, new Stopper {}, excludeFilter, Map.empty, None, new Tracker(new Ordinal(99)), Set.empty))
-    assert(excludeReporter.suiteStartingEventsReceived.size === 4)
-    assert(excludeReporter.testIgnoredEventsReceived.size === 3)
-    val excludeReporterDist = new EventRecordingReporter
-    val excludeDistributor = new CounterDistributor
-    masterSpec.runNestedSuites(Args(excludeReporterDist, new Stopper {}, excludeFilter, Map.empty, Some(excludeDistributor), new Tracker(new Ordinal(99)), Set.empty))
-    assert(excludeDistributor.count === 4)
   }
   
-  def testExpectedTestCount() {
-    class NoTagSpec extends Spec {
-      def testMethod1() {}
-      def testMethod2() {}
-      def testMethod3() {}
-    }
-    @Ignore
-    class IgnoreSpec extends Spec {
-      def testMethod1() {}
-      def testMethod2() {}
-      def testMethod3() {}
-    }
-    @SlowAsMolasses
-    class SlowAsMolassesSpec extends Spec {
-      def testMethod1() {}
-      def testMethod2() {}
-      def testMethod3() {}
-    }
-    @FastAsLight
-    class FastAsLightSpec extends Spec {
-      def testMethod1() {}
-      def testMethod2() {}
-      def testMethod3() {}
-    }
-    
-    class MasterSpec extends Spec {
-      override def nestedSuites = Vector(new NoTagSpec(), new IgnoreSpec(), new SlowAsMolassesSpec(), new FastAsLightSpec())
-      override def runNestedSuites(args: Args) {
-        super.runNestedSuites(args)
+  describe("when its expectedTestCount method is invoked") {
+    it("should return a count that takes into 'account' the passed filter") {
+      class NoTagSpec extends Spec {
+        def `test method 1` {}
+        def `test method 2` {}
+        def `test method 3` {}
       }
-    }
+      @Ignore
+      class IgnoreSpec extends Spec {
+        def `test method 1` {}
+        def `test method 2` {}
+        def `test method 3` {}
+      }
+      @SlowAsMolasses
+      class SlowAsMolassesSpec extends Spec {
+        def `test method 1` {}
+        def `test method 2` {}
+        def `test method 3` {}
+      }
+      @FastAsLight
+      class FastAsLightSpec extends Spec {
+        def `test method 1` {}
+        def `test method 2` {}
+        def `test method 3` {}
+      }
     
-    val masterSpec = new MasterSpec()
-    assert(masterSpec.expectedTestCount(new Filter(None, Set.empty)) === 9)
-    assert(masterSpec.expectedTestCount(new Filter(Some(Set("org.scalatest.FastAsLight")), Set.empty)) === 3)
-    assert(masterSpec.expectedTestCount(new Filter(None, Set("org.scalatest.FastAsLight"))) === 6)
-    assert(masterSpec.expectedTestCount(new Filter(Some(Set("org.scalatest.SlowAsMolasses")), Set.empty)) === 3)
-    assert(masterSpec.expectedTestCount(new Filter(None, Set("org.scalatest.SlowAsMolasses"))) === 6)
+      class MasterSpec extends Spec {
+        override def nestedSuites = Vector(new NoTagSpec(), new IgnoreSpec(), new SlowAsMolassesSpec(), new FastAsLightSpec())
+        override def runNestedSuites(args: Args) {
+          super.runNestedSuites(args)
+        }
+      }
+    
+      val masterSpec = new MasterSpec()
+      assert(masterSpec.expectedTestCount(new Filter(None, Set.empty)) === 9)
+      assert(masterSpec.expectedTestCount(new Filter(Some(Set("org.scalatest.FastAsLight")), Set.empty)) === 3)
+      assert(masterSpec.expectedTestCount(new Filter(None, Set("org.scalatest.FastAsLight"))) === 6)
+      assert(masterSpec.expectedTestCount(new Filter(Some(Set("org.scalatest.SlowAsMolasses")), Set.empty)) === 3)
+      assert(masterSpec.expectedTestCount(new Filter(None, Set("org.scalatest.SlowAsMolasses"))) === 6)
+    }
   }
   
-  def testSuiteRunner() {
-    assert(new NormalSpec().rerunner.get === classOf[NormalSpec].getName)
-    assert(new WrappedSpec(Map.empty).rerunner.get === classOf[WrappedSpec].getName)
-    assert(new NotAccessibleSpec("test").rerunner === None)
+  describe("when its rerunner method is invoked") {
+    it("should provide the fully qualified name of a class that could be used to rerun the suite, wrapped in a Some, or None, if can't be rerun") {
+      assert(new NormalSpec().rerunner.get === classOf[NormalSpec].getName)
+      assert(new WrappedSpec(Map.empty).rerunner.get === classOf[WrappedSpec].getName)
+      assert(new NotAccessibleSpec("test").rerunner === None)
+    }
   }
   
-  def testCheckChosenStyles() {
+  it("should run only chosen styles, if specified, and throw an exception from run if a non-chosen style is attempted to be run") {
+
     class SimpleSpec extends Spec {
-      def testMethod1() {}
-      def testMethod2() {}
-      def testMethod3() {}
+      def `test method 1` {}
+      def `test method 2` {}
+      def `test method 3` {}
     }
     
     val simpleSpec = new SimpleSpec()
@@ -559,18 +564,20 @@ class SpecSuite extends Spec with PrivateMethodTester with SharedHelpers with Se
     assert(caught3.message.value === Resources("notOneOfTheChosenStyles", "org.scalatest.Spec", Suite.makeListForHumans(Vector("org.scalatest.FunSpec", "org.scalatest.FreeSpec", "org.scalatest.FlatSpec"))))
   }
   
-  def testStackDepth() {
-    class TestSpec extends Spec {
-      def testFailure() {
-        assert(1 === 2)
+  describe("when a test fails") {
+    it("should send proper stack depth information") {
+      class TestSpec extends Spec {
+        def `test failure`() {
+          assert(1 === 2)
+        }
       }
+      val rep = new EventRecordingReporter
+      val s1 = new TestSpec
+      s1.run(None, Args(rep, new Stopper {}, Filter(), Map(), None, new Tracker, Set.empty))
+      assert(rep.testFailedEventsReceived.size === 1)
+      assert(rep.testFailedEventsReceived(0).throwable.get.asInstanceOf[TestFailedException].failedCodeFileName.get === "SpecSuite.scala")
+      assert(rep.testFailedEventsReceived(0).throwable.get.asInstanceOf[TestFailedException].failedCodeLineNumber.get === thisLineNumber - 8)
     }
-    val rep = new EventRecordingReporter
-    val s1 = new TestSpec
-    s1.run(None, Args(rep, new Stopper {}, Filter(), Map(), None, new Tracker, Set.empty))
-    assert(rep.testFailedEventsReceived.size === 1)
-    assert(rep.testFailedEventsReceived(0).throwable.get.asInstanceOf[TestFailedException].failedCodeFileName.get === "SpecSuite.scala")
-    assert(rep.testFailedEventsReceived(0).throwable.get.asInstanceOf[TestFailedException].failedCodeLineNumber.get === thisLineNumber - 8)
   }
 }
 
