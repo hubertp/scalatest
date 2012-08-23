@@ -19,23 +19,11 @@ import org.scalatest.events._
 
 class SpecSuite extends Spec with PrivateMethodTester with SharedHelpers with SeveredStackTraces {
 
-  def `test: Spec should discover method names and tags using deprecated Informer form` {
-
-    val a = new Spec {
-      def testNames(info: Informer): Unit = ()
-    }
-    assert(a.expectedTestCount(Filter()) === 1)
-    val tnResult: Set[String] = a.testNames
-    val gResult: Map[String, Set[String]] = a.tags
-    assert(tnResult.size === 1)
-    assert(gResult.keySet.size === 0)
-  }
-  
   // TODO: ensure spec aborts if same name is used with and without communicator
   def `test: Spec should discover method names and tags` {
 
     val a = new Spec {
-      def testNames(r: Rep): Unit = ()
+      def `some test name`: Unit = ()
     }
     assert(a.expectedTestCount(Filter()) === 1)
     val tnResult: Set[String] = a.testNames
@@ -52,30 +40,10 @@ class SpecSuite extends Spec with PrivateMethodTester with SharedHelpers with Se
     assert(a.tags.keySet.size === 0)
   }
   
-  def `test: test methods that return non-Unit should be discovered using deprecated Informer form` {
-    val a = new Spec {
-      def testThis(): Int = 1
-      def testThat(info: Informer): String = "hi"
-    }
-    assert(a.expectedTestCount(Filter()) === 2)
-    assert(a.testNames.size === 2)
-    assert(a.tags.keySet.size === 0)
-  }
-  
   def `test: test methods that return non-Unit should be discovered` {
     val a = new Spec {
       def `test: this`: Int = 1
-      def `test: that`(r: Rep): String = "hi"
-    }
-    assert(a.expectedTestCount(Filter()) === 2)
-    assert(a.testNames.size === 2)
-    assert(a.tags.keySet.size === 0)
-  }
-  
-  def `test: overloaded test methods should be discovered using deprecated Informer form` {
-    val a = new Spec {
-      def testThis() = ()
-      def testThis(info: Informer) = ()
+      def `test: that`(): String = "hi"
     }
     assert(a.expectedTestCount(Filter()) === 2)
     assert(a.testNames.size === 2)
@@ -187,16 +155,16 @@ class SpecSuite extends Spec with PrivateMethodTester with SharedHelpers with Se
     override def withFixture(test: NoArgTest) {
       if (test.configMap.size > 0)
         test.name match {
-          case "testThis" => theTestThisConfigMapWasEmpty = false
-          case "testThat" => theTestThatConfigMapWasEmpty = false
-          case "testTheOther" => theTestTheOtherConfigMapWasEmpty = false
+          case "test$u0020this" => theTestThisConfigMapWasEmpty = false
+          case "test$u0020that" => theTestThatConfigMapWasEmpty = false
+          case "test$u0020the$u0020other" => theTestTheOtherConfigMapWasEmpty = false
           case _ => throw new Exception("Should never happen")
         }
       test()
     }
-    def testThis() { theTestThisCalled = true }
-    def testThat() { theTestThatCalled = true }
-    def testTheOther() { theTestTheOtherCalled = true }
+    def `test this`() { theTestThisCalled = true }
+    def `test that`() { theTestThatCalled = true }
+    def `test the other`() { theTestTheOtherCalled = true }
   }
   
   def testExecute() {
@@ -211,7 +179,7 @@ class SpecSuite extends Spec with PrivateMethodTester with SharedHelpers with Se
     assert(s1.theTestTheOtherConfigMapWasEmpty)
 
     val s2 = new TestWasCalledSpec
-    s2.execute("testThis")
+    s2.execute("test this")
     assert(s2.theTestThisCalled)
     assert(!s2.theTestThatCalled)
     assert(!s2.theTestTheOtherCalled)
@@ -229,7 +197,7 @@ class SpecSuite extends Spec with PrivateMethodTester with SharedHelpers with Se
     assert(!s3.theTestTheOtherConfigMapWasEmpty)
 
     val s4 = new TestWasCalledSpec
-    s4.execute("testThis", Map("s" -> "s"))
+    s4.execute("test this", Map("s" -> "s"))
     assert(s4.theTestThisCalled)
     assert(!s4.theTestThatCalled)
     assert(!s4.theTestTheOtherCalled)
@@ -238,7 +206,7 @@ class SpecSuite extends Spec with PrivateMethodTester with SharedHelpers with Se
     assert(s4.theTestTheOtherConfigMapWasEmpty)
 
     val s5 = new TestWasCalledSpec
-    s5.execute(testName = "testThis")
+    s5.execute(testName = "test this")
     assert(s5.theTestThisCalled)
     assert(!s5.theTestThatCalled)
     assert(!s5.theTestTheOtherCalled)
@@ -247,63 +215,7 @@ class SpecSuite extends Spec with PrivateMethodTester with SharedHelpers with Se
     assert(s5.theTestTheOtherConfigMapWasEmpty)
 
     val s6 = new TestWasCalledSpec
-    s6.execute(testName = "testThis", configMap = Map("s" -> "s"))
-    assert(s6.theTestThisCalled)
-    assert(!s6.theTestThatCalled)
-    assert(!s6.theTestTheOtherCalled)
-    assert(!s6.theTestThisConfigMapWasEmpty)
-    assert(s6.theTestThatConfigMapWasEmpty)
-    assert(s6.theTestTheOtherConfigMapWasEmpty)
-  }
-  
-  def `test: execute should use dynamic tagging to enable Doenitz wildcards for non-encoded test names` {
-    val s1 = new TestWasCalledSpec
-    s1.execute("Th")
-    assert(s1.theTestThisCalled)
-    assert(s1.theTestThatCalled)
-    assert(s1.theTestTheOtherCalled)
-    assert(s1.theTestThisConfigMapWasEmpty)
-    assert(s1.theTestThatConfigMapWasEmpty)
-    assert(s1.theTestTheOtherConfigMapWasEmpty)
-
-    val s2 = new TestWasCalledSpec
-    s2.execute("This")
-    assert(s2.theTestThisCalled)
-    assert(!s2.theTestThatCalled)
-    assert(!s2.theTestTheOtherCalled)
-    assert(s2.theTestThisConfigMapWasEmpty)
-    assert(s2.theTestThatConfigMapWasEmpty)
-    assert(s2.theTestTheOtherConfigMapWasEmpty)
-
-    val s3 = new TestWasCalledSpec
-    s3.execute("Th", configMap = Map("s" -> "s"))
-    assert(s3.theTestThisCalled)
-    assert(s3.theTestThatCalled)
-    assert(s3.theTestTheOtherCalled)
-    assert(!s3.theTestThisConfigMapWasEmpty)
-    assert(!s3.theTestThatConfigMapWasEmpty)
-    assert(!s3.theTestTheOtherConfigMapWasEmpty)
-
-    val s4 = new TestWasCalledSpec
-    s4.execute("Th", Map("s" -> "s"))
-    assert(s4.theTestThisCalled)
-    assert(s4.theTestThatCalled)
-    assert(s4.theTestTheOtherCalled)
-    assert(!s4.theTestThisConfigMapWasEmpty)
-    assert(!s4.theTestThatConfigMapWasEmpty)
-    assert(!s4.theTestTheOtherConfigMapWasEmpty)
-
-    val s5 = new TestWasCalledSpec
-    s5.execute(testName = "Th")
-    assert(s5.theTestThisCalled)
-    assert(s5.theTestThatCalled)
-    assert(s5.theTestTheOtherCalled)
-    assert(s5.theTestThisConfigMapWasEmpty)
-    assert(s5.theTestThatConfigMapWasEmpty)
-    assert(s5.theTestTheOtherConfigMapWasEmpty)
-
-    val s6 = new TestWasCalledSpec
-    s6.execute(testName = "This", configMap = Map("s" -> "s"))
+    s6.execute(testName = "test this", configMap = Map("s" -> "s"))
     assert(s6.theTestThisCalled)
     assert(!s6.theTestThatCalled)
     assert(!s6.theTestTheOtherCalled)
