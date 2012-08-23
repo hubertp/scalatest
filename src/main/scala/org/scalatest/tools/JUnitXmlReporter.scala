@@ -414,13 +414,12 @@ private[scalatest] class JUnitXmlReporter(directory: String) extends Reporter {
   // Determines hostname of local machine.
   //
   private def findHostname: String = {
-    val localMachine =
-      try {
-        InetAddress.getLocalHost();
-      } catch {
-        case e: UnknownHostException => "unknown"
-      }
-    localMachine.getHostName
+    try {
+      val localMachine = InetAddress.getLocalHost();
+      localMachine.getHostName
+    } catch {
+      case e: UnknownHostException => "unknown"
+    }
   }
 
   //
