@@ -18,7 +18,6 @@ package org.scalatest
 import scala.collection.immutable.ListSet
 import Suite.autoTagClassAnnotations
 import Spec.isTestMethod
-import Suite.takesInformer
 import Suite.InformerInParens
 import Suite.testMethodTakesAnInformer
 import java.lang.reflect.Method
@@ -39,13 +38,6 @@ trait Spec extends Suite { thisSuite =>
         if annotationClass.isAnnotationPresent(classOf[TagAnnotation])
       } yield annotationClass.getName
       
-    def testMethodTakesARep(method: Method): Boolean = {
-      val paramTypes = method.getParameterTypes
-      (paramTypes.size == 1) && (paramTypes(0) eq classOf[Rep])
-    }
- 
-    class RepImpl(val info: Informer, val markup: Documenter) extends Rep
-
     object MethodNameEncodedOrdering extends Ordering[Method] {
       import scala.reflect.NameTransformer.decode
       def compare(x: Method, y: Method): Int = {
@@ -57,19 +49,11 @@ trait Spec extends Suite { thisSuite =>
     val testMethods = getClass.getMethods.filter(isTestMethod(_)).sorted(MethodNameEncodedOrdering)
 
     testMethods.foreach { m =>
-      val testName = if (takesInformer(m)) m.getName + InformerInParens else m.getName
+      val testName = m.getName
       val methodTags = getTestTags(testName)
       val testFun: () => Unit = () => { 
-        val argsArray: Array[Object] =
-          if (testMethodTakesAnInformer(testName)) 
-            Array(info)  
-          else if (testMethodTakesARep(m)) 
-            Array(new RepImpl(info, markup))
-          else 
-            Array.empty
-        try {
-          m.invoke(thisSuite, argsArray: _*)
-        }
+        val argsArray: Array[Object] = Array.empty
+        try m.invoke(thisSuite, argsArray: _*)
         catch {
           case ite: InvocationTargetException => 
             throw ite.getTargetException
