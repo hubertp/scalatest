@@ -440,7 +440,7 @@ trait FreeSpec extends Suite { thisSuite =>
 
     // TODO: Fill in Scaladoc
     def - (fun: => Unit) {
-      registerNestedBranch(string, None, fun, "describeCannotAppearInsideAnIt", sourceFileName, "-", 3, -2)
+      registerNestedBranch(string, None, fun, "describeCannotAppearInsideAnIt", sourceFileName, "-", 3, -2, None)
     }
 
     /**

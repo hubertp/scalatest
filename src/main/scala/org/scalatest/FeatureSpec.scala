@@ -1728,7 +1728,7 @@ trait FeatureSpec extends Suite { thisSuite =>
     if (!currentBranchIsTrunk)
       throw new NotAllowedException(Resources("cantNestFeatureClauses"), getStackDepthFun("FeatureSpec.scala", "feature"))
 
-    registerNestedBranch(Resources("feature", description), None, fun, "featureCannotAppearInsideAScenario", "FeatureSpec.scala", "feature", 4, -2)
+    registerNestedBranch(Resources("feature", description), None, fun, "featureCannotAppearInsideAScenario", "FeatureSpec.scala", "feature", 4, -2, None)
   }
 
   /**

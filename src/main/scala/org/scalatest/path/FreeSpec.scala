@@ -850,7 +850,7 @@ trait FreeSpec extends org.scalatest.Suite with OneInstancePerTest { thisSuite =
      */
     def - (fun: => Unit) {
       // TODO: Fix the resource name
-      handleNestedBranch(string, None, fun, "describeCannotAppearInsideAnIt", "FreeSpec.scala", "-", 3, -2)
+      handleNestedBranch(string, None, fun, "describeCannotAppearInsideAnIt", "FreeSpec.scala", "-", 3, -2, None)
     }
 
     /**

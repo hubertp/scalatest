@@ -959,7 +959,7 @@ trait FunSpec extends org.scalatest.Suite with OneInstancePerTest { thisSuite =>
    * </p>
    */
   protected def describe(description: String)(fun: => Unit) {
-    handleNestedBranch(description, None, fun, "describeCannotAppearInsideAnIt", "FunSpec.scala", "describe", 4, -2)
+    handleNestedBranch(description, None, fun, "describeCannotAppearInsideAnIt", "FunSpec.scala", "describe", 4, -2, None)
   }
   
   /**

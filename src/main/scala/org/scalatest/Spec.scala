@@ -18,12 +18,15 @@ package org.scalatest
 import scala.collection.immutable.ListSet
 import Suite.autoTagClassAnnotations
 import Spec.isTestMethod
+import Suite.simpleNameForTest
 import Suite.InformerInParens
 import Suite.testMethodTakesAnInformer
 import java.lang.reflect.Method
 import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Modifier
 import org.scalatest.events.TopOfMethod
+import org.scalatest.events.TopOfClass
+import scala.reflect.NameTransformer._
 
 trait Spec extends Suite { thisSuite =>
 
@@ -32,51 +35,84 @@ trait Spec extends Suite { thisSuite =>
   
   private def discoveryAndRegisterTests() {
     
-    def getTestTags(testName: String) =
+    def getMethod(o: AnyRef, methodName: String) = { 
+      o.getClass.getMethod(
+        simpleNameForTest(methodName),
+        (if (testMethodTakesAnInformer(methodName)) Array(classOf[Informer]) else new Array[Class[_]](0)): _*
+      )
+    }
+    
+    def getMethodTags(o: AnyRef, methodName: String) =
       for {
-        a <- getMethodForTestName(testName).getDeclaredAnnotations
+        a <- getMethod(o, methodName).getDeclaredAnnotations
         annotationClass = a.annotationType
         if annotationClass.isAnnotationPresent(classOf[TagAnnotation])
       } yield annotationClass.getName
       
+    def isScopeMethod(o: AnyRef, m: Method): Boolean = {
+      val className = o.getClass.getName
+      val scopeClassName = 
+        if (className.endsWith("$"))
+          className + m.getName + "$"
+        else
+          className + "$" + m.getName + "$"
+      scopeClassName == m.getReturnType.getName
+    }
+    
+    def getScopeDesc(m: Method): String = {
+      val objName = m.getReturnType.getName
+      val objClassName = decode(objName.substring(0, objName.length - 1))
+      objClassName.substring(objClassName.lastIndexOf("$") + 1)
+    }
+    
+    val testTags = tags
     object MethodNameEncodedOrdering extends Ordering[Method] {
-      import scala.reflect.NameTransformer.decode
       def compare(x: Method, y: Method): Int = {
         decode(x.getName) compareTo decode(y.getName)
       }
     }
- 
-    val testTags = tags
-    val testMethods = getClass.getMethods.filter(isTestMethod(_)).sorted(MethodNameEncodedOrdering)
-
-    testMethods.foreach { m =>
-      val scope = (m.getDeclaringClass.getName + "$" + m.getName + "$") == m.getReturnType.getName
-      if (scope) {
-        println("Got a scope! " + scala.reflect.NameTransformer.decode(m.getName))
-      }
-      else {
-        val testName = m.getName
-        val methodTags = getTestTags(testName)
-        val testFun: () => Unit = () => { 
-          val argsArray: Array[Object] = Array.empty
-          try m.invoke(thisSuite, argsArray: _*)
-          catch {
-            case ite: InvocationTargetException => 
-              throw ite.getTargetException
-          }
-        }
+    
+    def register(o: AnyRef) {
+      val testMethods = o.getClass.getMethods.filter(isTestMethod(_)).sorted(MethodNameEncodedOrdering)
       
-        val location = TopOfMethod(getClass.getName, m.toGenericString)
-        val isIgnore = testTags.get(testName) match {
-          case Some(tagSet) => tagSet.contains(Suite.IgnoreAnnotation) || methodTags.contains(Suite.IgnoreAnnotation)
-          case None => methodTags.contains(Suite.IgnoreAnnotation)
+      testMethods.foreach { m =>
+        val scope = isScopeMethod(o, m)
+        if (scope) {
+          val scopeDesc = getScopeDesc(m)
+          def scopeFun = {
+            val scopeObj = m.invoke(o)
+            register(scopeObj)
+          }
+          val scopeLocation = TopOfClass(o.getClass.getName)
+          registerNestedBranch(scopeDesc, None, scopeFun, "registrationAlreadyClosed", sourceFileName, "discoveryAndRegisterTests", 2, 0, Some(scopeLocation))
         }
-        if (isIgnore)
-          registerIgnoredTest(testName, testFun, "registrationAlreadyClosed", sourceFileName, "discoveryAndRegisterTests", 3, 0, Some(location), methodTags.map(new Tag(_)): _*)
-        else
-          registerTest(testName, testFun, "registrationAlreadyClosed", sourceFileName, "discoveryAndRegisterTests", 2, 0, None, Some(location), None, methodTags.map(new Tag(_)): _*)
+        else {
+          val methodName = m.getName
+          val testName = decode(methodName)
+          val methodTags = getMethodTags(o, methodName)
+          val testFun: () => Unit = () => { 
+            val argsArray: Array[Object] = Array.empty
+            try m.invoke(o, argsArray: _*)
+            catch {
+              case ite: InvocationTargetException => 
+                throw ite.getTargetException
+            }
+          }
+      
+          val testLocation = TopOfMethod(o.getClass.getName, m.toGenericString)
+          val isIgnore = testTags.get(methodName) match {
+            case Some(tagSet) => tagSet.contains(Suite.IgnoreAnnotation) || methodTags.contains(Suite.IgnoreAnnotation)
+            case None => methodTags.contains(Suite.IgnoreAnnotation)
+          }
+          if (isIgnore)
+            registerIgnoredTest(testName, testFun, "registrationAlreadyClosed", sourceFileName, "discoveryAndRegisterTests", 3, 0, Some(testLocation), methodTags.map(new Tag(_)): _*)
+          else
+            registerTest(testName, testFun, "registrationAlreadyClosed", sourceFileName, "discoveryAndRegisterTests", 2, 0, None, Some(testLocation), None, methodTags.map(new Tag(_)): _*)
+        }
       }
     }
+ 
+    register(thisSuite)
   }
 
   discoveryAndRegisterTests()

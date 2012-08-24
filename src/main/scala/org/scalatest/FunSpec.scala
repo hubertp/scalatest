@@ -1717,7 +1717,7 @@ trait FunSpec extends Suite { thisSuite =>
    * description string and immediately invoke the passed function.
    */
   protected def describe(description: String)(fun: => Unit) {
-    registerNestedBranch(description, None, fun, "describeCannotAppearInsideAnIt", sourceFileName, "describe", 4, -2)
+    registerNestedBranch(description, None, fun, "describeCannotAppearInsideAnIt", sourceFileName, "describe", 4, -2, None)
   }
 
   /**

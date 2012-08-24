@@ -97,7 +97,7 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
         def `it should do that`() {}
       }
 
-      expectResult(List(encode("it should do that"), encode("it should do this"))) {
+      expectResult(List("it should do that", "it should do this")) {
         a.testNames.iterator.toList
       }
 
@@ -112,32 +112,55 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
         def `test: this`() {}
       }
 
-      expectResult(List(encode("test: that"), encode("test: this"))) {
+      expectResult(List("test: that", "test: this")) {
         c.testNames.iterator.toList
       }
-
-      val d = new Spec {
+    }
+    
+    it("should return test names nested in scope in alpahbetical order from testNames") {
+      val a = new Spec {
         object `A Tester` {
           def `should test that` {}
           def `should test this` {}
         }
       }
 
-      expectResult(List(encode("A Tester should test that"), encode("A Tester should test this"))) {
-        d.testNames.iterator.toList
+      expectResult(List("A Tester should test that", "A Tester should test this")) {
+        a.testNames.iterator.toList
       }
 
-      val e = new Spec {
+      val b = new Spec {
         object `A Tester` {
-          def `should test this` {}
-          def `should test that` {}
+          object `should be able to` {
+            def `test this` {}
+            def `test that` {}
+          }
+          object `must be able to` {
+            def `test this` {}
+            def `test that` {}
+          }
         }
       }
 
-      expectResult(List(encode("A Tester should test this"), encode("A Tester should test that"))) {
-        e.testNames.iterator.toList
+      expectResult(List("A Tester must be able to test that", "A Tester must be able to test this", "A Tester should be able to test that", "A Tester should be able to test this")) {
+        b.testNames.iterator.toList
       }
     }
+    
+    /*it("should register scopes and tests lazily after spec instance variables are created") {
+      val a = new Spec {
+        val name = "ScalaTest"
+        object `In Scope: ` {
+          info(name)
+        }
+      }
+      val rep = new EventRecordingReporter
+      a.run(None, Args(reporter = rep))
+      val infoEvents = rep.infoProvidedEventsReceived
+      assert(infoEvents.length === 1)
+      val info = infoEvents(0)
+      assert(info.message === "ScalaTest")
+    }*/
  
     class TestWasCalledSpec extends Spec {
       var theTestThisCalled = false
@@ -157,7 +180,7 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
     it("should execute one test when run is called with a defined testName") {
 
       val a = new TestWasCalledSpec
-      a.run(Some(encode("test: this")), Args(SilentReporter, new Stopper {}, Filter(), Map(), None, new Tracker, Set.empty))
+      a.run(Some("test: this"), Args(SilentReporter, new Stopper {}, Filter(), Map(), None, new Tracker, Set.empty))
       assert(a.theTestThisCalled)
       assert(!a.theTestThatCalled)
     }
@@ -189,7 +212,7 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
       b.run(None, Args(repB, new Stopper {}, Filter(), Map(), None, new Tracker, Set.empty))
       assert(repB.testIgnoredReceived)
       assert(repB.lastEvent.isDefined)
-      assert(repB.lastEvent.get.testName endsWith encode("test: this"))
+      assert(repB.lastEvent.get.testName endsWith "test: this")
       assert(!b.theTestThisCalled)
       assert(b.theTestThatCalled)
 
@@ -205,7 +228,7 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
       c.run(None, Args(repC, new Stopper {}, Filter(), Map(), None, new Tracker, Set.empty))
       assert(repC.testIgnoredReceived)
       assert(repC.lastEvent.isDefined)
-      assert(repC.lastEvent.get.testName endsWith encode("test: that"), repC.lastEvent.get.testName)
+      assert(repC.lastEvent.get.testName endsWith "test: that", repC.lastEvent.get.testName)
       assert(c.theTestThisCalled)
       assert(!c.theTestThatCalled)
 
@@ -222,7 +245,7 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
       d.run(None, Args(repD, new Stopper {}, Filter(), Map(), None, new Tracker, Set.empty))
       assert(repD.testIgnoredReceived)
       assert(repD.lastEvent.isDefined)
-      assert(repD.lastEvent.get.testName === encode("test: this")) // last because run alphabetically
+      assert(repD.lastEvent.get.testName === "test: this") // last because run alphabetically
       assert(!d.theTestThisCalled)
       assert(!d.theTestThatCalled)
     }
@@ -238,7 +261,7 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
       }
 
       val repE = new TestIgnoredTrackingReporter
-      e.run(Some(encode("test: this")), Args(repE, new Stopper {}, Filter(), Map(), None, new Tracker, Set.empty))
+      e.run(Some("test: this"), Args(repE, new Stopper {}, Filter(), Map(), None, new Tracker, Set.empty))
       assert(repE.testIgnoredReceived)
       assert(!e.theTestThisCalled)
       assert(!e.theTestThatCalled)
@@ -255,7 +278,7 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
       }
 
       val repE = new TestIgnoredTrackingReporter
-      e.run(Some(encode("test: this")), Args(repE, new Stopper {}, Filter(None, Set("org.scalatest.SlowAsMolasses")), Map(), None, new Tracker, Set.empty))
+      e.run(Some("test: this"), Args(repE, new Stopper {}, Filter(None, Set("org.scalatest.SlowAsMolasses")), Map(), None, new Tracker, Set.empty))
       assert(!repE.testIgnoredReceived)
       assert(!e.theTestThisCalled)
       assert(!e.theTestThatCalled)
@@ -638,7 +661,7 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
       val a = new Spec {
         var correctTestNameWasPassed = false
         override def withFixture(test: NoArgTest) {
-          correctTestNameWasPassed = test.name == encode("test: something")
+          correctTestNameWasPassed = test.name == "test: something"
           super.withFixture(test)
         }
         def `test: something` {}
@@ -947,9 +970,9 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
     override def withFixture(test: NoArgTest) {
       if (test.configMap.size > 0)
         test.name match {
-          case "test$u0020this" => theTestThisConfigMapWasEmpty = false
-          case "test$u0020that" => theTestThatConfigMapWasEmpty = false
-          case "test$u0020the$u0020other" => theTestTheOtherConfigMapWasEmpty = false
+          case "test this" => theTestThisConfigMapWasEmpty = false
+          case "test that" => theTestThatConfigMapWasEmpty = false
+          case "test the other" => theTestTheOtherConfigMapWasEmpty = false
           case _ => throw new Exception("Should never happen")
         }
       test()
@@ -1140,8 +1163,8 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
 
     val a = new ASpec
     val expectedTestNames = List("" +
-      "test$colon$u0020the$u0020$plus$u0020operator$u0020should$u0020add",
-      "test$colon$u0020the$u0020$minus$u0020operator$u0020should$u0020subtract"
+      "test: the + operator should add",
+      "test: the - operator should subtract"
     )
     assert(a.testNames.iterator.toList === expectedTestNames)
   }
@@ -1151,43 +1174,7 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
     expectResult(None) { (new NormalSpec).decodedSuiteName }
   }
 
-  it("should send defined decoded test names") {
- 
-/*
-    class NormalSpec extends Spec {
-      def testSucceed() = {}
-      def testFail() = { fail }
-      def testPending() = { pending }
-      @Ignore
-      def testIgnore() = {}
-    }
-
-    val normalSpec = new NormalSpec
-    val normalReporter = new EventRecordingReporter
-    normalSpec.run(None, Args(normalReporter, new Stopper {}, Filter(), Map(), None, new Tracker(new Ordinal(99)), Set.empty))
-    val normalEventList:List[Event] = normalReporter.eventsReceived
-    expectResult(7) { normalEventList.size }
-    normalEventList.foreach {event =>
-      event match {
-        case testStarting:TestStarting => 
-          expectResult(None) { testStarting.decodedTestName }
-          expectResult(None) { testStarting.decodedSuiteName }
-        case testSucceed:TestSucceeded => 
-          expectResult("testSucceed") { testSucceed.testName }
-          expectResult(None) { testSucceed.decodedTestName }
-        case testFail:TestFailed =>
-          expectResult("testFail") { testFail.testName }
-          expectResult(None) { testFail.decodedTestName }
-        case testPending:TestPending =>
-          expectResult("testPending") { testPending.testName }
-          expectResult(None) { testPending.decodedTestName }
-        case testIgnore:TestIgnored => 
-          expectResult("testIgnore") { testIgnore.testName }
-          expectResult(None) { testIgnore.decodedTestName }
-        case _ =>
-      }
-    }
-*/
+  it("should send None decoded test names") {
     
     class DecodedSpec extends Spec {
       def `test Succeed`() {}
@@ -1202,7 +1189,7 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
     decodedSpec.run(None, Args(decodedReporter, new Stopper {}, Filter(), Map(), None, new Tracker(new Ordinal(99)), Set.empty))
     val decodedEventList:List[Event] = decodedReporter.eventsReceived
     expectResult(7) { decodedEventList.size }
-    decodedEventList.foreach {event =>
+    /*decodedEventList.foreach {event =>
       event match {
         case testStarting:TestStarting => 
           testStarting.decodedTestName match {
@@ -1222,6 +1209,29 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
         case testIgnore:TestIgnored => 
           expectResult("test$u0020Ignore") { testIgnore.testName }
           expectResult(Some("test Ignore")) { testIgnore.decodedTestName }
+        case _ =>
+      }
+    }*/
+    decodedEventList.foreach {event =>
+      event match {
+        case testStarting:TestStarting => 
+          testStarting.decodedTestName match {
+            case Some(name) => fail("decodedTestName should be None.")
+            case None => 
+          }
+          expectResult(None) { testStarting.decodedSuiteName }
+        case testSucceed:TestSucceeded => 
+          expectResult("test Succeed") { testSucceed.testName }
+          expectResult(None) { testSucceed.decodedTestName }
+        case testFail:TestFailed =>
+          expectResult("test Fail") { testFail.testName }
+          expectResult(None) { testFail.decodedTestName }
+        case testPending:TestPending =>
+          expectResult("test Pending") { testPending.testName }
+          expectResult(None) { testPending.decodedTestName }
+        case testIgnore:TestIgnored => 
+          expectResult("test Ignore") { testIgnore.testName }
+          expectResult(None) { testIgnore.decodedTestName }
         case _ =>
       }
     }

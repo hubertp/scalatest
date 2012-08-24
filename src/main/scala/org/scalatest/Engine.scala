@@ -72,7 +72,7 @@ private[scalatest] sealed abstract class SuperEngine[T](concurrentBundleModResou
     parent: Branch,
     descriptionText: String,
     childPrefix: Option[String], // If defined, put it at the beginning of any child descriptionText or testText 
-    lineInFile: Option[LineInFile]
+    location: Option[Location]
   ) extends Branch(Some(parent))   
 
   // Access to the testNamesList, testsMap, and tagsMap must be synchronized, because the test methods are invoked by
@@ -450,7 +450,7 @@ private[scalatest] sealed abstract class SuperEngine[T](concurrentBundleModResou
     }
   } */
 
-  def registerNestedBranch(description: String, childPrefix: Option[String], fun: => Unit, registrationClosedResource: String, sourceFile: String, methodName: String, stackDepth: Int, adjustment: Int) {
+  def registerNestedBranch(description: String, childPrefix: Option[String], fun: => Unit, registrationClosedResource: String, sourceFile: String, methodName: String, stackDepth: Int, adjustment: Int, location: Option[Location]) {
 
     val oldBundle = atomic.get
     val (currentBranch, testNamesList, testsMap, tagsMap, registrationClosed) = oldBundle.unpack
@@ -458,9 +458,14 @@ private[scalatest] sealed abstract class SuperEngine[T](concurrentBundleModResou
     if (registrationClosed)
       throw new TestRegistrationClosedException(Resources(registrationClosedResource), getStackDepthFun(sourceFile, methodName, stackDepth + adjustment))
 
+    val branchLocation = 
+      location match {
+        case Some(loc) => Some(loc)
+        case None => getLineInFile(Thread.currentThread().getStackTrace, stackDepth)
+      }
+    
     val oldBranch = currentBranch
-    val loc = getLineInFile(Thread.currentThread().getStackTrace, stackDepth)
-    val newBranch = DescriptionBranch(currentBranch, description, childPrefix, getLineInFile(Thread.currentThread().getStackTrace, stackDepth))
+    val newBranch = DescriptionBranch(currentBranch, description, childPrefix, branchLocation)
     oldBranch.subNodes ::= newBranch
 
     // Update atomic, making the current branch to the new branch
@@ -749,7 +754,7 @@ private[scalatest] class PathEngine(concurrentBundleModResourceName: String, sim
     }
   }
 
-  def handleNestedBranch(description: String, childPrefix: Option[String], fun: => Unit, registrationClosedResource: String, sourceFile: String, methodName: String, stackDepth: Int, adjustment: Int) {
+  def handleNestedBranch(description: String, childPrefix: Option[String], fun: => Unit, registrationClosedResource: String, sourceFile: String, methodName: String, stackDepth: Int, adjustment: Int, location: Option[Location]) {
 
     if (insideAPathTest)
       throw new TestRegistrationClosedException(Resources("describeCannotAppearInsideAnIt"), getStackDepthFun(sourceFile, methodName, stackDepth + adjustment))
@@ -774,7 +779,7 @@ private[scalatest] class PathEngine(concurrentBundleModResourceName: String, sim
         // Set this to true before executing the describe. If it has a test, then handleTest will be invoked
         // and it will set previousDescribeWasEmpty back to false
         describeRegisteredNoTests = true
-        registerNestedBranch(description, None, fun, "describeCannotAppearInsideAnIt", "FunSpec.scala", "describe", stackDepth + 1, adjustment)
+        registerNestedBranch(description, None, fun, "describeCannotAppearInsideAnIt", "FunSpec.scala", "describe", stackDepth + 1, adjustment, location)
         registeredPathSet += nextPath
         if (describeRegisteredNoTests)
           targetLeafHasBeenReached = true

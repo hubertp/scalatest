@@ -1715,7 +1715,7 @@ trait FreeSpec extends Suite { thisSuite =>
      * text (passed to the contructor of <code>FreeSpecStringWrapper</code> and immediately invoke the passed function.
      */
     def - (fun: => Unit) {
-      registerNestedBranch(string, None, fun, "describeCannotAppearInsideAnIt", "FreeSpec.scala", "-", 3, -2)
+      registerNestedBranch(string, None, fun, "describeCannotAppearInsideAnIt", "FreeSpec.scala", "-", 3, -2, None)
     }
 
     /**
