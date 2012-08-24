@@ -15,7 +15,7 @@ trait ParallelTestExecutionSuiteTimeoutExamples extends Tables {
     Table(
       "pair", 
       new ExampleParallelTestExecutionSuiteTimeoutSuitePair, 
-      //new ExampleParallelTestExecutionSuiteTimeoutSpecPair, 
+      new ExampleParallelTestExecutionSuiteTimeoutSpecPair, 
       new ExampleParallelTestExecutionSuiteTimeoutFunSuitePair, 
       new ExampleParallelTestExecutionSuiteTimeoutFunSpecPair, 
       new ExampleParallelTestExecutionSuiteTimeoutFeatureSpecPair,
@@ -56,7 +56,7 @@ class ExampleParallelTestExecutionSuiteTimeoutSuitePair extends SuiteTimeoutSuit
 
 class ExampleParallelTestExecutionSuiteTimeoutSpecPair extends SuiteTimeoutSuites {
   def suite1 = new ExampleParallelTestExecutionSuiteTimeoutSpec
-  def suite2 = new ExampleParallelTestExecutionSuiteTimeoutSuite
+  def suite2 = new ExampleParallelTestExecutionSuiteTimeoutFixtureSuite
   
   def assertSuiteTimeoutTest(events: List[Event]) {
     assert(events.size === 16)
@@ -69,12 +69,12 @@ class ExampleParallelTestExecutionSuiteTimeoutSpecPair extends SuiteTimeoutSuite
     checkSuiteCompleted(events(5), suite1.suiteId)
     
     checkSuiteStarting(events(6), suite2.suiteId)
-    checkTestStarting(events(7), "testMethod1")
-    checkTestSucceeded(events(8), "testMethod1")
-    checkTestStarting(events(9), "testMethod2")
-    checkTestSucceeded(events(10), "testMethod2")
-    checkTestStarting(events(11), "testMethod3")
-    checkTestSucceeded(events(12), "testMethod3")
+    checkTestStarting(events(7), "testFixtureMethod1")
+    checkTestSucceeded(events(8), "testFixtureMethod1")
+    checkTestStarting(events(9), "testFixtureMethod2")
+    checkTestSucceeded(events(10), "testFixtureMethod2")
+    checkTestStarting(events(11), "testFixtureMethod3")
+    checkTestSucceeded(events(12), "testFixtureMethod3")
     checkSuiteCompleted(events(13), suite2.suiteId)
     
     checkTestStarting(events(14), "test$u00203")
