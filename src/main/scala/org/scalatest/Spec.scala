@@ -50,26 +50,32 @@ trait Spec extends Suite { thisSuite =>
     val testMethods = getClass.getMethods.filter(isTestMethod(_)).sorted(MethodNameEncodedOrdering)
 
     testMethods.foreach { m =>
-      val testName = m.getName
-      val methodTags = getTestTags(testName)
-      val testFun: () => Unit = () => { 
-        val argsArray: Array[Object] = Array.empty
-        try m.invoke(thisSuite, argsArray: _*)
-        catch {
-          case ite: InvocationTargetException => 
-            throw ite.getTargetException
+      val scope = (m.getDeclaringClass.getName + "$" + m.getName + "$") == m.getReturnType.getName
+      if (scope) {
+        println("Got a scope! " + scala.reflect.NameTransformer.decode(m.getName))
+      }
+      else {
+        val testName = m.getName
+        val methodTags = getTestTags(testName)
+        val testFun: () => Unit = () => { 
+          val argsArray: Array[Object] = Array.empty
+          try m.invoke(thisSuite, argsArray: _*)
+          catch {
+            case ite: InvocationTargetException => 
+              throw ite.getTargetException
+          }
         }
-      }
       
-      val location = TopOfMethod(getClass.getName, m.toGenericString)
-      val isIgnore = testTags.get(testName) match {
-        case Some(tagSet) => tagSet.contains(Suite.IgnoreAnnotation) || methodTags.contains(Suite.IgnoreAnnotation)
-        case None => methodTags.contains(Suite.IgnoreAnnotation)
+        val location = TopOfMethod(getClass.getName, m.toGenericString)
+        val isIgnore = testTags.get(testName) match {
+          case Some(tagSet) => tagSet.contains(Suite.IgnoreAnnotation) || methodTags.contains(Suite.IgnoreAnnotation)
+          case None => methodTags.contains(Suite.IgnoreAnnotation)
+        }
+        if (isIgnore)
+          registerIgnoredTest(testName, testFun, "registrationAlreadyClosed", sourceFileName, "discoveryAndRegisterTests", 3, 0, Some(location), methodTags.map(new Tag(_)): _*)
+        else
+          registerTest(testName, testFun, "registrationAlreadyClosed", sourceFileName, "discoveryAndRegisterTests", 2, 0, None, Some(location), None, methodTags.map(new Tag(_)): _*)
       }
-      if (isIgnore)
-        registerIgnoredTest(testName, testFun, "registrationAlreadyClosed", sourceFileName, "discoveryAndRegisterTests", 3, 0, Some(location), methodTags.map(new Tag(_)): _*)
-      else
-        registerTest(testName, testFun, "registrationAlreadyClosed", sourceFileName, "discoveryAndRegisterTests", 2, 0, None, Some(location), None, methodTags.map(new Tag(_)): _*)
     }
   }
 

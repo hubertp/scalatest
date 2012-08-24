@@ -115,6 +115,28 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
       expectResult(List(encode("test: that"), encode("test: this"))) {
         c.testNames.iterator.toList
       }
+
+      val d = new Spec {
+        object `A Tester` {
+          def `should test that` {}
+          def `should test this` {}
+        }
+      }
+
+      expectResult(List(encode("A Tester should test that"), encode("A Tester should test this"))) {
+        d.testNames.iterator.toList
+      }
+
+      val e = new Spec {
+        object `A Tester` {
+          def `should test this` {}
+          def `should test that` {}
+        }
+      }
+
+      expectResult(List(encode("A Tester should test this"), encode("A Tester should test that"))) {
+        e.testNames.iterator.toList
+      }
     }
  
     class TestWasCalledSpec extends Spec {
