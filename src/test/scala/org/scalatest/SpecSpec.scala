@@ -147,7 +147,45 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
       }
     }
     
-    /*it("should register scopes and tests lazily after spec instance variables are created") {
+    it("should register scopes and tests lazily after spec instance variables are created when testNames is invoked") {
+      val a = new Spec {
+        val name = "ScalaTest"
+        object `In Scope: ` {
+          assert(name === "ScalaTest")
+        }
+      }
+      a.testNames // Should execute assertion in the scope
+    }
+    it("should register scopes and tests lazily after spec instance variables are created when run is invoked") {
+      val a = new Spec {
+        val name = "ScalaTest"
+        object `In Scope: ` {
+          assert(name === "ScalaTest")
+        }
+      }
+      a.run(None, Args(SilentReporter)) // Should execute assertion in the scope
+    }
+    it("should register scopes and tests lazily after spec instance variables are created when expectedTestCount is invoked") {
+      val a = new Spec {
+        val name = "ScalaTest"
+        object `In Scope: ` {
+          assert(name === "ScalaTest")
+        }
+      }
+      a.expectedTestCount(Filter.default) // Should execute assertion in the scope
+    }
+    it("should register scopes and tests lazily after spec instance variables are created when tags is invoked") {
+      val a = new Spec {
+        val name = "ScalaTest"
+        object `In Scope: ` {
+          assert(name === "ScalaTest")
+        }
+      }
+      a.tags // Should execute assertion in the scope
+    }
+
+/*
+    it("should register scopes and tests lazily after spec instance variables are created") {
       val a = new Spec {
         val name = "ScalaTest"
         object `In Scope: ` {
@@ -160,7 +198,8 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
       assert(infoEvents.length === 1)
       val info = infoEvents(0)
       assert(info.message === "ScalaTest")
-    }*/
+    }
+*/
  
     class TestWasCalledSpec extends Spec {
       var theTestThisCalled = false

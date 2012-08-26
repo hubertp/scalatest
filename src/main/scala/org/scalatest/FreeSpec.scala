@@ -29,7 +29,6 @@ import Suite.autoTagClassAnnotations
 /**
  * Trait that facilitates a &#8220;behavior-driven&#8221; style of development (BDD), in which tests
  * are nested inside text clauses denoted with the dash operator (<code>-</code>).
- * </p>
  *
  * <p>
  * Trait <code>FreeSpec</code> is so named because unlike traits such as <code>WordSpec</code>, <code>FlatSpec</code>, and <code>FunSpec</code>,
