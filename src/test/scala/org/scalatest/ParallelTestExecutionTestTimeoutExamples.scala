@@ -102,13 +102,13 @@ class ExampleParallelTestExecutionTestTimeoutSpec extends Spec with TestTimeoutE
   
   def assertTestTimeoutTest(events: List[Event]) {
     assert(events.size === 6)
-    checkTestStarting(events(0), "test$u00201")
-    checkTestSucceeded(events(1), "test$u00201")
-    checkTestStarting(events(2), "test$u00202")
-    checkTestStarting(events(3), "test$u00203")
-    checkTestSucceeded(events(4), "test$u00203")
+    checkTestStarting(events(0), "test 1")
+    checkTestSucceeded(events(1), "test 1")
+    checkTestStarting(events(2), "test 2")
+    checkTestStarting(events(3), "test 3")
+    checkTestSucceeded(events(4), "test 3")
     // The missing one
-    checkTestSucceeded(events(5), "test$u00202")
+    checkTestSucceeded(events(5), "test 2")
   }
 }
 

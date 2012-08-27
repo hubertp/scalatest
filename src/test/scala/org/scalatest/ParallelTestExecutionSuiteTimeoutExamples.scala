@@ -62,10 +62,10 @@ class ExampleParallelTestExecutionSuiteTimeoutSpecPair extends SuiteTimeoutSuite
     assert(events.size === 16)
     
     checkSuiteStarting(events(0), suite1.suiteId)
-    checkTestStarting(events(1), "test$u00201")
-    checkTestSucceeded(events(2), "test$u00201")
-    checkTestStarting(events(3), "test$u00202")
-    checkTestSucceeded(events(4), "test$u00202")
+    checkTestStarting(events(1), "test 1")
+    checkTestSucceeded(events(2), "test 1")
+    checkTestStarting(events(3), "test 2")
+    checkTestSucceeded(events(4), "test 2")
     checkSuiteCompleted(events(5), suite1.suiteId)
     
     checkSuiteStarting(events(6), suite2.suiteId)
@@ -77,8 +77,8 @@ class ExampleParallelTestExecutionSuiteTimeoutSpecPair extends SuiteTimeoutSuite
     checkTestSucceeded(events(12), "testFixtureMethod3")
     checkSuiteCompleted(events(13), suite2.suiteId)
     
-    checkTestStarting(events(14), "test$u00203")
-    checkTestSucceeded(events(15), "test$u00203")
+    checkTestStarting(events(14), "test 3")
+    checkTestSucceeded(events(15), "test 3")
   }
 }
 

@@ -61,12 +61,12 @@ class ExampleParallelTestExecutionParallelSpecPair extends ParallelSuites {
     assert(events.size === 16)
     
     checkSuiteStarting(events(0), suite1.suiteId)
-    checkTestStarting(events(1), "test$u00201")
-    checkTestSucceeded(events(2), "test$u00201")
-    checkTestStarting(events(3), "test$u00202")
-    checkTestSucceeded(events(4), "test$u00202")
-    checkTestStarting(events(5), "test$u00203")
-    checkTestSucceeded(events(6), "test$u00203")
+    checkTestStarting(events(1), "test 1")
+    checkTestSucceeded(events(2), "test 1")
+    checkTestStarting(events(3), "test 2")
+    checkTestSucceeded(events(4), "test 2")
+    checkTestStarting(events(5), "test 3")
+    checkTestSucceeded(events(6), "test 3")
     checkSuiteCompleted(events(7), suite1.suiteId)
     
     checkSuiteStarting(events(8), suite2.suiteId)
