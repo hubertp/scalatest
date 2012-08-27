@@ -147,6 +147,38 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
       }
     }
     
+    it("test names should properly nest scopes in test names") {
+      class MySpec extends Spec with ShouldMatchers {
+        object `A Stack` {
+          object `(when not empty)` {
+            def `must allow me to pop` {}
+          }
+          object `(when not full)` {
+            def `must allow me to push` {}
+          }
+        }
+      }
+      val a = new MySpec
+      assert(a.testNames.size === 2)
+      assert(a.testNames.iterator.toList(0) === "A Stack (when not empty) must allow me to pop")
+      assert(a.testNames.iterator.toList(1) === "A Stack (when not full) must allow me to push")
+    }
+    
+    it("should be able to mix in BeforeAndAfterEach with BeforeAndAfterAll without any problems") {
+      class MySpec extends Spec with ShouldMatchers with BeforeAndAfterEach with BeforeAndAfterAll {
+        object `A Stack` {
+          object `(when not empty)` {
+            def `should allow me to pop` {}
+          }
+          object `(when not full)` {
+            def `should allow me to push` {}
+          }
+        }
+      }
+      val a = new MySpec
+      a.execute()
+    }
+    
     it("should register scopes and tests lazily after spec instance variables are created when testNames is invoked") {
       val a = new Spec {
         val name = "ScalaTest"
@@ -323,20 +355,6 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
       assert(!e.theTestThatCalled)
     }
     
-    it("should throw IllegalArgumentException if run is passed a testName that does not exist") {
-      val spec = new Spec {
-        var theTestThisCalled = false
-        var theTestThatCalled = false
-        def `test: this`() { theTestThisCalled = true }
-        def `test: that` { theTestThatCalled = true }
-      }
-
-      intercept[IllegalArgumentException] {
-        // Here, they forgot that the name is actually `test: this`(Fixture)
-        spec.run(Some(encode("test: misspelled")), Args(SilentReporter, new Stopper {}, Filter(), Map(), None, new Tracker, Set.empty))
-      }
-    }
-    
     it("should run only those tests selected by the tags to include and exclude sets") {
 
       // Nothing is excluded
@@ -344,8 +362,8 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
         var theTestThisCalled = false
         var theTestThatCalled = false
         @SlowAsMolasses
-        def `test: this`() { theTestThisCalled = true }
-        def `test: that` { theTestThatCalled = true }
+        def `test this` { theTestThisCalled = true }
+        def `test that` { theTestThatCalled = true }
       }
       val repA = new TestIgnoredTrackingReporter
       a.run(None, Args(repA, new Stopper {}, Filter(), Map(), None, new Tracker, Set.empty))
@@ -358,8 +376,8 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
         var theTestThisCalled = false
         var theTestThatCalled = false
         @SlowAsMolasses
-        def `test: this`() { theTestThisCalled = true }
-        def `test: that` { theTestThatCalled = true }
+        def `test this` { theTestThisCalled = true }
+        def `test that` { theTestThatCalled = true }
       }
       val repB = new TestIgnoredTrackingReporter
       b.run(None, Args(repB, new Stopper {}, Filter(Some(Set("org.scalatest.SlowAsMolasses")), Set()), Map(), None, new Tracker, Set.empty))
@@ -372,9 +390,9 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
         var theTestThisCalled = false
         var theTestThatCalled = false
         @SlowAsMolasses
-        def `test: this`() { theTestThisCalled = true }
+        def `test this` { theTestThisCalled = true }
         @SlowAsMolasses
-        def `test: that` { theTestThatCalled = true }
+        def `test that` { theTestThatCalled = true }
       }
       val repC = new TestIgnoredTrackingReporter
       c.run(None, Args(repB, new Stopper {}, Filter(Some(Set("org.scalatest.SlowAsMolasses")), Set()), Map(), None, new Tracker, Set.empty))
@@ -388,9 +406,9 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
         var theTestThatCalled = false
         @Ignore
         @SlowAsMolasses
-        def `test: this`() { theTestThisCalled = true }
+        def `test this` { theTestThisCalled = true }
         @SlowAsMolasses
-        def `test: that` { theTestThatCalled = true }
+        def `test that` { theTestThatCalled = true }
       }
       val repD = new TestIgnoredTrackingReporter
       d.run(None, Args(repD, new Stopper {}, Filter(Some(Set("org.scalatest.SlowAsMolasses")), Set("org.scalatest.Ignore")), Map(), None, new Tracker, Set.empty))
@@ -403,12 +421,12 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
         var theTestThisCalled = false
         var theTestThatCalled = false
         var theTestTheOtherCalled = false
+        @SlowAsMolasses
         @FastAsLight
+        def `test this` { theTestThisCalled = true }
         @SlowAsMolasses
-        def `test: this`() { theTestThisCalled = true }
-        @SlowAsMolasses
-        def `test: that` { theTestThatCalled = true }
-        def `test: the other` { theTestTheOtherCalled = true }
+        def `test that` { theTestThatCalled = true }
+        def `test the other` { theTestTheOtherCalled = true }
       }
       val repE = new TestIgnoredTrackingReporter
       e.run(None, Args(repE, new Stopper {}, Filter(Some(Set("org.scalatest.SlowAsMolasses")), Set("org.scalatest.FastAsLight")),
@@ -424,12 +442,12 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
         var theTestThatCalled = false
         var theTestTheOtherCalled = false
         @Ignore
+        @SlowAsMolasses
         @FastAsLight
+        def `test this` { theTestThisCalled = true }
         @SlowAsMolasses
-        def `test: this`() { theTestThisCalled = true }
-        @SlowAsMolasses
-        def `test: that` { theTestThatCalled = true }
-        def `test: the other` { theTestTheOtherCalled = true }
+        def `test that` { theTestThatCalled = true }
+        def `test the other` { theTestTheOtherCalled = true }
       }
       val repF = new TestIgnoredTrackingReporter
       f.run(None, Args(repF, new Stopper {}, Filter(Some(Set("org.scalatest.SlowAsMolasses")), Set("org.scalatest.FastAsLight")),
@@ -444,13 +462,13 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
         var theTestThisCalled = false
         var theTestThatCalled = false
         var theTestTheOtherCalled = false
+        @SlowAsMolasses
         @FastAsLight
+        def `test this` { theTestThisCalled = true }
         @SlowAsMolasses
-        def `test: this`() { theTestThisCalled = true }
-        @SlowAsMolasses
-        def `test: that` { theTestThatCalled = true }
+        def `test that` { theTestThatCalled = true }
         @Ignore
-        def `test: the other` { theTestTheOtherCalled = true }
+        def `test the other` { theTestTheOtherCalled = true }
       }
       val repG = new TestIgnoredTrackingReporter
       g.run(None, Args(repG, new Stopper {}, Filter(Some(Set("org.scalatest.SlowAsMolasses")), Set("org.scalatest.FastAsLight")),
@@ -465,12 +483,12 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
         var theTestThisCalled = false
         var theTestThatCalled = false
         var theTestTheOtherCalled = false
+        @SlowAsMolasses
         @FastAsLight
+        def `test this` { theTestThisCalled = true }
         @SlowAsMolasses
-        def `test: this`() { theTestThisCalled = true }
-        @SlowAsMolasses
-        def `test: that` { theTestThatCalled = true }
-        def `test: the other` { theTestTheOtherCalled = true }
+        def `test that` { theTestThatCalled = true }
+        def `test the other` { theTestTheOtherCalled = true }
       }
       val repH = new TestIgnoredTrackingReporter
       h.run(None, Args(repH, new Stopper {}, Filter(None, Set("org.scalatest.FastAsLight")), Map(), None, new Tracker, Set.empty))
@@ -484,12 +502,12 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
         var theTestThisCalled = false
         var theTestThatCalled = false
         var theTestTheOtherCalled = false
+        @SlowAsMolasses
         @FastAsLight
+        def `test this` { theTestThisCalled = true }
         @SlowAsMolasses
-        def `test: this`() { theTestThisCalled = true }
-        @SlowAsMolasses
-        def `test: that` { theTestThatCalled = true }
-        def `test: the other` { theTestTheOtherCalled = true }
+        def `test that` { theTestThatCalled = true }
+        def `test the other` { theTestTheOtherCalled = true }
       }
       val repI = new TestIgnoredTrackingReporter
       i.run(None, Args(repI, new Stopper {}, Filter(None, Set("org.scalatest.SlowAsMolasses")), Map(), None, new Tracker, Set.empty))
@@ -504,13 +522,13 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
         var theTestThatCalled = false
         var theTestTheOtherCalled = false
         @Ignore
-        @FastAsLight
         @SlowAsMolasses
-        def `test: this`() { theTestThisCalled = true }
+        @FastAsLight
+        def `test this` { theTestThisCalled = true }
         @Ignore
         @SlowAsMolasses
-        def `test: that` { theTestThatCalled = true }
-        def `test: the other` { theTestTheOtherCalled = true }
+        def `test that` { theTestThatCalled = true }
+        def `test the other` { theTestTheOtherCalled = true }
       }
       val repJ = new TestIgnoredTrackingReporter
       j.run(None, Args(repJ, new Stopper {}, Filter(None, Set("org.scalatest.SlowAsMolasses")), Map(), None, new Tracker, Set.empty))
@@ -525,14 +543,14 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
         var theTestThatCalled = false
         var theTestTheOtherCalled = false
         @Ignore
+        @SlowAsMolasses
         @FastAsLight
-        @SlowAsMolasses
-        def `test: this`() { theTestThisCalled = true }
+        def `test this` { theTestThisCalled = true }
         @Ignore
         @SlowAsMolasses
-        def `test: that` { theTestThatCalled = true }
+        def `test that` { theTestThatCalled = true }
         @Ignore
-        def `test: the other` { theTestTheOtherCalled = true }
+        def `test the other` { theTestTheOtherCalled = true }
       }
       val repK = new TestIgnoredTrackingReporter
       k.run(None, Args(repK, new Stopper {}, Filter(None, Set("org.scalatest.SlowAsMolasses", "org.scalatest.Ignore")), Map(), None, new Tracker, Set.empty))
@@ -540,6 +558,106 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
       assert(!k.theTestThisCalled)
       assert(!k.theTestThatCalled)
       assert(!k.theTestTheOtherCalled)
+    }
+    
+    it("should return a correct tags map from the tags method") {
+
+      val a = new Spec {
+        object `This Spec should` {
+          @Ignore
+          def `test this` {}
+          def `test that` { pending }
+        }
+      }
+      expectResult(Map("This Spec should test this" -> Set("org.scalatest.Ignore"))) {
+        a.tags
+      }
+
+      val b = new Spec {
+        object `This Spec should` {
+          def `test this` { pending }
+          @Ignore
+          def `test that` {}
+        }
+      }
+      expectResult(Map("This Spec should test that" -> Set("org.scalatest.Ignore"))) {
+        b.tags
+      }
+
+      val c = new Spec {
+        object `This Spec should` {
+          @Ignore
+          def `test this` {}
+          @Ignore
+          def `test that` {}
+        }
+      }
+      expectResult(Map("This Spec should test this" -> Set("org.scalatest.Ignore"), "This Spec should test that" -> Set("org.scalatest.Ignore"))) {
+        c.tags
+      }
+
+      val d = new Spec {
+        object `This Spec should` {
+          @SlowAsMolasses
+          def `test this` { pending }
+          @SlowAsMolasses
+          @Ignore
+          def `test that` {}
+        }
+      }
+      expectResult(Map("This Spec should test this" -> Set("org.scalatest.SlowAsMolasses"), "This Spec should test that" -> Set("org.scalatest.Ignore", "org.scalatest.SlowAsMolasses"))) {
+        d.tags
+      }
+
+      val e = new Spec {
+        object `This Spec should` {
+          def `test this` { pending }
+          def `test that` { pending }
+        }
+      }
+      expectResult(Map()) {
+        e.tags
+      }
+
+      val f = new Spec {
+        object `This Spec should` {
+          @SlowAsMolasses
+          @WeakAsAKitten
+          def `test this` { pending }
+          @SlowAsMolasses
+          def `test that` {}
+        }
+      }
+      expectResult(Map("This Spec should test this" -> Set("org.scalatest.SlowAsMolasses", "org.scalatest.WeakAsAKitten"), "This Spec should test that" -> Set("org.scalatest.SlowAsMolasses"))) {
+        f.tags
+      }
+
+      val g = new Spec {
+        object `This Spec should` {
+          @SlowAsMolasses
+          @WeakAsAKitten
+          def `test this` { pending }
+          @SlowAsMolasses
+          def `test that` {}
+        }
+      }
+      expectResult(Map("This Spec should test this" -> Set("org.scalatest.SlowAsMolasses", "org.scalatest.WeakAsAKitten"), "This Spec should test that" -> Set("org.scalatest.SlowAsMolasses"))) {
+        g.tags
+      }
+    }
+    
+    it("should throw IllegalArgumentException if run is passed a testName that does not exist") {
+      val spec = new Spec {
+        var theTestThisCalled = false
+        var theTestThatCalled = false
+        def `test: this`() { theTestThisCalled = true }
+        def `test: that` { theTestThatCalled = true }
+      }
+
+      intercept[IllegalArgumentException] {
+        // Here, they forgot that the name is actually `test: this`(Fixture)
+        spec.run(Some(encode("test: misspelled")), Args(SilentReporter, new Stopper {}, Filter(), Map(), None, new Tracker, Set.empty))
+      }
     }
     
     it("should return the correct test count from its expectedTestCount method") {
@@ -594,6 +712,22 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
 
       val f = new Specs(a, b, c, d, e)
       assert(f.expectedTestCount(Filter()) === 10)
+    }
+    
+    it("should send an InfoProvided event for an info") {
+      class MySuite extends Spec  {
+        info(
+          "hi there"
+        )
+      }
+      val suite = new MySuite
+      val reporter = new EventRecordingReporter
+      suite.run(None, Args(reporter, new Stopper {}, Filter(), Map(), None, new Tracker, Set.empty))
+
+      val infoList = reporter.infoProvidedEventsReceived
+
+      assert(infoList.size === 1)
+      assert(infoList(0).message === "hi there")
     }
     
     it("should generate a TestPending message when the test body is (pending)") {
@@ -740,6 +874,768 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
       assert(msg === ip.message)
     }
     
+    it("Top-level plain-old specifiers should yield good strings in a TestSucceeded report") {
+      var reportHadCorrectTestName = false
+      var reportHadCorrectSpecText = false
+      var reportHadCorrectFormattedSpecText = false
+      class MyReporter extends Reporter {
+        def apply(event: Event) {
+          event match {
+            case TestSucceeded(ordinal, suiteName, suiteID, suiteClassName, decodedSuiteName, testName, testText, decodedTestName, testEvents, duration, formatter, location, rerunnable, payload, threadName, timeStamp) =>
+              if (testName.indexOf("must start with proper words") != -1)
+                reportHadCorrectTestName = true
+              formatter match {
+                case Some(IndentedText(formattedText, rawText, indentationLevel)) =>
+                  if (rawText == "must start with proper words")
+                    reportHadCorrectSpecText = true
+                  if (formattedText == "- must start with proper words")
+                    reportHadCorrectFormattedSpecText = true
+                case _ =>
+              }
+            case _ =>
+          }
+        }
+      }
+      class MySpec extends Spec with ShouldMatchers {
+        def `must start with proper words` {}
+      }
+      val a = new MySpec
+      a.run(None, Args(new MyReporter, new Stopper {}, Filter(), Map(), None, new Tracker, Set.empty))
+      assert(reportHadCorrectTestName)
+      assert(reportHadCorrectSpecText)
+      assert(reportHadCorrectFormattedSpecText)
+    }
+    
+    it("Top-level plain-old specifiers should yield good strings in a testSucceeded report") {
+      var reportHadCorrectTestName = false
+      var reportHadCorrectSpecText = false
+      var reportHadCorrectFormattedSpecText = false
+      class MyReporter extends Reporter {
+        def apply(event: Event) {
+          event match {
+            case TestSucceeded(ordinal, suiteName, suiteID, suiteClassName, decodedSuiteName, testName, testText, decodedTestName, testEvents, duration, formatter, location, rerunnable, payload, threadName, timeStamp) =>
+              if (testName.indexOf("must start with proper words") != -1)
+                reportHadCorrectTestName = true
+              formatter match {
+                case Some(IndentedText(formattedText, rawText, indentationLevel)) =>
+                  if (rawText == "must start with proper words")
+                    reportHadCorrectSpecText = true
+                  if (formattedText == "- must start with proper words")
+                    reportHadCorrectFormattedSpecText = true
+                case _ =>
+              }
+            case _ =>
+          }
+        }
+      }
+      class MySpec extends Spec with ShouldMatchers {
+        def `must start with proper words` {}
+      }
+      val a = new MySpec
+      a.run(None, Args(new MyReporter, new Stopper {}, Filter(), Map(), None, new Tracker, Set.empty))
+      assert(reportHadCorrectTestName)
+      assert(reportHadCorrectSpecText)
+      assert(reportHadCorrectFormattedSpecText)
+    }
+    
+    it("Top-level plain-old specifiers should yield good strings in a testFailed report") {
+      var reportHadCorrectTestName = false
+      var reportHadCorrectSpecText = false
+      var reportHadCorrectFormattedSpecText = false
+      class MyReporter extends Reporter {
+        def apply(event: Event) {
+          event match {
+            case event: TestFailed =>
+              if (event.testName.indexOf("must start with proper words") != -1)
+                reportHadCorrectTestName = true
+              event.formatter match {
+                case Some(IndentedText(formattedText, rawText, indentationLevel)) =>
+                  if (rawText == "must start with proper words")
+                    reportHadCorrectSpecText = true
+                  if (formattedText == "- must start with proper words")
+                    reportHadCorrectFormattedSpecText = true
+                case _ =>
+              }
+            case _ =>
+          }
+        }
+      }
+      class MySpec extends Spec with ShouldMatchers {
+        def `must start with proper words` { fail() }
+      }
+      val a = new MySpec
+      a.run(None, Args(new MyReporter, new Stopper {}, Filter(), Map(), None, new Tracker, Set.empty))
+      assert(reportHadCorrectTestName)
+      assert(reportHadCorrectSpecText)
+      assert(reportHadCorrectFormattedSpecText)
+    }
+    
+    // Tests for good strings in report for nested-one-level examples
+    it("Nested-one-level plain-old specifiers should yield good strings in a TestSucceeded report") {
+      var infoReportHadCorrectTestName = false
+      var infoReportHadCorrectSpecText = false
+      var infoReportHadCorrectFormattedSpecText = false
+      var reportHadCorrectTestName = false
+      var reportHadCorrectSpecText = false
+      var reportHadCorrectFormattedSpecText = false
+      var scopeOpenedHasBeenInvoked = false
+      var theOtherMethodHasBeenInvoked = false
+      class MyReporter extends Reporter {
+        def apply(event: Event) {
+          event match {
+            case ScopeOpened(ordinal, message, nameInfo, formatter, location, payload, threadName, timeStamp) =>
+              // scopeOpened should be invoked before the other method
+              assert(!theOtherMethodHasBeenInvoked)
+              scopeOpenedHasBeenInvoked = true
+              if (message.indexOf("My Spec") != -1)
+                infoReportHadCorrectTestName = true
+              formatter match {
+                case Some(IndentedText(formattedText, rawText, indentationLevel)) =>
+                  if (rawText == "My Spec")
+                    infoReportHadCorrectSpecText = true
+                  if (formattedText == "My Spec")
+                    infoReportHadCorrectFormattedSpecText = true
+                case _ =>
+              }
+            case TestSucceeded(ordinal, suiteName, suiteID, suiteClassName, decodedSuiteName, testName, testText, decodedTestName, testEvents, duration, formatter, location, rerunnable, payload, threadName, timeStamp) =>
+              // scopeOpened should be invoked before the this method
+              assert(scopeOpenedHasBeenInvoked)
+              theOtherMethodHasBeenInvoked = true
+              if (testName.indexOf("My Spec must start with proper words") != -1)
+                reportHadCorrectTestName = true
+              formatter match {
+                case Some(IndentedText(formattedText, rawText, indentationLevel)) =>
+                  if (rawText == "must start with proper words")
+                    reportHadCorrectSpecText = true
+                  if (formattedText == "- must start with proper words")
+                    reportHadCorrectFormattedSpecText = true
+                case _ =>
+              }
+            case _ =>
+          }
+        }
+      }
+      class MySpec extends Spec with ShouldMatchers {
+        object `My Spec` {
+          def `must start with proper words` {}
+        }
+      }
+      val a = new MySpec
+      a.run(None, Args(new MyReporter, new Stopper {}, Filter(), Map(), None, new Tracker, Set.empty))
+      assert(reportHadCorrectTestName)
+      assert(reportHadCorrectSpecText)
+      assert(reportHadCorrectFormattedSpecText)
+      assert(infoReportHadCorrectTestName)
+      assert(infoReportHadCorrectSpecText)
+      assert(infoReportHadCorrectFormattedSpecText)
+    }
+    
+    it("Nested-one-level plain-old specifiers should yield good strings in a testSucceeded report") {
+      var infoReportHadCorrectTestName = false
+      var infoReportHadCorrectSpecText = false
+      var infoReportHadCorrectFormattedSpecText = false
+      var reportHadCorrectTestName = false
+      var reportHadCorrectSpecText = false
+      var reportHadCorrectFormattedSpecText = false
+      var scopeOpenedHasBeenInvoked = false
+      var theOtherMethodHasBeenInvoked = false
+      class MyReporter extends Reporter {
+        def apply(event: Event) {
+          event match {
+            case ScopeOpened(ordinal, message, nameInfo, formatter, location, payload, threadName, timeStamp) =>
+              // scopeOpened should be invoked before the other method
+              assert(!theOtherMethodHasBeenInvoked)
+              scopeOpenedHasBeenInvoked = true
+              if (message.indexOf("My Spec") != -1)
+                infoReportHadCorrectTestName = true
+              formatter match {
+                case Some(IndentedText(formattedText, rawText, indentationLevel)) =>
+                  if (rawText == "My Spec")
+                    infoReportHadCorrectSpecText = true
+                  if (formattedText == "My Spec")
+                    infoReportHadCorrectFormattedSpecText = true
+                case _ =>
+              }
+            case TestSucceeded(ordinal, suiteName, suiteID, suiteClassName, decodedSuiteName, testName, testText, decodedTestName, testEvents, duration, formatter, location, rerunnable, payload, threadName, timeStamp) =>
+              // scopeOpened should be invoked before the this method
+              assert(scopeOpenedHasBeenInvoked)
+              theOtherMethodHasBeenInvoked = true
+              if (testName.indexOf("My Spec must start with proper words") != -1)
+                reportHadCorrectTestName = true
+              formatter match {
+                case Some(IndentedText(formattedText, rawText, indentationLevel)) =>
+                  if (rawText == "must start with proper words")
+                    reportHadCorrectSpecText = true
+                  if (formattedText == "- must start with proper words")
+                    reportHadCorrectFormattedSpecText = true
+                case _ =>
+              }
+            case _ =>
+          }
+        }
+      }
+      class MySpec extends Spec with ShouldMatchers {
+        object `My Spec` {
+          def `must start with proper words` {}
+        }
+      }
+      val a = new MySpec
+      a.run(None, Args(new MyReporter, new Stopper {}, Filter(), Map(), None, new Tracker, Set.empty))
+      assert(reportHadCorrectTestName)
+      assert(reportHadCorrectSpecText)
+      assert(reportHadCorrectFormattedSpecText)
+      assert(infoReportHadCorrectTestName)
+      assert(infoReportHadCorrectSpecText)
+      assert(infoReportHadCorrectFormattedSpecText)
+    }
+    
+    it("Nested-one-level plain-old specifiers should yield good strings in a TestFailed report") {
+      var infoReportHadCorrectTestName = false
+      var infoReportHadCorrectSpecText = false
+      var infoReportHadCorrectFormattedSpecText = false
+      var reportHadCorrectTestName = false
+      var reportHadCorrectSpecText = false
+      var reportHadCorrectFormattedSpecText = false
+      var scopeOpenedHasBeenInvoked = false
+      var theOtherMethodHasBeenInvoked = false
+      class MyReporter extends Reporter {
+        def apply(event: Event) {
+          event match {
+            case ScopeOpened(ordinal, message, nameInfo, formatter, location, payload, threadName, timeStamp) =>
+              // scopeOpened should be invoked before the other method
+              assert(!theOtherMethodHasBeenInvoked)
+              scopeOpenedHasBeenInvoked = true
+              if (message.indexOf("My Spec") != -1)
+                infoReportHadCorrectTestName = true
+              formatter match {
+                case Some(IndentedText(formattedText, rawText, indentationLevel)) =>
+                  if (rawText == "My Spec")
+                    infoReportHadCorrectSpecText = true
+                  if (formattedText == "My Spec")
+                    infoReportHadCorrectFormattedSpecText = true
+                case _ =>
+              }
+            case event: TestFailed =>
+              // scopeOpened should be invoked before the this method
+              assert(scopeOpenedHasBeenInvoked)
+              theOtherMethodHasBeenInvoked = true
+              if (event.testName.indexOf("My Spec must start with proper words") != -1)
+                reportHadCorrectTestName = true
+              event.formatter match {
+                case Some(IndentedText(formattedText, rawText, indentationLevel)) =>
+                  if (rawText == "must start with proper words")
+                    reportHadCorrectSpecText = true
+                  if (formattedText == "- must start with proper words")
+                    reportHadCorrectFormattedSpecText = true
+                case _ =>
+              }
+            case _ =>
+          }
+        }
+      }
+      class MySpec extends Spec with ShouldMatchers {
+        object`My Spec` {
+          def `must start with proper words` { fail() }
+        }
+      }
+      val a = new MySpec
+      a.run(None, Args(new MyReporter, new Stopper {}, Filter(), Map(), None, new Tracker, Set.empty))
+      assert(reportHadCorrectTestName)
+      assert(reportHadCorrectSpecText)
+      assert(reportHadCorrectFormattedSpecText)
+      assert(infoReportHadCorrectTestName)
+      assert(infoReportHadCorrectSpecText)
+      assert(infoReportHadCorrectFormattedSpecText)
+    }
+    
+    // Tests for good strings in report for nested-two-levels examples
+    it("Nested-two-levels plain-old specifiers should yield good strings in a TestSucceeded report") { //ZZZ
+      var infoReportHadCorrectTestName = false
+      var infoReportHadCorrectSpecText = false
+      var infoReportHadCorrectFormattedSpecText = false
+      var reportHadCorrectTestName = false
+      var reportHadCorrectSpecText = false
+      var reportHadCorrectFormattedSpecText = false
+      var scopeOpenedHasBeenInvokedOnce = false
+      var scopeOpenedHasBeenInvokedTwice = false
+      var theOtherMethodHasBeenInvoked = false
+      class MyReporter extends Reporter {
+        def apply(event: Event) {
+          event match {
+            case ScopeOpened(ordinal, message, nameInfo, formatter, location, payload, threadName, timeStamp) =>
+              // scopeOpened should be invoked before the other method
+              assert(!theOtherMethodHasBeenInvoked)
+              if (!scopeOpenedHasBeenInvokedOnce) { 
+                scopeOpenedHasBeenInvokedOnce = true
+                if (message.indexOf("My Spec") >= 0)
+                  infoReportHadCorrectTestName = true
+                formatter match {
+                  case Some(IndentedText(formattedText, rawText, indentationLevel)) =>
+                    if (rawText == "My Spec")
+                      infoReportHadCorrectSpecText = true
+                    if (formattedText == "My Spec")
+                      infoReportHadCorrectFormattedSpecText = true
+                  case _ =>
+                }
+              }
+              else {
+                scopeOpenedHasBeenInvokedTwice = true
+                if (message.indexOf("must start") < 0)
+                  infoReportHadCorrectTestName = false
+                formatter match {
+                  case Some(IndentedText(formattedText, rawText, indentationLevel)) =>
+                    if (rawText != "must start")
+                      infoReportHadCorrectSpecText = false
+                    if (formattedText != "  must start")
+                      infoReportHadCorrectFormattedSpecText = false
+                  case _ =>
+                }
+              }
+            case TestSucceeded(ordinal, suiteName, suiteID, suiteClassName, decodedSuiteName, testName, testText, decodedTestName, testEvents, duration, formatter, location, rerunnable, payload, threadName, timeStamp) =>
+              // scopeOpened should be invoked before the this method
+              assert(scopeOpenedHasBeenInvokedTwice)
+              theOtherMethodHasBeenInvoked = true
+              if (testName.indexOf("My Spec must start with proper words") != -1)
+                reportHadCorrectTestName = true
+              formatter match {
+                case Some(IndentedText(formattedText, rawText, indentationLevel)) =>
+                  if (rawText == "with proper words")
+                    reportHadCorrectSpecText = true
+                  if (formattedText == "  - with proper words")
+                    reportHadCorrectFormattedSpecText = true
+                case _ =>
+              }
+            case _ =>
+          }
+        }
+      }
+      class MySpec extends Spec with ShouldMatchers {
+        object `My Spec` {
+          object `must start` {
+            def `with proper words` {}
+          }
+        }
+      }
+      val a = new MySpec
+      a.run(None, Args(new MyReporter, new Stopper {}, Filter(), Map(), None, new Tracker, Set.empty))
+      assert(reportHadCorrectTestName)
+      assert(reportHadCorrectSpecText)
+      assert(reportHadCorrectFormattedSpecText)
+      assert(infoReportHadCorrectTestName)
+      assert(infoReportHadCorrectSpecText)
+      assert(infoReportHadCorrectFormattedSpecText)
+    }
+    
+    it("Nested-two-levels plain-old specifiers should yield good strings in a TestFailed report") { //YYY
+      var infoReportHadCorrectTestName = false
+      var infoReportHadCorrectSpecText = false
+      var infoReportHadCorrectFormattedSpecText = false
+      var reportHadCorrectTestName = false
+      var reportHadCorrectSpecText = false
+      var reportHadCorrectFormattedSpecText = false
+      var scopeOpenedHasBeenInvokedOnce = false
+      var scopeOpenedHasBeenInvokedTwice = false
+      var theOtherMethodHasBeenInvoked = false
+      class MyReporter extends Reporter {
+        def apply(event: Event) {
+          event match {
+            case ScopeOpened(ordinal, message, nameInfo, formatter, location, payload, threadName, timeStamp) =>
+              // scopeOpened should be invoked before the other method
+              assert(!theOtherMethodHasBeenInvoked)
+              if (!scopeOpenedHasBeenInvokedOnce) { 
+                scopeOpenedHasBeenInvokedOnce = true
+                if (message.indexOf("My Spec") >= 0)
+                  infoReportHadCorrectTestName = true
+                formatter match {
+                  case Some(IndentedText(formattedText, rawText, indentationLevel)) =>
+                    if (rawText == "My Spec")
+                      infoReportHadCorrectSpecText = true
+                    if (formattedText == "My Spec")
+                      infoReportHadCorrectFormattedSpecText = true
+                  case _ =>
+                }
+              }
+              else {
+                scopeOpenedHasBeenInvokedTwice = true
+                if (message.indexOf("must start") < 0)
+                  infoReportHadCorrectTestName = false
+                formatter match {
+                  case Some(IndentedText(formattedText, rawText, indentationLevel)) =>
+                    if (rawText != "must start")
+                      infoReportHadCorrectSpecText = false
+                    if (formattedText != "  must start")
+                      infoReportHadCorrectFormattedSpecText = false
+                  case _ =>
+                }
+              }
+            case event: TestFailed =>
+              // scopeOpened should be invoked before the this method
+              assert(scopeOpenedHasBeenInvokedTwice)
+              theOtherMethodHasBeenInvoked = true
+              if (event.testName.indexOf("My Spec must start with proper words") != -1)
+                reportHadCorrectTestName = true
+              event.formatter match {
+                case Some(IndentedText(formattedText, rawText, indentationLevel)) =>
+                  if (rawText == "with proper words")
+                    reportHadCorrectSpecText = true
+                  if (formattedText == "  - with proper words")
+                    reportHadCorrectFormattedSpecText = true
+                case _ =>
+              }
+            case _ =>
+          }
+        }
+      }
+      class MySpec extends Spec with ShouldMatchers {
+        object `My Spec` {
+          object `must start` {
+            def `with proper words` { fail() }
+          }
+        }
+      }
+      val a = new MySpec
+      a.run(None, Args(new MyReporter, new Stopper {}, Filter(), Map(), None, new Tracker, Set.empty))
+      assert(reportHadCorrectTestName)
+      assert(reportHadCorrectSpecText)
+      assert(reportHadCorrectFormattedSpecText)
+      assert(infoReportHadCorrectTestName)
+      assert(infoReportHadCorrectSpecText)
+      assert(infoReportHadCorrectFormattedSpecText)
+    }
+    
+    // Testing strings sent in reports
+    it("In a TestSucceeded report, the test name should be verbatim if it is top level test") {
+      var testSucceededReportHadCorrectTestName = false
+      class MyReporter extends Reporter {
+        def apply(event: Event) {
+          event match {
+            case TestSucceeded(ordinal, suiteName, suiteID, suiteClassName, decodedSuiteName, testName, testText, decodedTestName, testEvents, duration, formatter, location, rerunnable, payload, threadName, timeStamp) =>
+              if (testName.indexOf("this thing must start with proper words") != -1) {
+                testSucceededReportHadCorrectTestName = true
+              }  
+            case _ =>
+          }
+        }
+      }
+      class MySpec extends Spec with ShouldMatchers {
+        def `this thing must start with proper words` {}
+      }
+      val a = new MySpec
+      a.run(None, Args(new MyReporter, new Stopper {}, Filter(), Map(), None, new Tracker, Set.empty))
+      assert(testSucceededReportHadCorrectTestName)
+    }
+    
+    it("In a TestFailed report, the test name should be verbatim if it is top level test") {
+      var testFailedReportHadCorrectTestName = false
+      class MyReporter extends Reporter {
+        def apply(event: Event) {
+          event match {
+            case event: TestFailed =>
+              if (event.testName.indexOf("this thing must start with proper words") != -1)
+                testFailedReportHadCorrectTestName = true
+            case _ =>
+          }
+        }
+      }
+      class MySpec extends Spec with ShouldMatchers {
+        def `this thing must start with proper words` { fail() }
+      }
+      val a = new MySpec
+      a.run(None, Args(new MyReporter, new Stopper {}, Filter(), Map(), None, new Tracker, Set.empty))
+      assert(testFailedReportHadCorrectTestName)
+    }
+    
+    it("In a TestStarting report, the test name should start with '<scope> ' if nested one level " +
+        "inside a object clause and registered with it") {
+      var testSucceededReportHadCorrectTestName = false
+      class MyReporter extends Reporter {
+        def apply(event: Event) {
+          event match {
+            case TestStarting(_, _, _, _, _, testName, _, _, _, _, _, _, _, _) =>
+              if (testName == "A Stack needs to push and pop properly") {
+                testSucceededReportHadCorrectTestName = true
+              }
+            case _ => 
+          }
+        }
+      }
+      class MySpec extends Spec with ShouldMatchers {
+        object `A Stack` {
+          def `needs to push and pop properly` {}
+        }
+      }
+      val a = new MySpec
+      a.run(None, Args(new MyReporter, new Stopper {}, Filter(), Map(), None, new Tracker, Set.empty))
+      assert(testSucceededReportHadCorrectTestName)
+    }
+    
+    it("Spec should send defined formatters") {
+      class MyReporter extends Reporter {
+
+        var gotAnUndefinedFormatter = false
+        var lastEventWithUndefinedFormatter: Option[Event] = None
+
+        private def ensureFormatterIsDefined(event: Event) {
+          if (!event.formatter.isDefined) {
+            gotAnUndefinedFormatter = true
+            lastEventWithUndefinedFormatter = Some(event)
+          }
+        }
+
+        def apply(event: Event) {
+          event match {
+            case event: RunAborted => ensureFormatterIsDefined(event)
+            case event: SuiteAborted => ensureFormatterIsDefined(event)
+            case event: SuiteStarting => ensureFormatterIsDefined(event)
+            case event: SuiteCompleted => ensureFormatterIsDefined(event)
+            case event: TestStarting => ensureFormatterIsDefined(event)
+            case event: TestSucceeded => ensureFormatterIsDefined(event)
+            case event: TestIgnored => ensureFormatterIsDefined(event)
+            case event: TestFailed => ensureFormatterIsDefined(event)
+            case event: InfoProvided => ensureFormatterIsDefined(event)
+            case _ =>
+          }
+        }
+      }
+
+      class MySpec extends Spec with ShouldMatchers {
+        def `it should send defined formatters` {
+          assert(true)
+        }
+        def `it should also send defined formatters` {
+          assert(false)
+        }
+      }
+      val a = new MySpec
+      val myRep = new MyReporter
+      a.run(None, Args(myRep, new Stopper {}, Filter(), Map(), None, new Tracker, Set.empty))
+      assert(!myRep.gotAnUndefinedFormatter, myRep.lastEventWithUndefinedFormatter.toString)
+    }
+    
+    it("SpecText should come through correctly in a SpecReport when registering with def") {
+      var testSucceededReportHadCorrectSpecText = false
+      var lastSpecText: Option[String] = None
+      class MyReporter extends Reporter {
+        def apply(event: Event) {
+          event match {
+            case TestSucceeded(ordinal, suiteName, suiteID, suiteClassName, decodedSuiteName, testName, testText, decodedTestName, testEvents, duration, formatter, location, rerunnable, payload, threadName, timeStamp) =>
+              formatter match {
+                case Some(IndentedText(formattedText, rawText, indentationLevel)) =>
+                  if (rawText == "My spec text must have the proper words")
+                    testSucceededReportHadCorrectSpecText = true
+                  else
+                    lastSpecText = Some(rawText)
+                case _ => throw new RuntimeException("Got a non-SpecReport")
+              }
+            case _ =>
+          }
+        }
+      }
+      class MySpec extends Spec with ShouldMatchers {
+        def `My spec text must have the proper words` {}
+      }
+      val a = new MySpec
+      a.run(None, Args(new MyReporter, new Stopper {}, Filter(), Map(), None, new Tracker, Set.empty))
+      assert(testSucceededReportHadCorrectSpecText, lastSpecText match { case Some(s) => s; case None => "No report"})
+    }
+    
+    it("Spec text should come through correctly in a SpecReport when registering with def when nested in one object") {
+      var testSucceededReportHadCorrectSpecText = false
+      var lastSpecText: Option[String] = None
+      class MyReporter extends Reporter {
+        def apply(event: Event) {
+          event match {
+            case TestSucceeded(ordinal, suiteName, suiteID, suiteClassName, decodedSuiteName, testName, testText, decodedTestName, testEvents, duration, formatter, location, rerunnable, payload, threadName, timeStamp) =>
+              formatter match {
+                case Some(IndentedText(formattedText, rawText, indentationLevel)) =>
+                  if (rawText == "My short name must have the proper words")
+                    testSucceededReportHadCorrectSpecText = true
+                  else
+                    lastSpecText = Some(rawText)
+                case _ => throw new RuntimeException("Got a non-SpecReport")
+              }
+            case _ =>
+          }
+        }
+      }
+      class MySpec extends Spec with ShouldMatchers {
+        object `A Stack` {
+          def `My short name must have the proper words` {}
+        }
+      }
+      val a = new MySpec
+      a.run(None, Args(new MyReporter, new Stopper {}, Filter(), Map(), None, new Tracker, Set.empty))
+      assert(testSucceededReportHadCorrectSpecText, lastSpecText match { case Some(s) => s; case None => "No report"})
+    }
+    
+    it("Spec text should come through correctly in a SpecReport when registering with def when nested in two objects") {
+      var testSucceededReportHadCorrectSpecText = false
+      var lastSpecText: Option[String] = None
+      class MyReporter extends Reporter {
+        def apply(event: Event) {
+          event match {
+            case TestSucceeded(ordinal, suiteName, suiteID, suiteClassName, decodedSuiteName, testName, testText, decodedTestName, testEvents, duration, formatter, location, rerunnable, payload, threadName, timeStamp) =>
+              formatter match {
+                case Some(IndentedText(formattedText, rawText, indentationLevel)) =>
+                  if (rawText == "My short name must have the proper words")
+                    testSucceededReportHadCorrectSpecText = true
+                  else
+                    lastSpecText = Some(rawText)
+                case _ => throw new RuntimeException("Got a non-SpecReport")
+              }
+            case _ =>
+          }
+        }
+      }
+      class MySpec extends Spec with ShouldMatchers {
+        object `A Stack` {
+          object `(when empty)` {
+            def `My short name must have the proper words` {}
+          }
+        }
+      }
+      val a = new MySpec
+      a.run(None, Args(new MyReporter, new Stopper {}, Filter(), Map(), None, new Tracker, Set.empty))
+      assert(testSucceededReportHadCorrectSpecText, lastSpecText match { case Some(s) => s; case None => "No report"})
+    }
+    
+    it("Should get ScopedOpened with description if one and only one object clause") {
+
+      val expectedSpecText = "A Stack"
+
+      class MyReporter extends Reporter {
+        var scopeOpenedCalled = false
+        var expectedMessageReceived = false
+        def apply(event: Event) {
+          event match {
+            case event: ScopeOpened =>
+              event.formatter match {
+                case Some(IndentedText(formattedText, rawText, indentationLevel)) =>
+                  scopeOpenedCalled = true
+                  if (!expectedMessageReceived) {
+                    expectedMessageReceived = (rawText == expectedSpecText)
+                  }
+                case _ =>
+              }
+            case _ =>
+          }
+        }
+      }
+
+      class MySpec extends Spec with ShouldMatchers {
+        object `A Stack` {
+          def `should allow me to push` {}
+        }
+      }
+
+      val a = new MySpec
+      val myRep = new MyReporter
+      a.run(None, Args(myRep, new Stopper {}, Filter(), Map(), None, new Tracker, Set.empty))
+      assert(myRep.scopeOpenedCalled)
+      assert(myRep.expectedMessageReceived)
+    }
+    
+    it("should be able to send info to the reporter") { 
+
+      val expectedMessage = "this is the expected message"
+
+      class MyReporter extends Reporter {
+        var infoProvidedCalled = false
+        var expectedMessageReceived = false
+
+        def apply(event: Event) {
+          event match {
+            case testSucceeded: TestSucceeded if testSucceeded.testName == "A Stack (when not empty) should allow me to pop" => 
+              val recordedEvents = testSucceeded.recordedEvents
+              recordedEvents(0) match {
+                case event: InfoProvided =>
+                  infoProvidedCalled = true
+                  if (!expectedMessageReceived) {
+                    expectedMessageReceived = event.message.indexOf(expectedMessage) != -1
+                  }
+                case _ =>
+              }
+            case _ =>
+          }
+        }
+      }
+
+      class MySpec extends Spec with ShouldMatchers {
+        object `A Stack` {
+          object `(when not empty)` {
+            def `should allow me to pop` {
+              info(expectedMessage)
+              ()
+            }
+          }
+          object `(when not full)` {
+            def `should allow me to push` {}
+          }
+        }
+      }
+      val a = new MySpec
+      val myRep = new MyReporter
+      a.run(None, Args(myRep, new Stopper {}, Filter(), Map(), None, new Tracker, Set.empty))
+      assert(myRep.infoProvidedCalled)
+      assert(myRep.expectedMessageReceived)
+    }
+    
+    it("test durations are included in TestFailed and TestSucceeded events fired from Spec") {
+
+      class MySpec extends Spec {
+        def `should succeed` {}
+        def `should fail` { fail() }
+      }
+
+      val mySpec = new MySpec
+      val myReporter = new TestDurationReporter
+      mySpec.run(None, Args(myReporter, new Stopper {}, Filter(), Map(), None, new Tracker(new Ordinal(99)), Set.empty))
+      assert(myReporter.testSucceededWasFiredAndHadADuration)
+      assert(myReporter.testFailedWasFiredAndHadADuration)
+    }
+    
+    it("suite durations are included in SuiteCompleted events fired from Spec") {
+
+      class MySpec extends Spec {
+        override def nestedSuites = Vector(new Suite {})
+      }
+
+      val mySuite = new MySpec
+      val myReporter = new SuiteDurationReporter
+      mySuite.run(None, Args(myReporter, new Stopper {}, Filter(), Map(), None, new Tracker(new Ordinal(99)), Set.empty))
+      assert(myReporter.suiteCompletedWasFiredAndHadADuration)
+    }
+    
+    it("suite durations are included in SuiteAborted events fired from Spec") {
+
+      class SuiteThatAborts extends Suite {
+        override def run(testName: Option[String], args: Args) {
+          throw new RuntimeException("Aborting for testing purposes")
+        }
+      }
+
+      class MySpec extends Spec {
+        override def nestedSuites = Vector(new SuiteThatAborts {})
+      }
+
+      val mySuite = new MySpec
+      val myReporter = new SuiteDurationReporter
+      mySuite.run(None, Args(myReporter, new Stopper {}, Filter(), Map(), None, new Tracker(new Ordinal(99)), Set.empty))
+      assert(myReporter.suiteAbortedWasFiredAndHadADuration)
+    }
+    
+    it("pending in a Spec should cause TestPending to be fired") {
+
+      class MySpec extends Spec {
+        def `should be pending` { pending }
+      }
+
+      val mySuite = new MySpec
+      val myReporter = new PendingReporter
+      mySuite.run(None, Args(myReporter, new Stopper {}, Filter(), Map(), None, new Tracker(new Ordinal(99)), Set.empty))
+      assert(myReporter.testPendingWasFired)
+    }
+    
     describe("the stopper") {
       
       it("should stop nested suites from being executed") {
@@ -884,6 +1780,88 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
         val y = new MyStoppingSpec
         y.run(None, Args(SilentReporter, myStopper, Filter(), Map(), None, new Tracker, Set.empty))
         assert(y.testsExecutedCount === 4)
+      }
+    }
+    
+    describe("(with info calls)") {
+      class InfoInsideTestSpec extends Spec {
+        val msg = "hi there, dude"
+        def `test name` {
+          info(msg)
+        }
+      }
+      // In a FlatSpec, any InfoProvided's fired during the test should be cached and sent out after the test has
+      // suceeded or failed. This makes the report look nicer, because the info is tucked under the "specifier'
+      // text for that test.
+      it("should, when the info appears in the code of a successful test, report the info in the TestSucceeded") {
+        val spec = new InfoInsideTestSpec
+        /*val (infoProvidedIndex, testStartingIndex, testSucceededIndex) =
+          getIndexesForInformerEventOrderTests(spec, spec.testName, spec.msg)
+        assert(testSucceededIndex < infoProvidedIndex)*/
+        val myRep = new EventRecordingReporter
+        spec.run(None, Args(myRep, new Stopper {}, Filter(), Map(), None, new Tracker, Set.empty))
+        val testStarting = myRep.testStartingEventsReceived
+        assert(1 === testStarting.size)
+        val testSucceeded = myRep.testSucceededEventsReceived
+        assert(1 === testSucceeded.size)
+        assert(1 === testSucceeded(0).recordedEvents.size)
+        val ip: InfoProvided = testSucceeded(0).recordedEvents(0).asInstanceOf[InfoProvided]
+        assert(spec.msg === ip.message)
+      }
+      class InfoBeforeTestSpec extends Spec {
+        val msg = "hi there, dude"
+        val testName = "test name"
+        info(msg)
+        def `test name` {}
+      }
+      it("should, when the info appears in the body before a test, report the info before the test") {
+        val spec = new InfoBeforeTestSpec
+        val (infoProvidedIndex, testStartingIndex, testSucceededIndex) =
+          getIndexesForInformerEventOrderTests(spec, spec.testName, spec.msg)
+        assert(infoProvidedIndex < testStartingIndex)
+        assert(testStartingIndex < testSucceededIndex)
+      }
+      // TODO: This does not work, can't think of a solution yet.
+      /*it("should, when the info appears in the body after a test, report the info after the test runs") {
+        val msg = "hi there, dude"
+        val testName = "test name"
+        class MySpec extends Spec {
+          def `test name` {}
+          info(msg)
+        }
+        val (infoProvidedIndex, testStartingIndex, testSucceededIndex) =
+          getIndexesForInformerEventOrderTests(new MySpec, testName, msg)
+        assert(testStartingIndex < testSucceededIndex)
+        assert(testSucceededIndex < infoProvidedIndex)
+      }*/
+      it("should throw an IllegalStateException when info is called by a method invoked after the suite has been executed") {
+        class MySpec extends Spec {
+          callInfo() // This should work fine
+          def callInfo() {
+            info("howdy")
+          }
+          def `howdy also` {
+            callInfo() // This should work fine
+          }
+        }
+        val spec = new MySpec
+        val myRep = new EventRecordingReporter
+        spec.run(None, Args(myRep, new Stopper {}, Filter(), Map(), None, new Tracker, Set.empty))
+        intercept[IllegalStateException] {
+          spec.callInfo()
+        }
+      }
+      it("should send an InfoProvided with an IndentedText formatter with level 0 when called outside a test") {
+        val spec = new InfoBeforeTestSpec
+        val indentedText = getIndentedTextFromInfoProvided(spec)
+        assert(indentedText === IndentedText("+ " + spec.msg, spec.msg, 0))
+      }
+      it("should send an InfoProvided with an IndentedText formatter with level 1 when called within a test") {
+        val spec = new InfoInsideTestSpec
+        val myRep = new EventRecordingReporter
+        spec.run(None, Args(myRep, new Stopper {}, Filter(), Map(), None, new Tracker, Set.empty))
+        val indentedText = getIndentedTextFromTestInfoProvided(spec)
+        assert(indentedText === IndentedText("  + " + spec.msg, spec.msg, 1))
       }
     }
   }
@@ -1448,6 +2426,28 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
       assert(rep.testFailedEventsReceived.size === 1)
       assert(rep.testFailedEventsReceived(0).throwable.get.asInstanceOf[TestFailedException].failedCodeFileName.get === "SpecSpec.scala")
       assert(rep.testFailedEventsReceived(0).throwable.get.asInstanceOf[TestFailedException].failedCodeLineNumber.get === thisLineNumber - 8)
+    }
+    
+    it("should fire TestFailed event with correct stack depth info when test failed") {
+      class TestSpec extends Spec {
+        def `it should fail` {
+          assert(1 === 2)
+        }
+        object `A scenario` {
+          def `should fail` {
+            assert(1 === 2)
+          }
+        }
+      }
+      val rep = new EventRecordingReporter
+      val s1 = new TestSpec
+      s1.run(None, Args(rep, new Stopper {}, Filter(), Map(), None, new Tracker, Set.empty))
+      assert(rep.testFailedEventsReceived.size === 2)
+      // The 'A scenario should fail' will be execute first because tests are executed in alphanumerical order.
+      assert(rep.testFailedEventsReceived(0).throwable.get.asInstanceOf[TestFailedException].failedCodeFileName.get === "SpecSpec.scala") 
+      assert(rep.testFailedEventsReceived(0).throwable.get.asInstanceOf[TestFailedException].failedCodeLineNumber.get === thisLineNumber - 10)
+      assert(rep.testFailedEventsReceived(1).throwable.get.asInstanceOf[TestFailedException].failedCodeFileName.get === "SpecSpec.scala")
+      assert(rep.testFailedEventsReceived(1).throwable.get.asInstanceOf[TestFailedException].failedCodeLineNumber.get === thisLineNumber - 16)
     }
   }
 }
