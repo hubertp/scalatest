@@ -13,15 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.scalatest
+package org.scalatest.fixture
 
 import scala.reflect.NameTransformer.encode
 import org.scalatest.events._
+import org.scalatest.exceptions._
 import collection.immutable.TreeSet
+import org.scalatest.Suite._
+import org.scalatest.{ PrivateMethodTester, SharedHelpers, ShouldMatchers, BeforeAndAfterEach, BeforeAndAfterAll, 
+                        Filter, Args, Stopper, Tracker, Ignore, SlowAsMolasses, FastAsLight, WeakAsAKitten, Specs, 
+                        Reporter, Distributor, OptionValues, NotAllowedException, Resources, DoNotDiscover, WrapWith, 
+                        ConfigMapWrapperSuite, StringFixture }
 
-class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
+class SpecSpec extends org.scalatest.FunSpec with PrivateMethodTester with SharedHelpers {
 
-  describe("A Spec") {
+  describe("A fixture.Spec") {
     /*
     it("should send InfoProvided events with aboutAPendingTest set to true and aboutACanceledTest set to false for info " +
             "calls made from a test that is pending") {
@@ -93,85 +99,97 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
     
     it("should return the test names in alphabetical order from testNames") {
       val a = new Spec {
-        def `it should do this`() {}
-        def `it should do that`() {}
+        type FixtureParam = String
+        def withFixture(test: OneArgTest) { test("A Fixture") }
+        def `it should do this`(fixture: String) {}
+        def `it should do that`(fixture: String) {}
       }
 
-      expectResult(List("it should do that", "it should do this")) {
+      expectResult(List("it should do that(FixtureParam)", "it should do this(FixtureParam)")) {
         a.testNames.iterator.toList
       }
 
-      val b = new Spec {}
+      val b = new Spec with StringFixture { }
 
       expectResult(List[String]()) {
         b.testNames.iterator.toList
       }
 
       val c = new Spec {
-        def `test: that`() {}
-        def `test: this`() {}
+        type FixtureParam = String
+        def withFixture(test: OneArgTest) { test("A Fixture") }
+        def `test: that`(fixture: String) {}
+        def `test: this`(fixture: String) {}
       }
 
-      expectResult(List("test: that", "test: this")) {
+      expectResult(List("test: that(FixtureParam)", "test: this(FixtureParam)")) {
         c.testNames.iterator.toList
       }
     }
     
     it("should return test names nested in scope in alpahbetical order from testNames") {
       val a = new Spec {
+        type FixtureParam = String
+        def withFixture(test: OneArgTest) { test("A Fixture") }
         object `A Tester` {
-          def `should test that` {}
-          def `should test this` {}
+          def `should test that`(fixture: String) {}
+          def `should test this`(fixture: String) {}
         }
       }
 
-      expectResult(List("A Tester should test that", "A Tester should test this")) {
+      expectResult(List("A Tester should test that(FixtureParam)", "A Tester should test this(FixtureParam)")) {
         a.testNames.iterator.toList
       }
 
       val b = new Spec {
+        type FixtureParam = String
+        def withFixture(test: OneArgTest) { test("A Fixture") }
         object `A Tester` {
           object `should be able to` {
-            def `test this` {}
-            def `test that` {}
+            def `test this`(fixture: String) {}
+            def `test that`(fixture: String) {}
           }
           object `must be able to` {
-            def `test this` {}
-            def `test that` {}
+            def `test this`(fixture: String) {}
+            def `test that`(fixture: String) {}
           }
         }
       }
 
-      expectResult(List("A Tester must be able to test that", "A Tester must be able to test this", "A Tester should be able to test that", "A Tester should be able to test this")) {
+      expectResult(List("A Tester must be able to test that(FixtureParam)", "A Tester must be able to test this(FixtureParam)", "A Tester should be able to test that(FixtureParam)", "A Tester should be able to test this(FixtureParam)")) {
         b.testNames.iterator.toList
       }
     }
     
     it("test names should properly nest scopes in test names") {
       class MySpec extends Spec with ShouldMatchers {
+        type FixtureParam = String
+        def withFixture(test: OneArgTest) { test("A Fixture") }
         object `A Stack` {
           object `(when not empty)` {
-            def `must allow me to pop` {}
+            def `must allow me to pop`(fixture: String) {}
           }
           object `(when not full)` {
-            def `must allow me to push` {}
+            def `must allow me to push`(fixture: String) {}
           }
         }
       }
       val a = new MySpec
       assert(a.testNames.size === 2)
-      assert(a.testNames.iterator.toList(0) === "A Stack (when not empty) must allow me to pop")
-      assert(a.testNames.iterator.toList(1) === "A Stack (when not full) must allow me to push")
+      assert(a.testNames.iterator.toList(0) === "A Stack (when not empty) must allow me to pop(FixtureParam)")
+      assert(a.testNames.iterator.toList(1) === "A Stack (when not full) must allow me to push(FixtureParam)")
     }
     
     it("should be able to mix in BeforeAndAfterEach with BeforeAndAfterAll without any problems") {
       class MySpec extends Spec with ShouldMatchers with BeforeAndAfterEach with BeforeAndAfterAll {
+        type FixtureParam = String
+        def withFixture(test: OneArgTest) { test("A Fixture") }
         object `A Stack` {
           object `(when not empty)` {
-            def `should allow me to pop` {}
+            def `should allow me to pop`(fixture: String) {}
           }
           object `(when not full)` {
-            def `should allow me to push` {}
+            def `should allow me to push`(fixture: String) {}
           }
         }
       }
@@ -180,7 +198,7 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
     }
     
     it("should register scopes and tests lazily after spec instance variables are created when testNames is invoked") {
-      val a = new Spec {
+      val a = new Spec with StringFixture {
         val name = "ScalaTest"
         object `In Scope: ` {
           assert(name === "ScalaTest")
@@ -189,7 +207,7 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
       a.testNames // Should execute assertion in the scope
     }
     it("should register scopes and tests lazily after spec instance variables are created when run is invoked") {
-      val a = new Spec {
+      val a = new Spec with StringFixture {
         val name = "ScalaTest"
         object `In Scope: ` {
           assert(name === "ScalaTest")
@@ -198,7 +216,7 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
       a.run(None, Args(SilentReporter)) // Should execute assertion in the scope
     }
     it("should register scopes and tests lazily after spec instance variables are created when expectedTestCount is invoked") {
-      val a = new Spec {
+      val a = new Spec with StringFixture {
         val name = "ScalaTest"
         object `In Scope: ` {
           assert(name === "ScalaTest")
@@ -207,7 +225,7 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
       a.expectedTestCount(Filter.default) // Should execute assertion in the scope
     }
     it("should register scopes and tests lazily after spec instance variables are created when tags is invoked") {
-      val a = new Spec {
+      val a = new Spec with StringFixture {
         val name = "ScalaTest"
         object `In Scope: ` {
           assert(name === "ScalaTest")
@@ -233,11 +251,11 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
     }
 */
  
-    class TestWasCalledSpec extends Spec {
+    class TestWasCalledSpec extends Spec with StringFixture {
       var theTestThisCalled = false
       var theTestThatCalled = false
-      def `test: this`() { theTestThisCalled = true }
-      def `test: that`() { theTestThatCalled = true }
+      def `test: this`(fixture: String) { theTestThisCalled = true }
+      def `test: that`(fixture: String) { theTestThatCalled = true }
     }
     
     it("should execute all tests when run is called with testName None") {
@@ -251,18 +269,18 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
     it("should execute one test when run is called with a defined testName") {
 
       val a = new TestWasCalledSpec
-      a.run(Some("test: this"), Args(SilentReporter, new Stopper {}, Filter(), Map(), None, new Tracker, Set.empty))
+      a.run(Some("test: this(FixtureParam)"), Args(SilentReporter, new Stopper {}, Filter(), Map(), None, new Tracker, Set.empty))
       assert(a.theTestThisCalled)
       assert(!a.theTestThatCalled)
     }
     
     it("should report as ignored, and not run, tests marked ignored") {
 
-      val a = new Spec {
+      val a = new Spec with StringFixture {
         var theTestThisCalled = false
         var theTestThatCalled = false
-        def `test: this`() { theTestThisCalled = true }
-        def `test: that` { theTestThatCalled = true }
+        def `test: this`(fixture: String) { theTestThisCalled = true }
+        def `test: that`(fixture: String) { theTestThatCalled = true }
       }
 
       val repA = new TestIgnoredTrackingReporter
@@ -271,68 +289,68 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
       assert(a.theTestThisCalled)
       assert(a.theTestThatCalled)
 
-      val b = new Spec {
+      val b = new Spec with StringFixture {
         var theTestThisCalled = false
         var theTestThatCalled = false
         @Ignore
-        def `test: this`() { theTestThisCalled = true }
-        def `test: that` { theTestThatCalled = true }
+        def `test: this`(fixture: String) { theTestThisCalled = true }
+        def `test: that`(fixture: String) { theTestThatCalled = true }
       }
 
       val repB = new TestIgnoredTrackingReporter
       b.run(None, Args(repB, new Stopper {}, Filter(), Map(), None, new Tracker, Set.empty))
       assert(repB.testIgnoredReceived)
       assert(repB.lastEvent.isDefined)
-      assert(repB.lastEvent.get.testName endsWith "test: this")
+      assert(repB.lastEvent.get.testName endsWith "test: this(FixtureParam)")
       assert(!b.theTestThisCalled)
       assert(b.theTestThatCalled)
 
-      val c = new Spec {
+      val c = new Spec with StringFixture {
         var theTestThisCalled = false
         var theTestThatCalled = false
-        def `test: this`() { theTestThisCalled = true }
+        def `test: this`(fixture: String) { theTestThisCalled = true }
         @Ignore
-        def `test: that` { theTestThatCalled = true }
+        def `test: that`(fixture: String) { theTestThatCalled = true }
       }
 
       val repC = new TestIgnoredTrackingReporter
       c.run(None, Args(repC, new Stopper {}, Filter(), Map(), None, new Tracker, Set.empty))
       assert(repC.testIgnoredReceived)
       assert(repC.lastEvent.isDefined)
-      assert(repC.lastEvent.get.testName endsWith "test: that", repC.lastEvent.get.testName)
+      assert(repC.lastEvent.get.testName endsWith "test: that(FixtureParam)", repC.lastEvent.get.testName)
       assert(c.theTestThisCalled)
       assert(!c.theTestThatCalled)
 
-      val d = new Spec {
+      val d = new Spec with StringFixture {
         var theTestThisCalled = false
         var theTestThatCalled = false
         @Ignore
-        def `test: this`() { theTestThisCalled = true }
+        def `test: this`(fixture: String) { theTestThisCalled = true }
         @Ignore
-        def `test: that` { theTestThatCalled = true }
+        def `test: that`(fixture: String) { theTestThatCalled = true }
       }
 
       val repD = new TestIgnoredTrackingReporter
       d.run(None, Args(repD, new Stopper {}, Filter(), Map(), None, new Tracker, Set.empty))
       assert(repD.testIgnoredReceived)
       assert(repD.lastEvent.isDefined)
-      assert(repD.lastEvent.get.testName === "test: this") // last because run alphabetically
+      assert(repD.lastEvent.get.testName === "test: this(FixtureParam)") // last because run alphabetically
       assert(!d.theTestThisCalled)
       assert(!d.theTestThatCalled)
     }
     
     it("should ignore a test marked as ignored if run is invoked with that testName") {
 
-      val e = new Spec {
+      val e = new Spec with StringFixture {
         var theTestThisCalled = false
         var theTestThatCalled = false
         @Ignore
-        def `test: this`() { theTestThisCalled = true }
-        def `test: that` { theTestThatCalled = true }
+        def `test: this`(fixture: String) { theTestThisCalled = true }
+        def `test: that`(fixture: String) { theTestThatCalled = true }
       }
 
       val repE = new TestIgnoredTrackingReporter
-      e.run(Some("test: this"), Args(repE, new Stopper {}, Filter(), Map(), None, new Tracker, Set.empty))
+      e.run(Some("test: this(FixtureParam)"), Args(repE, new Stopper {}, Filter(), Map(), None, new Tracker, Set.empty))
       assert(repE.testIgnoredReceived)
       assert(!e.theTestThisCalled)
       assert(!e.theTestThatCalled)
@@ -340,16 +358,16 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
     
     it("should exclude a test with a tag included in the tagsToExclude set even if run is invoked with that testName") {
 
-      val e = new Spec {
+      val e = new Spec with StringFixture {
         var theTestThisCalled = false
         var theTestThatCalled = false
         @SlowAsMolasses
-        def `test: this`() { theTestThisCalled = true }
-        def `test: that` { theTestThatCalled = true }
+        def `test: this`(fixture: String) { theTestThisCalled = true }
+        def `test: that`(fixture: String) { theTestThatCalled = true }
       }
 
       val repE = new TestIgnoredTrackingReporter
-      e.run(Some("test: this"), Args(repE, new Stopper {}, Filter(None, Set("org.scalatest.SlowAsMolasses")), Map(), None, new Tracker, Set.empty))
+      e.run(Some("test: this(FixtureParam)"), Args(repE, new Stopper {}, Filter(None, Set("org.scalatest.SlowAsMolasses")), Map(), None, new Tracker, Set.empty))
       assert(!repE.testIgnoredReceived)
       assert(!e.theTestThisCalled)
       assert(!e.theTestThatCalled)
@@ -358,12 +376,12 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
     it("should run only those tests selected by the tags to include and exclude sets") {
 
       // Nothing is excluded
-      val a = new Spec {
+      val a = new Spec with StringFixture {
         var theTestThisCalled = false
         var theTestThatCalled = false
         @SlowAsMolasses
-        def `test this` { theTestThisCalled = true }
-        def `test that` { theTestThatCalled = true }
+        def `test this`(fixture: String) { theTestThisCalled = true }
+        def `test that`(fixture: String) { theTestThatCalled = true }
       }
       val repA = new TestIgnoredTrackingReporter
       a.run(None, Args(repA, new Stopper {}, Filter(), Map(), None, new Tracker, Set.empty))
@@ -372,12 +390,12 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
       assert(a.theTestThatCalled)
 
       // SlowAsMolasses is included, one test should be excluded
-      val b = new Spec {
+      val b = new Spec with StringFixture {
         var theTestThisCalled = false
         var theTestThatCalled = false
         @SlowAsMolasses
-        def `test this` { theTestThisCalled = true }
-        def `test that` { theTestThatCalled = true }
+        def `test this`(fixture: String) { theTestThisCalled = true }
+        def `test that`(fixture: String) { theTestThatCalled = true }
       }
       val repB = new TestIgnoredTrackingReporter
       b.run(None, Args(repB, new Stopper {}, Filter(Some(Set("org.scalatest.SlowAsMolasses")), Set()), Map(), None, new Tracker, Set.empty))
@@ -386,13 +404,13 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
       assert(!b.theTestThatCalled)
 
       // SlowAsMolasses is included, and both tests should be included
-      val c = new Spec {
+      val c = new Spec with StringFixture {
         var theTestThisCalled = false
         var theTestThatCalled = false
         @SlowAsMolasses
-        def `test this` { theTestThisCalled = true }
+        def `test this`(fixture: String) { theTestThisCalled = true }
         @SlowAsMolasses
-        def `test that` { theTestThatCalled = true }
+        def `test that`(fixture: String) { theTestThatCalled = true }
       }
       val repC = new TestIgnoredTrackingReporter
       c.run(None, Args(repB, new Stopper {}, Filter(Some(Set("org.scalatest.SlowAsMolasses")), Set()), Map(), None, new Tracker, Set.empty))
@@ -401,14 +419,14 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
       assert(c.theTestThatCalled)
 
       // SlowAsMolasses is included. both tests should be included but one ignored
-      val d = new Spec {
+      val d = new Spec with StringFixture {
         var theTestThisCalled = false
         var theTestThatCalled = false
         @Ignore
         @SlowAsMolasses
-        def `test this` { theTestThisCalled = true }
+        def `test this`(fixture: String) { theTestThisCalled = true }
         @SlowAsMolasses
-        def `test that` { theTestThatCalled = true }
+        def `test that`(fixture: String) { theTestThatCalled = true }
       }
       val repD = new TestIgnoredTrackingReporter
       d.run(None, Args(repD, new Stopper {}, Filter(Some(Set("org.scalatest.SlowAsMolasses")), Set("org.scalatest.Ignore")), Map(), None, new Tracker, Set.empty))
@@ -417,16 +435,16 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
       assert(d.theTestThatCalled)
 
       // SlowAsMolasses included, FastAsLight excluded
-      val e = new Spec {
+      val e = new Spec with StringFixture {
         var theTestThisCalled = false
         var theTestThatCalled = false
         var theTestTheOtherCalled = false
         @SlowAsMolasses
         @FastAsLight
-        def `test this` { theTestThisCalled = true }
+        def `test this`(fixture: String) { theTestThisCalled = true }
         @SlowAsMolasses
-        def `test that` { theTestThatCalled = true }
-        def `test the other` { theTestTheOtherCalled = true }
+        def `test that`(fixture: String) { theTestThatCalled = true }
+        def `test the other`(fixture: String) { theTestTheOtherCalled = true }
       }
       val repE = new TestIgnoredTrackingReporter
       e.run(None, Args(repE, new Stopper {}, Filter(Some(Set("org.scalatest.SlowAsMolasses")), Set("org.scalatest.FastAsLight")),
@@ -437,17 +455,17 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
       assert(!e.theTestTheOtherCalled)
 
       // An Ignored test that was both included and excluded should not generate a TestIgnored event
-      val f = new Spec {
+      val f = new Spec with StringFixture {
         var theTestThisCalled = false
         var theTestThatCalled = false
         var theTestTheOtherCalled = false
         @Ignore
         @SlowAsMolasses
         @FastAsLight
-        def `test this` { theTestThisCalled = true }
+        def `test this`(fixture: String) { theTestThisCalled = true }
         @SlowAsMolasses
-        def `test that` { theTestThatCalled = true }
-        def `test the other` { theTestTheOtherCalled = true }
+        def `test that`(fixture: String) { theTestThatCalled = true }
+        def `test the other`(fixture: String) { theTestTheOtherCalled = true }
       }
       val repF = new TestIgnoredTrackingReporter
       f.run(None, Args(repF, new Stopper {}, Filter(Some(Set("org.scalatest.SlowAsMolasses")), Set("org.scalatest.FastAsLight")),
@@ -458,17 +476,17 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
       assert(!f.theTestTheOtherCalled)
 
       // An Ignored test that was not included should not generate a TestIgnored event
-      val g = new Spec {
+      val g = new Spec with StringFixture {
         var theTestThisCalled = false
         var theTestThatCalled = false
         var theTestTheOtherCalled = false
         @SlowAsMolasses
         @FastAsLight
-        def `test this` { theTestThisCalled = true }
+        def `test this`(fixture: String) { theTestThisCalled = true }
         @SlowAsMolasses
-        def `test that` { theTestThatCalled = true }
+        def `test that`(fixture: String) { theTestThatCalled = true }
         @Ignore
-        def `test the other` { theTestTheOtherCalled = true }
+        def `test the other`(fixture: String) { theTestTheOtherCalled = true }
       }
       val repG = new TestIgnoredTrackingReporter
       g.run(None, Args(repG, new Stopper {}, Filter(Some(Set("org.scalatest.SlowAsMolasses")), Set("org.scalatest.FastAsLight")),
@@ -479,16 +497,16 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
       assert(!g.theTestTheOtherCalled)
 
       // No tagsToInclude set, FastAsLight excluded
-      val h = new Spec {
+      val h = new Spec with StringFixture {
         var theTestThisCalled = false
         var theTestThatCalled = false
         var theTestTheOtherCalled = false
         @SlowAsMolasses
         @FastAsLight
-        def `test this` { theTestThisCalled = true }
+        def `test this`(fixture: String) { theTestThisCalled = true }
         @SlowAsMolasses
-        def `test that` { theTestThatCalled = true }
-        def `test the other` { theTestTheOtherCalled = true }
+        def `test that`(fixture: String) { theTestThatCalled = true }
+        def `test the other`(fixture: String) { theTestTheOtherCalled = true }
       }
       val repH = new TestIgnoredTrackingReporter
       h.run(None, Args(repH, new Stopper {}, Filter(None, Set("org.scalatest.FastAsLight")), Map(), None, new Tracker, Set.empty))
@@ -498,16 +516,16 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
       assert(h.theTestTheOtherCalled)
 
       // No tagsToInclude set, SlowAsMolasses excluded
-      val i = new Spec {
+      val i = new Spec with StringFixture {
         var theTestThisCalled = false
         var theTestThatCalled = false
         var theTestTheOtherCalled = false
         @SlowAsMolasses
         @FastAsLight
-        def `test this` { theTestThisCalled = true }
+        def `test this`(fixture: String) { theTestThisCalled = true }
         @SlowAsMolasses
-        def `test that` { theTestThatCalled = true }
-        def `test the other` { theTestTheOtherCalled = true }
+        def `test that`(fixture: String) { theTestThatCalled = true }
+        def `test the other`(fixture: String) { theTestTheOtherCalled = true }
       }
       val repI = new TestIgnoredTrackingReporter
       i.run(None, Args(repI, new Stopper {}, Filter(None, Set("org.scalatest.SlowAsMolasses")), Map(), None, new Tracker, Set.empty))
@@ -517,18 +535,18 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
       assert(i.theTestTheOtherCalled)
 
       // No tagsToInclude set, SlowAsMolasses excluded, TestIgnored should not be received on excluded ones
-      val j = new Spec {
+      val j = new Spec with StringFixture {
         var theTestThisCalled = false
         var theTestThatCalled = false
         var theTestTheOtherCalled = false
         @Ignore
         @SlowAsMolasses
         @FastAsLight
-        def `test this` { theTestThisCalled = true }
+        def `test this`(fixture: String) { theTestThisCalled = true }
         @Ignore
         @SlowAsMolasses
-        def `test that` { theTestThatCalled = true }
-        def `test the other` { theTestTheOtherCalled = true }
+        def `test that`(fixture: String) { theTestThatCalled = true }
+        def `test the other`(fixture: String) { theTestTheOtherCalled = true }
       }
       val repJ = new TestIgnoredTrackingReporter
       j.run(None, Args(repJ, new Stopper {}, Filter(None, Set("org.scalatest.SlowAsMolasses")), Map(), None, new Tracker, Set.empty))
@@ -538,19 +556,19 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
       assert(j.theTestTheOtherCalled)
 
       // Same as previous, except Ignore specifically mentioned in excludes set
-      val k = new Spec {
+      val k = new Spec with StringFixture {
         var theTestThisCalled = false
         var theTestThatCalled = false
         var theTestTheOtherCalled = false
         @Ignore
         @SlowAsMolasses
         @FastAsLight
-        def `test this` { theTestThisCalled = true }
+        def `test this`(fixture: String) { theTestThisCalled = true }
         @Ignore
         @SlowAsMolasses
-        def `test that` { theTestThatCalled = true }
+        def `test that`(fixture: String) { theTestThatCalled = true }
         @Ignore
-        def `test the other` { theTestTheOtherCalled = true }
+        def `test the other`(fixture: String) { theTestTheOtherCalled = true }
       }
       val repK = new TestIgnoredTrackingReporter
       k.run(None, Args(repK, new Stopper {}, Filter(None, Set("org.scalatest.SlowAsMolasses", "org.scalatest.Ignore")), Map(), None, new Tracker, Set.empty))
@@ -562,96 +580,96 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
     
     it("should return a correct tags map from the tags method") {
 
-      val a = new Spec {
+      val a = new Spec with StringFixture {
         object `This Spec should` {
           @Ignore
-          def `test this` {}
-          def `test that` { pending }
+          def `test this`(fixture: String) {}
+          def `test that`(fixture: String) { pending }
         }
       }
-      expectResult(Map("This Spec should test this" -> Set("org.scalatest.Ignore"))) {
+      expectResult(Map("This Spec should test this(FixtureParam)" -> Set("org.scalatest.Ignore"))) {
         a.tags
       }
 
-      val b = new Spec {
+      val b = new Spec with StringFixture {
         object `This Spec should` {
-          def `test this` { pending }
+          def `test this`(fixture: String) { pending }
           @Ignore
-          def `test that` {}
+          def `test that`(fixture: String) {}
         }
       }
-      expectResult(Map("This Spec should test that" -> Set("org.scalatest.Ignore"))) {
+      expectResult(Map("This Spec should test that(FixtureParam)" -> Set("org.scalatest.Ignore"))) {
         b.tags
       }
 
-      val c = new Spec {
+      val c = new Spec with StringFixture {
         object `This Spec should` {
           @Ignore
-          def `test this` {}
+          def `test this`(fixture: String) {}
           @Ignore
-          def `test that` {}
+          def `test that`(fixture: String) {}
         }
       }
-      expectResult(Map("This Spec should test this" -> Set("org.scalatest.Ignore"), "This Spec should test that" -> Set("org.scalatest.Ignore"))) {
+      expectResult(Map("This Spec should test this(FixtureParam)" -> Set("org.scalatest.Ignore"), "This Spec should test that(FixtureParam)" -> Set("org.scalatest.Ignore"))) {
         c.tags
       }
 
-      val d = new Spec {
+      val d = new Spec with StringFixture {
         object `This Spec should` {
           @SlowAsMolasses
-          def `test this` { pending }
+          def `test this`(fixture: String) { pending }
           @SlowAsMolasses
           @Ignore
-          def `test that` {}
+          def `test that`(fixture: String) {}
         }
       }
-      expectResult(Map("This Spec should test this" -> Set("org.scalatest.SlowAsMolasses"), "This Spec should test that" -> Set("org.scalatest.Ignore", "org.scalatest.SlowAsMolasses"))) {
+      expectResult(Map("This Spec should test this(FixtureParam)" -> Set("org.scalatest.SlowAsMolasses"), "This Spec should test that(FixtureParam)" -> Set("org.scalatest.Ignore", "org.scalatest.SlowAsMolasses"))) {
         d.tags
       }
 
-      val e = new Spec {
+      val e = new Spec with StringFixture {
         object `This Spec should` {
-          def `test this` { pending }
-          def `test that` { pending }
+          def `test this`(fixture: String) { pending }
+          def `test that`(fixture: String) { pending }
         }
       }
       expectResult(Map()) {
         e.tags
       }
 
-      val f = new Spec {
+      val f = new Spec with StringFixture {
         object `This Spec should` {
           @SlowAsMolasses
           @WeakAsAKitten
-          def `test this` { pending }
+          def `test this`(fixture: String) { pending }
           @SlowAsMolasses
-          def `test that` {}
+          def `test that`(fixture: String) {}
         }
       }
-      expectResult(Map("This Spec should test this" -> Set("org.scalatest.SlowAsMolasses", "org.scalatest.WeakAsAKitten"), "This Spec should test that" -> Set("org.scalatest.SlowAsMolasses"))) {
+      expectResult(Map("This Spec should test this(FixtureParam)" -> Set("org.scalatest.SlowAsMolasses", "org.scalatest.WeakAsAKitten"), "This Spec should test that(FixtureParam)" -> Set("org.scalatest.SlowAsMolasses"))) {
         f.tags
       }
 
-      val g = new Spec {
+      val g = new Spec with StringFixture {
         object `This Spec should` {
           @SlowAsMolasses
           @WeakAsAKitten
-          def `test this` { pending }
+          def `test this`(fixture: String) { pending }
           @SlowAsMolasses
-          def `test that` {}
+          def `test that`(fixture: String) {}
         }
       }
-      expectResult(Map("This Spec should test this" -> Set("org.scalatest.SlowAsMolasses", "org.scalatest.WeakAsAKitten"), "This Spec should test that" -> Set("org.scalatest.SlowAsMolasses"))) {
+      expectResult(Map("This Spec should test this(FixtureParam)" -> Set("org.scalatest.SlowAsMolasses", "org.scalatest.WeakAsAKitten"), "This Spec should test that(FixtureParam)" -> Set("org.scalatest.SlowAsMolasses"))) {
         g.tags
       }
     }
     
     it("should throw IllegalArgumentException if run is passed a testName that does not exist") {
-      val spec = new Spec {
+      val spec = new Spec with StringFixture {
         var theTestThisCalled = false
         var theTestThatCalled = false
-        def `test: this`() { theTestThisCalled = true }
-        def `test: that` { theTestThatCalled = true }
+        def `test: this`(fixture: String) { theTestThisCalled = true }
+        def `test: that`(fixture: String) { theTestThatCalled = true }
       }
 
       intercept[IllegalArgumentException] {
@@ -662,48 +680,48 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
     
     it("should return the correct test count from its expectedTestCount method") {
 
-      val a = new Spec {
-        def `test: this`() = ()
-        def `test: that` = ()
+      val a = new Spec with StringFixture {
+        def `test: this`(fixture: String) = ()
+        def `test: that`(fixture: String) = ()
       }
       assert(a.expectedTestCount(Filter()) === 2)
 
-      val b = new Spec {
+      val b = new Spec with StringFixture {
         @Ignore
-        def `test: this`() = ()
-        def `test: that` = ()
+        def `test: this`(fixture: String) = ()
+        def `test: that`(fixture: String) = ()
       }
       assert(b.expectedTestCount(Filter()) === 1)
 
-      val c = new Spec {
+      val c = new Spec with StringFixture {
         @FastAsLight
-        def `test: this`() = ()
-        def `test: that` = ()
+        def `test: this`(fixture: String) = ()
+        def `test: that`(fixture: String) = ()
       }
       assert(c.expectedTestCount(Filter(Some(Set("org.scalatest.FastAsLight")), Set())) === 1)
       assert(c.expectedTestCount(Filter(None, Set("org.scalatest.FastAsLight"))) === 1)
 
-      val d = new Spec {
+      val d = new Spec with StringFixture {
         @FastAsLight
         @SlowAsMolasses
-        def `test: this`() = ()
+        def `test: this`(fixture: String) = ()
         @SlowAsMolasses
-        def `test: that` = ()
-        def `test: the other thing` = ()
+        def `test: that`(fixture: String) = ()
+        def `test: the other thing`(fixture: String) = ()
       }
       assert(d.expectedTestCount(Filter(Some(Set("org.scalatest.FastAsLight")), Set())) === 1)
       assert(d.expectedTestCount(Filter(Some(Set("org.scalatest.SlowAsMolasses")), Set("org.scalatest.FastAsLight"))) === 1)
       assert(d.expectedTestCount(Filter(None, Set("org.scalatest.SlowAsMolasses"))) === 1)
       assert(d.expectedTestCount(Filter()) === 3)
 
-      val e = new Spec {
+      val e = new Spec with StringFixture {
         @FastAsLight
         @SlowAsMolasses
-        def `test: this`() = ()
+        def `test: this`(fixture: String) = ()
         @SlowAsMolasses
-        def `test: that` = ()
+        def `test: that`(fixture: String) = ()
         @Ignore
-        def `test: the other thing` = ()
+        def `test: the other thing`(fixture: String) = ()
       }
       assert(e.expectedTestCount(Filter(Some(Set("org.scalatest.FastAsLight")), Set())) === 1)
       assert(e.expectedTestCount(Filter(Some(Set("org.scalatest.SlowAsMolasses")), Set("org.scalatest.FastAsLight"))) === 1)
@@ -715,7 +733,7 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
     }
     
     it("should send an InfoProvided event for an info") {
-      class MySuite extends Spec  {
+      class MySuite extends Spec with StringFixture {
         info(
           "hi there"
         )
@@ -731,15 +749,15 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
     }
     
     it("should generate a TestPending message when the test body is (pending)") {
-      val a = new Spec {
+      val a = new Spec with StringFixture {
 
-        def `test: do this`() { pending }
+        def `test: do this`(fixture: String) { pending }
 
-        def `test: do that`() {
+        def `test: do that`(fixture: String) {
           assert(2 + 2 === 4)
         }
 
-        def `test: do something else`() {
+        def `test: do something else`(fixture: String) {
           assert(2 + 2 === 4)
           pending
         }
@@ -751,15 +769,15 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
     }
     
     it("should generate a TestCanceled message when the test body includes a cancel call") {
-      val a = new Spec {
+      val a = new Spec with StringFixture {
 
-        def `test: do this`() { cancel() }
+        def `test: do this`(fixture: String) { cancel() }
 
-        def `test: do that`() {
+        def `test: do that`(fixture: String) {
           assert(2 + 2 === 4)
         }
 
-        def `test: do something else`() {
+        def `test: do something else`(fixture: String) {
           assert(2 + 2 === 4)
           cancel()
         }
@@ -771,15 +789,15 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
     }
     
     it("should generate a TestCanceled message when the test body includes a failed assume call") {
-      val a = new Spec {
+      val a = new Spec with StringFixture {
 
-        def `test: do this`() { assume(1 === 2) }
+        def `test: do this`(fixture: String) { assume(1 === 2) }
 
-        def `test: do that`() {
+        def `test: do that`(fixture: String) {
           assert(2 + 2 === 4)
         }
 
-        def `test: do something else`() {
+        def `test: do something else`(fixture: String) {
           assert(2 + 2 === 4)
           assume(3 === 4)
         }
@@ -792,10 +810,10 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
     
     it("should generate a test failure if a Throwable, or an Error other than direct Error subtypes " +
             "known in JDK 1.5, excluding AssertionError") {
-      val a = new Spec {
-        def `test: throws AssertionError`() { throw new AssertionError }
-        def `test: throws plain old Error`() { throw new Error }
-        def `test: throws Throwable`() { throw new Throwable }
+      val a = new Spec with StringFixture {
+        def `test: throws AssertionError`(fixture: String) { throw new AssertionError }
+        def `test: throws plain old Error`(fixture: String) { throw new Error }
+        def `test: throws Throwable`(fixture: String) { throw new Throwable }
       }
       val rep = new EventRecordingReporter
       a.run(None, Args(rep, new Stopper {}, Filter(), Map(), None, new Tracker(), Set.empty))
@@ -805,8 +823,8 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
     
     it("should propagate out Errors that are direct subtypes of Error in JDK 1.5, other than " +
             "AssertionError, causing Suites and Runs to abort.") {
-      val a = new Spec {
-        def `test: throws AssertionError`() { throw new OutOfMemoryError }
+      val a = new Spec with StringFixture {
+        def `test: throws AssertionError`(fixture: String) { throw new OutOfMemoryError }
       }
       intercept[OutOfMemoryError] {
         a.run(None, Args(SilentReporter, new Stopper {}, Filter(), Map(), None, new Tracker(), Set.empty))
@@ -814,14 +832,14 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
     }
     
     it("should invoke withFixture from runTest for no-arg test method") {
-      val a = new Spec {
+      val a = new Spec with StringFixture {
         var withFixtureWasInvoked = false
         var theTestWasInvoked = false
-        override def withFixture(test: NoArgTest) {
+        override def withFixture(test: OneArgTest) {
           withFixtureWasInvoked = true
           super.withFixture(test)
         }
-        def `test: something`() {
+        def `test: something`(fixture: String) {
           theTestWasInvoked = true
         }
       }
@@ -830,27 +848,27 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
       assert(a.theTestWasInvoked)
     }
     
-    it("should pass the correct test name in the NoArgTest passed to withFixture") {
-      val a = new Spec {
+    it("should pass the correct test name in the OneArgTest passed to withFixture") {
+      val a = new Spec with StringFixture {
         var correctTestNameWasPassed = false
-        override def withFixture(test: NoArgTest) {
-          correctTestNameWasPassed = test.name == "test: something"
+        override def withFixture(test: OneArgTest) {
+          correctTestNameWasPassed = test.name == "test: something(FixtureParam)"
           super.withFixture(test)
         }
-        def `test: something` {}
+        def `test: something`(fixture: String) {}
       }
       a.run(None, Args(SilentReporter, new Stopper {}, Filter(), Map(), None, new Tracker(), Set.empty))
       assert(a.correctTestNameWasPassed)
     }
 
-    it("should pass the correct config map in the NoArgTest passed to withFixture") {
-      val a = new Spec {
+    it("should pass the correct config map in the OneArgTest passed to withFixture") {
+      val a = new Spec with StringFixture {
         var correctConfigMapWasPassed = false
-        override def withFixture(test: NoArgTest) {
+        override def withFixture(test: OneArgTest) {
           correctConfigMapWasPassed = (test.configMap == Map("hi" -> 7))
           super.withFixture(test)
         }
-        def `test: something` {}
+        def `test: something`(fixture: String) {}
       }
       a.run(None, Args(SilentReporter, new Stopper {}, Filter(), Map("hi" -> 7), None, new Tracker(), Set.empty))
       assert(a.correctConfigMapWasPassed)
@@ -859,8 +877,10 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
     it("should, when a test method writes to the Informer, report the info in test completion event") {
       val msg = "hi there dude"
       class MySpec extends Spec {
-        def `test: with Informer` {
-          info(msg)
+        type FixtureParam = String
+        def withFixture(test: OneArgTest) { test(msg) }
+        def `test: with Informer`(fixture: String) {
+          info(fixture)
         }
       }
       val myRep = new EventRecordingReporter
@@ -882,13 +902,13 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
         def apply(event: Event) {
           event match {
             case TestSucceeded(ordinal, suiteName, suiteID, suiteClassName, decodedSuiteName, testName, testText, decodedTestName, testEvents, duration, formatter, location, rerunnable, payload, threadName, timeStamp) =>
-              if (testName.indexOf("must start with proper words") != -1)
+              if (testName.indexOf("must start with proper words(FixtureParam)") != -1)
                 reportHadCorrectTestName = true
               formatter match {
                 case Some(IndentedText(formattedText, rawText, indentationLevel)) =>
-                  if (rawText == "must start with proper words")
+                  if (rawText == "must start with proper words(FixtureParam)")
                     reportHadCorrectSpecText = true
-                  if (formattedText == "- must start with proper words")
+                  if (formattedText == "- must start with proper words(FixtureParam)")
                     reportHadCorrectFormattedSpecText = true
                 case _ =>
               }
@@ -896,8 +916,8 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
           }
         }
       }
-      class MySpec extends Spec with ShouldMatchers {
-        def `must start with proper words` {}
+      class MySpec extends Spec with ShouldMatchers with StringFixture {
+        def `must start with proper words`(fixture: String) {}
       }
       val a = new MySpec
       a.run(None, Args(new MyReporter, new Stopper {}, Filter(), Map(), None, new Tracker, Set.empty))
@@ -914,13 +934,13 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
         def apply(event: Event) {
           event match {
             case TestSucceeded(ordinal, suiteName, suiteID, suiteClassName, decodedSuiteName, testName, testText, decodedTestName, testEvents, duration, formatter, location, rerunnable, payload, threadName, timeStamp) =>
-              if (testName.indexOf("must start with proper words") != -1)
+              if (testName.indexOf("must start with proper words(FixtureParam)") != -1)
                 reportHadCorrectTestName = true
               formatter match {
                 case Some(IndentedText(formattedText, rawText, indentationLevel)) =>
-                  if (rawText == "must start with proper words")
+                  if (rawText == "must start with proper words(FixtureParam)")
                     reportHadCorrectSpecText = true
-                  if (formattedText == "- must start with proper words")
+                  if (formattedText == "- must start with proper words(FixtureParam)")
                     reportHadCorrectFormattedSpecText = true
                 case _ =>
               }
@@ -928,8 +948,8 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
           }
         }
       }
-      class MySpec extends Spec with ShouldMatchers {
-        def `must start with proper words` {}
+      class MySpec extends Spec with ShouldMatchers with StringFixture {
+        def `must start with proper words`(fixture: String) {}
       }
       val a = new MySpec
       a.run(None, Args(new MyReporter, new Stopper {}, Filter(), Map(), None, new Tracker, Set.empty))
@@ -946,13 +966,13 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
         def apply(event: Event) {
           event match {
             case event: TestFailed =>
-              if (event.testName.indexOf("must start with proper words") != -1)
+              if (event.testName.indexOf("must start with proper words(FixtureParam)") != -1)
                 reportHadCorrectTestName = true
               event.formatter match {
                 case Some(IndentedText(formattedText, rawText, indentationLevel)) =>
-                  if (rawText == "must start with proper words")
+                  if (rawText == "must start with proper words(FixtureParam)")
                     reportHadCorrectSpecText = true
-                  if (formattedText == "- must start with proper words")
+                  if (formattedText == "- must start with proper words(FixtureParam)")
                     reportHadCorrectFormattedSpecText = true
                 case _ =>
               }
@@ -960,8 +980,8 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
           }
         }
       }
-      class MySpec extends Spec with ShouldMatchers {
-        def `must start with proper words` { fail() }
+      class MySpec extends Spec with ShouldMatchers with StringFixture {
+        def `must start with proper words`(fixture: String) { fail() }
       }
       val a = new MySpec
       a.run(None, Args(new MyReporter, new Stopper {}, Filter(), Map(), None, new Tracker, Set.empty))
@@ -1001,13 +1021,13 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
               // scopeOpened should be invoked before the this method
               assert(scopeOpenedHasBeenInvoked)
               theOtherMethodHasBeenInvoked = true
-              if (testName.indexOf("My Spec must start with proper words") != -1)
+              if (testName.indexOf("My Spec must start with proper words(FixtureParam)") != -1)
                 reportHadCorrectTestName = true
               formatter match {
                 case Some(IndentedText(formattedText, rawText, indentationLevel)) =>
-                  if (rawText == "must start with proper words")
+                  if (rawText == "must start with proper words(FixtureParam)")
                     reportHadCorrectSpecText = true
-                  if (formattedText == "- must start with proper words")
+                  if (formattedText == "- must start with proper words(FixtureParam)")
                     reportHadCorrectFormattedSpecText = true
                 case _ =>
               }
@@ -1015,9 +1035,9 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
           }
         }
       }
-      class MySpec extends Spec with ShouldMatchers {
+      class MySpec extends Spec with ShouldMatchers with StringFixture {
         object `My Spec` {
-          def `must start with proper words` {}
+          def `must start with proper words`(fixture: String) {}
         }
       }
       val a = new MySpec
@@ -1060,13 +1080,13 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
               // scopeOpened should be invoked before the this method
               assert(scopeOpenedHasBeenInvoked)
               theOtherMethodHasBeenInvoked = true
-              if (testName.indexOf("My Spec must start with proper words") != -1)
+              if (testName.indexOf("My Spec must start with proper words(FixtureParam)") != -1)
                 reportHadCorrectTestName = true
               formatter match {
                 case Some(IndentedText(formattedText, rawText, indentationLevel)) =>
-                  if (rawText == "must start with proper words")
+                  if (rawText == "must start with proper words(FixtureParam)")
                     reportHadCorrectSpecText = true
-                  if (formattedText == "- must start with proper words")
+                  if (formattedText == "- must start with proper words(FixtureParam)")
                     reportHadCorrectFormattedSpecText = true
                 case _ =>
               }
@@ -1074,9 +1094,9 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
           }
         }
       }
-      class MySpec extends Spec with ShouldMatchers {
+      class MySpec extends Spec with ShouldMatchers with StringFixture {
         object `My Spec` {
-          def `must start with proper words` {}
+          def `must start with proper words`(fixture: String) {}
         }
       }
       val a = new MySpec
@@ -1119,13 +1139,13 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
               // scopeOpened should be invoked before the this method
               assert(scopeOpenedHasBeenInvoked)
               theOtherMethodHasBeenInvoked = true
-              if (event.testName.indexOf("My Spec must start with proper words") != -1)
+              if (event.testName.indexOf("My Spec must start with proper words(FixtureParam)") != -1)
                 reportHadCorrectTestName = true
               event.formatter match {
                 case Some(IndentedText(formattedText, rawText, indentationLevel)) =>
-                  if (rawText == "must start with proper words")
+                  if (rawText == "must start with proper words(FixtureParam)")
                     reportHadCorrectSpecText = true
-                  if (formattedText == "- must start with proper words")
+                  if (formattedText == "- must start with proper words(FixtureParam)")
                     reportHadCorrectFormattedSpecText = true
                 case _ =>
               }
@@ -1133,9 +1153,9 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
           }
         }
       }
-      class MySpec extends Spec with ShouldMatchers {
+      class MySpec extends Spec with ShouldMatchers with StringFixture {
         object`My Spec` {
-          def `must start with proper words` { fail() }
+          def `must start with proper words`(fixture: String) { fail() }
         }
       }
       val a = new MySpec
@@ -1195,13 +1215,13 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
               // scopeOpened should be invoked before the this method
               assert(scopeOpenedHasBeenInvokedTwice)
               theOtherMethodHasBeenInvoked = true
-              if (testName.indexOf("My Spec must start with proper words") != -1)
+              if (testName.indexOf("My Spec must start with proper words(FixtureParam)") != -1)
                 reportHadCorrectTestName = true
               formatter match {
                 case Some(IndentedText(formattedText, rawText, indentationLevel)) =>
-                  if (rawText == "with proper words")
+                  if (rawText == "with proper words(FixtureParam)")
                     reportHadCorrectSpecText = true
-                  if (formattedText == "  - with proper words")
+                  if (formattedText == "  - with proper words(FixtureParam)")
                     reportHadCorrectFormattedSpecText = true
                 case _ =>
               }
@@ -1209,10 +1229,10 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
           }
         }
       }
-      class MySpec extends Spec with ShouldMatchers {
+      class MySpec extends Spec with ShouldMatchers with StringFixture {
         object `My Spec` {
           object `must start` {
-            def `with proper words` {}
+            def `with proper words`(fixture: String) {}
           }
         }
       }
@@ -1272,13 +1292,13 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
               // scopeOpened should be invoked before the this method
               assert(scopeOpenedHasBeenInvokedTwice)
               theOtherMethodHasBeenInvoked = true
-              if (event.testName.indexOf("My Spec must start with proper words") != -1)
+              if (event.testName.indexOf("My Spec must start with proper words(FixtureParam)") != -1)
                 reportHadCorrectTestName = true
               event.formatter match {
                 case Some(IndentedText(formattedText, rawText, indentationLevel)) =>
-                  if (rawText == "with proper words")
+                  if (rawText == "with proper words(FixtureParam)")
                     reportHadCorrectSpecText = true
-                  if (formattedText == "  - with proper words")
+                  if (formattedText == "  - with proper words(FixtureParam)")
                     reportHadCorrectFormattedSpecText = true
                 case _ =>
               }
@@ -1286,10 +1306,10 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
           }
         }
       }
-      class MySpec extends Spec with ShouldMatchers {
+      class MySpec extends Spec with ShouldMatchers with StringFixture {
         object `My Spec` {
           object `must start` {
-            def `with proper words` { fail() }
+            def `with proper words`(fixture: String) { fail() }
           }
         }
       }
@@ -1317,8 +1337,8 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
           }
         }
       }
-      class MySpec extends Spec with ShouldMatchers {
-        def `this thing must start with proper words` {}
+      class MySpec extends Spec with ShouldMatchers with StringFixture {
+        def `this thing must start with proper words`(fixture: String) {}
       }
       val a = new MySpec
       a.run(None, Args(new MyReporter, new Stopper {}, Filter(), Map(), None, new Tracker, Set.empty))
@@ -1337,8 +1357,8 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
           }
         }
       }
-      class MySpec extends Spec with ShouldMatchers {
-        def `this thing must start with proper words` { fail() }
+      class MySpec extends Spec with ShouldMatchers with StringFixture {
+        def `this thing must start with proper words`(fixture: String) { fail() }
       }
       val a = new MySpec
       a.run(None, Args(new MyReporter, new Stopper {}, Filter(), Map(), None, new Tracker, Set.empty))
@@ -1352,16 +1372,16 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
         def apply(event: Event) {
           event match {
             case TestStarting(_, _, _, _, _, testName, _, _, _, _, _, _, _, _) =>
-              if (testName == "A Stack needs to push and pop properly") {
+              if (testName == "A Stack needs to push and pop properly(FixtureParam)") {
                 testSucceededReportHadCorrectTestName = true
               }
             case _ => 
           }
         }
       }
-      class MySpec extends Spec with ShouldMatchers {
+      class MySpec extends Spec with ShouldMatchers with StringFixture {
         object `A Stack` {
-          def `needs to push and pop properly` {}
+          def `needs to push and pop properly`(fixture: String) {}
         }
       }
       val a = new MySpec
@@ -1398,11 +1418,11 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
         }
       }
 
-      class MySpec extends Spec with ShouldMatchers {
-        def `it should send defined formatters` {
+      class MySpec extends Spec with ShouldMatchers with StringFixture {
+        def `it should send defined formatters`(fixture: String) {
           assert(true)
         }
-        def `it should also send defined formatters` {
+        def `it should also send defined formatters`(fixture: String) {
           assert(false)
         }
       }
@@ -1421,7 +1441,7 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
             case TestSucceeded(ordinal, suiteName, suiteID, suiteClassName, decodedSuiteName, testName, testText, decodedTestName, testEvents, duration, formatter, location, rerunnable, payload, threadName, timeStamp) =>
               formatter match {
                 case Some(IndentedText(formattedText, rawText, indentationLevel)) =>
-                  if (rawText == "My spec text must have the proper words")
+                  if (rawText == "My spec text must have the proper words(FixtureParam)")
                     testSucceededReportHadCorrectSpecText = true
                   else
                     lastSpecText = Some(rawText)
@@ -1431,8 +1451,8 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
           }
         }
       }
-      class MySpec extends Spec with ShouldMatchers {
-        def `My spec text must have the proper words` {}
+      class MySpec extends Spec with ShouldMatchers with StringFixture {
+        def `My spec text must have the proper words`(fixture: String) {}
       }
       val a = new MySpec
       a.run(None, Args(new MyReporter, new Stopper {}, Filter(), Map(), None, new Tracker, Set.empty))
@@ -1448,7 +1468,7 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
             case TestSucceeded(ordinal, suiteName, suiteID, suiteClassName, decodedSuiteName, testName, testText, decodedTestName, testEvents, duration, formatter, location, rerunnable, payload, threadName, timeStamp) =>
               formatter match {
                 case Some(IndentedText(formattedText, rawText, indentationLevel)) =>
-                  if (rawText == "My short name must have the proper words")
+                  if (rawText == "My short name must have the proper words(FixtureParam)")
                     testSucceededReportHadCorrectSpecText = true
                   else
                     lastSpecText = Some(rawText)
@@ -1458,9 +1478,9 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
           }
         }
       }
-      class MySpec extends Spec with ShouldMatchers {
+      class MySpec extends Spec with ShouldMatchers with StringFixture {
         object `A Stack` {
-          def `My short name must have the proper words` {}
+          def `My short name must have the proper words`(fixture: String) {}
         }
       }
       val a = new MySpec
@@ -1477,7 +1497,7 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
             case TestSucceeded(ordinal, suiteName, suiteID, suiteClassName, decodedSuiteName, testName, testText, decodedTestName, testEvents, duration, formatter, location, rerunnable, payload, threadName, timeStamp) =>
               formatter match {
                 case Some(IndentedText(formattedText, rawText, indentationLevel)) =>
-                  if (rawText == "My short name must have the proper words")
+                  if (rawText == "My short name must have the proper words(FixtureParam)")
                     testSucceededReportHadCorrectSpecText = true
                   else
                     lastSpecText = Some(rawText)
@@ -1487,10 +1507,10 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
           }
         }
       }
-      class MySpec extends Spec with ShouldMatchers {
+      class MySpec extends Spec with ShouldMatchers with StringFixture {
         object `A Stack` {
           object `(when empty)` {
-            def `My short name must have the proper words` {}
+            def `My short name must have the proper words`(fixture: String) {}
           }
         }
       }
@@ -1522,9 +1542,9 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
         }
       }
 
-      class MySpec extends Spec with ShouldMatchers {
+      class MySpec extends Spec with ShouldMatchers with StringFixture {
         object `A Stack` {
-          def `should allow me to push` {}
+          def `should allow me to push`(fixture: String) {}
         }
       }
 
@@ -1545,7 +1565,7 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
 
         def apply(event: Event) {
           event match {
-            case testSucceeded: TestSucceeded if testSucceeded.testName == "A Stack (when not empty) should allow me to pop" => 
+            case testSucceeded: TestSucceeded if testSucceeded.testName == "A Stack (when not empty) should allow me to pop(FixtureParam)" => 
               val recordedEvents = testSucceeded.recordedEvents
               recordedEvents(0) match {
                 case event: InfoProvided =>
@@ -1560,16 +1580,16 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
         }
       }
 
-      class MySpec extends Spec with ShouldMatchers {
+      class MySpec extends Spec with ShouldMatchers with StringFixture {
         object `A Stack` {
           object `(when not empty)` {
-            def `should allow me to pop` {
+            def `should allow me to pop`(fixture: String) {
               info(expectedMessage)
               ()
             }
           }
           object `(when not full)` {
-            def `should allow me to push` {}
+            def `should allow me to push`(fixture: String) {}
           }
         }
       }
@@ -1582,9 +1602,9 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
     
     it("test durations are included in TestFailed and TestSucceeded events fired from Spec") {
 
-      class MySpec extends Spec {
-        def `should succeed` {}
-        def `should fail` { fail() }
+      class MySpec extends Spec with StringFixture {
+        def `should succeed`(fixture: String) {}
+        def `should fail`(fixture: String) { fail() }
       }
 
       val mySpec = new MySpec
@@ -1596,8 +1616,8 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
     
     it("suite durations are included in SuiteCompleted events fired from Spec") {
 
-      class MySpec extends Spec {
-        override def nestedSuites = Vector(new Suite {})
+      class MySpec extends Spec with StringFixture {
+        override def nestedSuites = Vector(new org.scalatest.Suite {})
       }
 
       val mySuite = new MySpec
@@ -1608,13 +1628,13 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
     
     it("suite durations are included in SuiteAborted events fired from Spec") {
 
-      class SuiteThatAborts extends Suite {
+      class SuiteThatAborts extends Suite with StringFixture {
         override def run(testName: Option[String], args: Args) {
           throw new RuntimeException("Aborting for testing purposes")
         }
       }
 
-      class MySpec extends Spec {
+      class MySpec extends Spec with StringFixture {
         override def nestedSuites = Vector(new SuiteThatAborts {})
       }
 
@@ -1626,8 +1646,8 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
     
     it("pending in a Spec should cause TestPending to be fired") {
 
-      class MySpec extends Spec {
-        def `should be pending` { pending }
+      class MySpec extends Spec with StringFixture {
+        def `should be pending`(fixture: String) { pending }
       }
 
       val mySuite = new MySpec
@@ -1639,28 +1659,28 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
     describe("the stopper") {
       
       it("should stop nested suites from being executed") {
-        class SpecA extends Spec {
+        class SpecA extends Spec with StringFixture {
           var executed = false;
           override def run(testName: Option[String], args: Args) {
             executed = true
             super.run(testName, args)
           }
         }
-        class SpecB extends Spec {
+        class SpecB extends Spec with StringFixture {
           var executed = false;
           override def run(testName: Option[String], args: Args) {
             executed = true
             super.run(testName, args)
           }
         }
-        class SpecC extends Spec {
+        class SpecC extends Spec with StringFixture {
           var executed = false;
           override def run(testName: Option[String], args: Args) {
             executed = true
             super.run(testName, args)
           }
         }
-        class SpecD extends Spec {
+        class SpecD extends Spec with StringFixture {
           var executed = false;
           override def run(testName: Option[String], args: Args) {
             executed = true
@@ -1671,21 +1691,21 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
             }
           }
         }
-        class SpecE extends Spec {
+        class SpecE extends Spec with StringFixture {
           var executed = false;
           override def run(testName: Option[String], args: Args) {
             executed = true
             super.run(testName, args)
           }
         }
-        class SpecF extends Spec {
+        class SpecF extends Spec with StringFixture {
           var executed = false;
           override def run(testName: Option[String], args: Args) {
             executed = true
             super.run(testName, args)
           }
         }
-        class SpecG extends Spec {
+        class SpecG extends Spec with StringFixture {
           var executed = false;
           override def run(testName: Option[String], args: Args) {
             executed = true
@@ -1739,17 +1759,17 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
       
       it("should stop tests from being executed") {
 
-        class MySpec extends Spec {
+        class MySpec extends Spec with StringFixture {
           var theTestsExecutedCount = 0
-          def `test: 1`() { theTestsExecutedCount += 1 }
-          def `test: 2`() { theTestsExecutedCount += 1 }
-          def `test: 3`() { theTestsExecutedCount += 1 }
-          def `test: 4`() {
+          def `test: 1`(fixture: String) { theTestsExecutedCount += 1 }
+          def `test: 2`(fixture: String) { theTestsExecutedCount += 1 }
+          def `test: 3`(fixture: String) { theTestsExecutedCount += 1 }
+          def `test: 4`(fixture: String) {
             theTestsExecutedCount += 1
           }
-          def `test: 5`() { theTestsExecutedCount += 1 }
-          def `test: 6`() { theTestsExecutedCount += 1 }
-          def `test: 7`() { theTestsExecutedCount += 1 }
+          def `test: 5`(fixture: String) { theTestsExecutedCount += 1 }
+          def `test: 6`(fixture: String) { theTestsExecutedCount += 1 }
+          def `test: 7`(fixture: String) { theTestsExecutedCount += 1 }
         }
 
         val x = new MySpec
@@ -1763,18 +1783,18 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
 
         val myStopper = new MyStopper
 
-        class MyStoppingSpec extends Spec {
+        class MyStoppingSpec extends Spec with StringFixture {
           var testsExecutedCount = 0
-          def `test: 1`() { testsExecutedCount += 1 }
-          def `test: 2`() { testsExecutedCount += 1 }
-          def `test: 3`() { testsExecutedCount += 1 }
-          def `test: 4`() {
+          def `test: 1`(fixture: String) { testsExecutedCount += 1 }
+          def `test: 2`(fixture: String) { testsExecutedCount += 1 }
+          def `test: 3`(fixture: String) { testsExecutedCount += 1 }
+          def `test: 4`(fixture: String) {
             testsExecutedCount += 1
             myStopper.stop = true
           }
-          def `test: 5`() { testsExecutedCount += 1 }
-          def `test: 6`() { testsExecutedCount += 1 }
-          def `test: 7`() { testsExecutedCount += 1 }
+          def `test: 5`(fixture: String) { testsExecutedCount += 1 }
+          def `test: 6`(fixture: String) { testsExecutedCount += 1 }
+          def `test: 7`(fixture: String) { testsExecutedCount += 1 }
         }
 
         val y = new MyStoppingSpec
@@ -1786,8 +1806,10 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
     describe("(with info calls)") {
       class InfoInsideTestSpec extends Spec {
         val msg = "hi there, dude"
-        def `test name` {
-          info(msg)
+        type FixtureParam = String
+        def withFixture(test: OneArgTest) { test(msg) }
+        def `test name`(fixture: String) {
+          info(fixture)
         }
       }
       // In a FlatSpec, any InfoProvided's fired during the test should be cached and sent out after the test has
@@ -1808,11 +1830,11 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
         val ip: InfoProvided = testSucceeded(0).recordedEvents(0).asInstanceOf[InfoProvided]
         assert(spec.msg === ip.message)
       }
-      class InfoBeforeTestSpec extends Spec {
+      class InfoBeforeTestSpec extends Spec with StringFixture {
         val msg = "hi there, dude"
-        val testName = "test name"
+        val testName = "test name(FixtureParam)"
         info(msg)
-        def `test name` {}
+        def `test name`(fixture: String) {}
       }
       it("should, when the info appears in the body before a test, report the info before the test") {
         val spec = new InfoBeforeTestSpec
@@ -1835,12 +1857,12 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
         assert(testSucceededIndex < infoProvidedIndex)
       }*/
       it("should throw an IllegalStateException when info is called by a method invoked after the suite has been executed") {
-        class MySpec extends Spec {
+        class MySpec extends Spec with StringFixture {
           callInfo() // This should work fine
           def callInfo() {
             info("howdy")
           }
-          def `howdy also` {
+          def `howdy also`(fixture: String) {
             callInfo() // This should work fine
           }
         }
@@ -1868,13 +1890,13 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
   
   describe("A Suite's execute method") {
     it("should throw NPE if passed null for configMap") {
-      class MySpec extends Spec
+      class MySpec extends Spec with StringFixture
       intercept[NullPointerException] {
         (new MySpec).execute(configMap = null)
       }
     }
     it("should throw IAE if a testName is passed that does not exist on the suite") {
-      class MySpec extends Spec
+      class MySpec extends Spec with StringFixture
       intercept[IllegalArgumentException] {
         (new MySpec).execute(testName = "fred")
       }
@@ -1884,8 +1906,8 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
   // TODO: ensure spec aborts if same name is used with and without communicator
   it("should discover method names and tags") {
 
-    val a = new Spec {
-      def `some test name`: Unit = ()
+    val a = new Spec with StringFixture {
+      def `some test name`(fixture: String): Unit = ()
     }
     assert(a.expectedTestCount(Filter()) === 1)
     val tnResult: Set[String] = a.testNames
@@ -1896,16 +1918,16 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
   
   it("should not return tests with no tags in the tags map") {
     
-    val a = new Spec {
-      def `test: not tagged` = ()
+    val a = new Spec with StringFixture {
+      def `test: not tagged`(fixture: String) = ()
     }
     assert(a.tags.keySet.size === 0)
   }
   
   it("should discover methods that return non-Unit") {
-    val a = new Spec {
-      def `test: this`: Int = 1
-      def `test: that`(): String = "hi"
+    val a = new Spec with StringFixture {
+      def `test: this`(fixture: String): Int = 1
+      def `test: that`(fixture: String): String = "hi"
     }
     assert(a.expectedTestCount(Filter()) === 2)
     assert(a.testNames.size === 2)
@@ -1914,9 +1936,9 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
   
   it("should send defined durations") {
 
-    class MySpec extends Spec {
-      def `test succeeds` = ()
-      def `test fails` { fail() }
+    class MySpec extends Spec with StringFixture {
+      def `test succeeds`(fixture: String) = ()
+      def `test fails`(fixture: String) { fail() }
     }
 
     val mySpec = new MySpec
@@ -1926,7 +1948,7 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
     assert(myReporter.testFailedWasFiredAndHadADuration)
   }
   
-  class SpecThatAborts extends Spec {
+  class SpecThatAborts extends Spec with StringFixture {
     override def run(testName: Option[String], args: Args) {
       throw new RuntimeException("Aborting for testing purposes")
     }
@@ -1936,10 +1958,10 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
 
     // the spec duration is sent by runNestedSuites, so MySpec needs a
     // nested suite
-    class MySpec extends Spec {
-      override def nestedSuites = Vector(new Spec {})
-      def `test Succeeds`() = ()
-      def `test Fails`() { fail() }
+    class MySpec extends Spec with StringFixture {
+      override def nestedSuites = Vector(new Spec with StringFixture {})
+      def `test Succeeds`(fixture: String) = ()
+      def `test Fails`(fixture: String) { fail() }
     }
 
     val mySpec = new MySpec
@@ -1953,10 +1975,10 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
 
     // the suite duration is sent by runNestedSuites, so MySuite needs a
     // nested suite
-    class MyOtherSpec extends Spec {
+    class MyOtherSpec extends Spec with StringFixture {
       override def nestedSuites = Vector(new SpecThatAborts)
-      def `test Succeeds`() = ()
-      def `test Fails`() { fail() }
+      def `test Succeeds`(fixture: String) = ()
+      def `test Fails`(fixture: String) { fail() }
     }
 
     val myOtherSpec = new MyOtherSpec
@@ -1967,8 +1989,8 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
 
   it("should fire TestPending event for a pending test") {
 
-    class MySpec extends Spec {
-      def `this is a pending test` { pending }
+    class MySpec extends Spec with StringFixture {
+      def `this is a pending test`(fixture: String) { pending }
     }
 
     val mySpec = new MySpec
@@ -1977,26 +1999,26 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
     assert(myReporter.testPendingWasFired)
   }
 
-  class TestWasCalledSpec extends Spec {
+  class TestWasCalledSpec extends Spec with StringFixture {
     var theTestThisCalled = false
     var theTestThatCalled = false
     var theTestTheOtherCalled = false
     var theTestThisConfigMapWasEmpty = true
     var theTestThatConfigMapWasEmpty = true
     var theTestTheOtherConfigMapWasEmpty = true
-    override def withFixture(test: NoArgTest) {
+    override def withFixture(test: OneArgTest) {
       if (test.configMap.size > 0)
         test.name match {
-          case "test this" => theTestThisConfigMapWasEmpty = false
-          case "test that" => theTestThatConfigMapWasEmpty = false
-          case "test the other" => theTestTheOtherConfigMapWasEmpty = false
+          case "test this(FixtureParam)" => theTestThisConfigMapWasEmpty = false
+          case "test that(FixtureParam)" => theTestThatConfigMapWasEmpty = false
+          case "test the other(FixtureParam)" => theTestTheOtherConfigMapWasEmpty = false
           case _ => throw new Exception("Should never happen")
         }
-      test()
+      test("hi")
     }
-    def `test this`() { theTestThisCalled = true }
-    def `test that`() { theTestThatCalled = true }
-    def `test the other`() { theTestTheOtherCalled = true }
+    def `test this`(fixture: String) { theTestThisCalled = true }
+    def `test that`(fixture: String) { theTestThatCalled = true }
+    def `test the other`(fixture: String) { theTestTheOtherCalled = true }
   }
   
   describe("when its execute method is invoked") {
@@ -2014,7 +2036,7 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
 
     it("should run just the specified test, passing an empty config map, if a full test name is passed") {
       val s2 = new TestWasCalledSpec
-      s2.execute("test this")
+      s2.execute("test this(FixtureParam)")
       assert(s2.theTestThisCalled)
       assert(!s2.theTestThatCalled)
       assert(!s2.theTestTheOtherCalled)
@@ -2036,7 +2058,7 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
 
     it("should pass a non-empty config map into just the specified test if a full test name and a config map is specified") {
       val s4 = new TestWasCalledSpec
-      s4.execute("test this", Map("s" -> "s"))
+      s4.execute("test this(FixtureParam)", Map("s" -> "s"))
       assert(s4.theTestThisCalled)
       assert(!s4.theTestThatCalled)
       assert(!s4.theTestTheOtherCalled)
@@ -2047,7 +2069,7 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
 
     it("should run just the specified test, passing an empty config map, if a full test name is passed via a named parameter") {
       val s5 = new TestWasCalledSpec
-      s5.execute(testName = "test this")
+      s5.execute(testName = "test this(FixtureParam)")
       assert(s5.theTestThisCalled)
       assert(!s5.theTestThatCalled)
       assert(!s5.theTestTheOtherCalled)
@@ -2058,7 +2080,7 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
 
     it("should pass a non-empty config map into just the specified test if a full test name and a config map is specified via named parameters") {
       val s6 = new TestWasCalledSpec
-      s6.execute(testName = "test this", configMap = Map("s" -> "s"))
+      s6.execute(testName = "test this(FixtureParam)", configMap = Map("s" -> "s"))
       assert(s6.theTestThisCalled)
       assert(!s6.theTestThatCalled)
       assert(!s6.theTestTheOtherCalled)
@@ -2078,7 +2100,7 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
       var theTestThisConfigMapWasEmpty = true
       var theTestThatConfigMapWasEmpty = true
       var theTestTheOtherConfigMapWasEmpty = true
-      override def withFixture(test: NoArgTest) {
+      override def withFixture(test: OneArgTest) {
         if (test.configMap.size > 0)
           test.name match {
             case "test$u0020this" => theTestThisConfigMapWasEmpty = false
@@ -2165,14 +2187,14 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
 
     // + comes before -
     // but $plus comes after $minus
-    class ASpec extends Spec {
+    class ASpec extends Spec with StringFixture {
 
-      def `test: the + operator should add` {
+      def `test: the + operator should add`(fixture: String) {
         val sum = 1 + 1
         assert(sum === 2)
       }
 
-      def `test: the - operator should subtract` {
+      def `test: the - operator should subtract`(fixture: String) {
         val diff = 4 - 1
         assert(diff === 3)
       }
@@ -2180,8 +2202,8 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
 
     val a = new ASpec
     val expectedTestNames = List("" +
-      "test: the + operator should add",
-      "test: the - operator should subtract"
+      "test: the + operator should add(FixtureParam)",
+      "test: the - operator should subtract(FixtureParam)"
     )
     assert(a.testNames.iterator.toList === expectedTestNames)
   }
@@ -2193,12 +2215,12 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
 
   it("should send None decoded test names") {
     
-    class DecodedSpec extends Spec {
-      def `test Succeed`() {}
-      def `test Fail`() = { fail }
-      def `test Pending`() = { pending }
+    class DecodedSpec extends Spec with StringFixture {
+      def `test Succeed`(fixture: String) {}
+      def `test Fail`(fixture: String) = { fail }
+      def `test Pending`(fixture: String) = { pending }
       @Ignore
-      def `test Ignore`() = {}
+      def `test Ignore`(fixture: String) = {}
     }
     
     val decodedSpec = new DecodedSpec
@@ -2238,16 +2260,16 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
           }
           expectResult(None) { testStarting.decodedSuiteName }
         case testSucceed:TestSucceeded => 
-          expectResult("test Succeed") { testSucceed.testName }
+          expectResult("test Succeed(FixtureParam)") { testSucceed.testName }
           expectResult(None) { testSucceed.decodedTestName }
         case testFail:TestFailed =>
-          expectResult("test Fail") { testFail.testName }
+          expectResult("test Fail(FixtureParam)") { testFail.testName }
           expectResult(None) { testFail.decodedTestName }
         case testPending:TestPending =>
-          expectResult("test Pending") { testPending.testName }
+          expectResult("test Pending(FixtureParam)") { testPending.testName }
           expectResult(None) { testPending.decodedTestName }
         case testIgnore:TestIgnored => 
-          expectResult("test Ignore") { testIgnore.testName }
+          expectResult("test Ignore(FixtureParam)") { testIgnore.testName }
           expectResult(None) { testIgnore.decodedTestName }
         case _ =>
       }
@@ -2255,10 +2277,10 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
   }
 
   def testTestTags() {
-    class TagSpec extends Spec {  
-      def testNoTagMethod() {}
+    class TagSpec extends Spec with StringFixture {  
+      def testNoTagMethod(fixture: String) {}
       @SlowAsMolasses
-      def testTagMethod() {}
+      def testTagMethod(fixture: String) {}
     }
     val testTags = new TagSpec().tags
     assert(testTags.size === 1)
@@ -2271,19 +2293,19 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
   describe("when annotations are applied at the class level") {
     it("should propate those annotations to all tests in the class") {
     
-      class NoTagSpec extends Spec
+      class NoTagSpec extends Spec with StringFixture
       @Ignore
-      class IgnoreSpec extends Spec {
-        def `test method 1` {}
-        def `test method 2` {}
-        def `test method 3` {}
+      class IgnoreSpec extends Spec with StringFixture {
+        def `test method 1`(fixture: String) {}
+        def `test method 2`(fixture: String) {}
+        def `test method 3`(fixture: String) {}
       }
       @SlowAsMolasses
-      class SlowAsMolassesSpec extends Spec
+      class SlowAsMolassesSpec extends Spec with StringFixture
       @FastAsLight
-      class FastAsLightSpec extends Spec
+      class FastAsLightSpec extends Spec with StringFixture
     
-      class MasterSpec extends Spec {
+      class MasterSpec extends Spec with StringFixture {
         override def nestedSuites = Vector(new NoTagSpec(), new IgnoreSpec(), new SlowAsMolassesSpec(), new FastAsLightSpec())
         override def runNestedSuites(args: Args) {
           super.runNestedSuites(args)
@@ -2292,10 +2314,10 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
     
       class CounterDistributor extends Distributor {
         var count = 0
-        def apply(suite: Suite, args: Args) {
+        def apply(suite: org.scalatest.Suite, args: Args) {
           count += 1
         }
-        def apply(suite: Suite, tracker: Tracker) {
+        def apply(suite: org.scalatest.Suite, tracker: Tracker) {
           count += 1
         }
       }
@@ -2336,31 +2358,31 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
   
   describe("when its expectedTestCount method is invoked") {
     it("should return a count that takes into 'account' the passed filter") {
-      class NoTagSpec extends Spec {
-        def `test method 1` {}
-        def `test method 2` {}
-        def `test method 3` {}
+      class NoTagSpec extends Spec with StringFixture {
+        def `test method 1`(fixture: String) {}
+        def `test method 2`(fixture: String) {}
+        def `test method 3`(fixture: String) {}
       }
       @Ignore
-      class IgnoreSpec extends Spec {
-        def `test method 1` {}
-        def `test method 2` {}
-        def `test method 3` {}
+      class IgnoreSpec extends Spec with StringFixture {
+        def `test method 1`(fixture: String) {}
+        def `test method 2`(fixture: String) {}
+        def `test method 3`(fixture: String) {}
       }
       @SlowAsMolasses
-      class SlowAsMolassesSpec extends Spec {
-        def `test method 1` {}
-        def `test method 2` {}
-        def `test method 3` {}
+      class SlowAsMolassesSpec extends Spec with StringFixture {
+        def `test method 1`(fixture: String) {}
+        def `test method 2`(fixture: String) {}
+        def `test method 3`(fixture: String) {}
       }
       @FastAsLight
-      class FastAsLightSpec extends Spec {
-        def `test method 1` {}
-        def `test method 2` {}
-        def `test method 3` {}
+      class FastAsLightSpec extends Spec with StringFixture {
+        def `test method 1`(fixture: String) {}
+        def `test method 2`(fixture: String) {}
+        def `test method 3`(fixture: String) {}
       }
     
-      class MasterSpec extends Spec {
+      class MasterSpec extends Spec with StringFixture {
         override def nestedSuites = Vector(new NoTagSpec(), new IgnoreSpec(), new SlowAsMolassesSpec(), new FastAsLightSpec())
         override def runNestedSuites(args: Args) {
           super.runNestedSuites(args)
@@ -2386,37 +2408,37 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
   
   it("should run only chosen styles, if specified, and throw an exception from run if a non-chosen style is attempted to be run") {
 
-    class SimpleSpec extends Spec {
-      def `test method 1` {}
-      def `test method 2` {}
-      def `test method 3` {}
+    class SimpleSpec extends Spec with StringFixture {
+      def `test method 1`(fixture: String) {}
+      def `test method 2`(fixture: String) {}
+      def `test method 3`(fixture: String) {}
     }
     
     val simpleSpec = new SimpleSpec()
     simpleSpec.run(None, Args(SilentReporter, new Stopper {}, Filter(), Map.empty, None, new Tracker, Set.empty))
-    simpleSpec.run(None, Args(SilentReporter, new Stopper {}, Filter(), Map("org.scalatest.ChosenStyles" -> Set("org.scalatest.Spec")), None, new Tracker, Set.empty))
+    simpleSpec.run(None, Args(SilentReporter, new Stopper {}, Filter(), Map("org.scalatest.ChosenStyles" -> Set("org.scalatest.fixture.Spec")), None, new Tracker, Set.empty))
     val caught =
       intercept[NotAllowedException] {
-        simpleSpec.run(None, Args(SilentReporter, new Stopper {}, Filter(), Map("org.scalatest.ChosenStyles" -> Set("org.scalatest.FunSpec")), None, new Tracker, Set.empty))
+        simpleSpec.run(None, Args(SilentReporter, new Stopper {}, Filter(), Map("org.scalatest.ChosenStyles" -> Set("org.scalatest.fixture.FunSpec")), None, new Tracker, Set.empty))
       }
     import OptionValues._
-    assert(caught.message.value === Resources("notTheChosenStyle", "org.scalatest.Spec", "org.scalatest.FunSpec"))
+    assert(caught.message.value === Resources("notTheChosenStyle", "org.scalatest.fixture.Spec", "org.scalatest.fixture.FunSpec"))
     val caught2 =
       intercept[NotAllowedException] {
-        simpleSpec.run(None, Args(SilentReporter, new Stopper {}, Filter(), Map("org.scalatest.ChosenStyles" -> Set("org.scalatest.FunSpec", "org.scalatest.FreeSpec")), None, new Tracker, Set.empty))
+        simpleSpec.run(None, Args(SilentReporter, new Stopper {}, Filter(), Map("org.scalatest.ChosenStyles" -> Set("org.scalatest.fixture.FunSpec", "org.scalatest.fixture.FreeSpec")), None, new Tracker, Set.empty))
       }
-    assert(caught2.message.value === Resources("notOneOfTheChosenStyles", "org.scalatest.Spec", Suite.makeListForHumans(Vector("org.scalatest.FunSpec", "org.scalatest.FreeSpec"))))
+    assert(caught2.message.value === Resources("notOneOfTheChosenStyles", "org.scalatest.fixture.Spec", makeListForHumans(Vector("org.scalatest.fixture.FunSpec", "org.scalatest.fixture.FreeSpec"))))
     val caught3 =
       intercept[NotAllowedException] {
-        simpleSpec.run(None, Args(SilentReporter, new Stopper {}, Filter(), Map("org.scalatest.ChosenStyles" -> Set("org.scalatest.FunSpec", "org.scalatest.FreeSpec", "org.scalatest.FlatSpec")), None, new Tracker, Set.empty))
+        simpleSpec.run(None, Args(SilentReporter, new Stopper {}, Filter(), Map("org.scalatest.ChosenStyles" -> Set("org.scalatest.fixture.FunSpec", "org.scalatest.fixture.FreeSpec", "org.scalatest.fixture.FlatSpec")), None, new Tracker, Set.empty))
       }
-    assert(caught3.message.value === Resources("notOneOfTheChosenStyles", "org.scalatest.Spec", Suite.makeListForHumans(Vector("org.scalatest.FunSpec", "org.scalatest.FreeSpec", "org.scalatest.FlatSpec"))))
+    assert(caught3.message.value === Resources("notOneOfTheChosenStyles", "org.scalatest.fixture.Spec", makeListForHumans(Vector("org.scalatest.fixture.FunSpec", "org.scalatest.fixture.FreeSpec", "org.scalatest.fixture.FlatSpec"))))
   }
   
   describe("when a test fails") {
     it("should send proper stack depth information") {
-      class TestSpec extends Spec {
-        def `test failure`() {
+      class TestSpec extends Spec with StringFixture {
+        def `test failure`(fixture: String) {
           assert(1 === 2)
         }
       }
@@ -2429,12 +2451,12 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
     }
     
     it("should fire TestFailed event with correct stack depth info when test failed") {
-      class TestSpec extends Spec {
-        def `it should fail` {
+      class TestSpec extends Spec with StringFixture {
+        def `it should fail`(fixture: String) {
           assert(1 === 2)
         }
         object `A scenario` {
-          def `should fail` {
+          def `should fail`(fixture: String) {
             assert(1 === 2)
           }
         }
@@ -2453,11 +2475,11 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
 }
 
 @DoNotDiscover
-class `My Spec` extends Spec {}
+class `My Spec` extends Spec with StringFixture {}
 @DoNotDiscover
-class NormalSpec extends Spec
+class NormalSpec extends Spec with StringFixture
 @DoNotDiscover
 @WrapWith(classOf[ConfigMapWrapperSuite]) 
-class WrappedSpec(configMap: Map[_, _]) extends Spec
+class WrappedSpec(configMap: Map[_, _]) extends Spec with StringFixture
 @DoNotDiscover
-class NotAccessibleSpec(name: String) extends Spec
+class NotAccessibleSpec(name: String) extends Spec with StringFixture

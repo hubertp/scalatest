@@ -16,17 +16,11 @@
 package org.scalatest
 
 import scala.collection.immutable.ListSet
-import Suite.autoTagClassAnnotations
+import Suite._
 import Spec.isTestMethod
-import Suite.simpleNameForTest
-import Suite.InformerInParens
-import Suite.testMethodTakesAnInformer
-import java.lang.reflect.Method
-import java.lang.reflect.InvocationTargetException
-import java.lang.reflect.Modifier
-import org.scalatest.events.TopOfMethod
-import org.scalatest.events.TopOfClass
+import org.scalatest.events._
 import scala.reflect.NameTransformer._
+import java.lang.reflect.{Method, Modifier, InvocationTargetException}
 
 /**
  * Trait that facilitates a &#8220;behavior-driven&#8221; style of development (BDD), in which tests
@@ -1187,7 +1181,7 @@ trait Spec extends Suite { thisSuite =>
         def getMethod(o: AnyRef, methodName: String) = { 
           o.getClass.getMethod(
             simpleNameForTest(methodName),
-            (if (testMethodTakesAnInformer(methodName)) Array(classOf[Informer]) else new Array[Class[_]](0)): _*
+            new Array[Class[_]](0): _*
           )
         }
         
