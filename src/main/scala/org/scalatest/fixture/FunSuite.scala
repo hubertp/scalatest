@@ -226,6 +226,7 @@ import org.scalatest.Suite.autoTagClassAnnotations
  *
  * @author Bill Venners
  */
+@Finders(Array("org.scalatest.finders.FunSuiteFinder"))
 trait FunSuite extends Suite { thisSuite =>
 
   private final val engine = new FixtureEngine[FixtureParam]("concurrentFixtureFunSuiteMod", "FixtureFunSuite")

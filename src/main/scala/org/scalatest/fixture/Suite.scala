@@ -228,6 +228,7 @@ import exceptions.{TestCanceledException, TestPendingException}
  *
  * @author Bill Venners
  */
+@Finders(Array("org.scalatest.finders.MethodFinder"))
 trait Suite extends org.scalatest.Suite { thisSuite =>
 
   /**

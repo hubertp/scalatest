@@ -236,6 +236,7 @@ import org.scalatest.exceptions.NotAllowedException
  *
  * @author Bill Venners
  */
+@Finders(Array("org.scalatest.finders.FeatureSpecFinder"))
 trait FeatureSpec extends Suite { thisSuite =>
 
   private final val engine = new FixtureEngine[FixtureParam]("concurrentFeatureSpecMod", "FixtureFeatureSpec")

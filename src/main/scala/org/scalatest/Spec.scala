@@ -1166,6 +1166,7 @@ import java.lang.reflect.{Method, Modifier, InvocationTargetException}
  *
  * @author Bill Venners
  */
+@Finders(Array("org.scalatest.finders.SpecFinder"))
 trait Spec extends Suite { thisSuite =>
 
   private final val engine = new Engine("concurrentSpecMod", "Spec")

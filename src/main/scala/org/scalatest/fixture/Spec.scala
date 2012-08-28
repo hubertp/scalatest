@@ -24,6 +24,7 @@ import org.scalatest.events.{TopOfClass, TopOfMethod}
 import scala.reflect.NameTransformer._
 import java.lang.reflect.{Method, Modifier, InvocationTargetException}
 
+@Finders(Array("org.scalatest.finders.SpecFinder"))
 trait Spec extends Suite  { thisSuite => 
   
   private final val engine = new FixtureEngine[FixtureParam]("concurrentSpecMod", "Spec")

@@ -232,6 +232,7 @@ import org.scalatest.Suite.autoTagClassAnnotations
  *
  * @author Bill Venners
  */
+@Finders(Array("org.scalatest.finders.FlatSpecFinder"))
 trait FlatSpec extends Suite with ShouldVerb with MustVerb with CanVerb { thisSuite =>
 
   private final val engine = new FixtureEngine[FixtureParam]("concurrentFixtureFlatSpecMod", "FixtureFlatSpec")

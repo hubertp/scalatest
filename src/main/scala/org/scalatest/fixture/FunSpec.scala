@@ -240,6 +240,7 @@ import org.scalatest.exceptions.TestRegistrationClosedException
  *
  * @author Bill Venners
  */
+@Finders(Array("org.scalatest.finders.FunSpecFinder"))
 trait FunSpec extends Suite { thisSuite =>
 
   private final val engine = new FixtureEngine[FixtureParam]("concurrentFixtureSpecMod", "FixtureFunSpec")
