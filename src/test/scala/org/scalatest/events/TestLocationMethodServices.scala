@@ -21,7 +21,7 @@ trait TestLocationMethodServices {
         location match {
           case topOfMethod:TopOfMethod => 
             val expectedClassName = className
-            val expectedMethodId = "public void " + expectedClassName + "." + methodName + "()"
+            val expectedMethodId = "public void " + expectedClassName + "." + methodName
             assert(expectedClassName == topOfMethod.className, "Suite " + suiteTypeName + "'s " + event.getClass.getName + " event's TopOfMethod.className expected to be " + expectedClassName + ", but got " + topOfMethod.className)
             assert(expectedMethodId == topOfMethod.methodId, "Suite " + suiteTypeName + "'s " + event.getClass.getName + " event's TopOfMethod.methodId expected to be " + expectedMethodId + ", but got " + topOfMethod.methodId)
             true
