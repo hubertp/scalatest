@@ -144,7 +144,7 @@ import java.lang.reflect.{Method, Modifier, InvocationTargetException}
  * </p>
  * 
  * <pre class="stHighlight">
- * package org.scalatest.examples.fixture.funspec.sharing
+ * package org.scalatest.examples.fixture.spec.sharing
  * 
  * import java.util.concurrent.ConcurrentHashMap
  * import org.scalatest.fixture
@@ -183,13 +183,13 @@ import java.lang.reflect.{Method, Modifier, InvocationTargetException}
  *   }
  * }
  * 
- * class ExampleSpec extends fixture.FunSpec with DbFixture {
+ * class ExampleSpec extends fixture.Spec with DbFixture {
  * 
  *   override def populateDb(db: Db) { // setup the fixture
  *     db.append("ScalaTest is ")
  *   }
  * 
- *   object &#96;Testing&#96; {
+ *   object &#96;Testing with ScalaTest&#96; {
  *     def &#96;should be easy&#96; (db: Db) {
  *       db.append("easy!")
  *       assert(db.toString === "ScalaTest is easy!")
