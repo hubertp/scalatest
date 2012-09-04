@@ -580,9 +580,11 @@ private[scalatest] object Spec {
 
     // name must have at least one encoded space: "$u0220"
     val includesEncodedSpace = m.getName.indexOf("$u0020") >= 0
+    
+    val isOuterMethod = m.getName.endsWith("$$outer")
 
     // def maybe(b: Boolean) = if (b) "" else "!"
     // println("m.getName: " + m.getName + ": " + maybe(isInstanceMethod) + "isInstanceMethod, " + maybe(hasNoParams) + "hasNoParams, " + maybe(includesEncodedSpace) + "includesEncodedSpace")
-    isInstanceMethod && hasNoParamOrFixtureParam && includesEncodedSpace
+    isInstanceMethod && hasNoParamOrFixtureParam && includesEncodedSpace && !isOuterMethod
   }
 }
