@@ -13,8 +13,8 @@ package org.scalatest
  *
  * <p>
  * In ScalaTest's event model, a test may be surrounded by &ldquo;scopes&rdquo;. Each test and scope is associated with string of text.
- * A test's name is concatenation of the text of any surrounding scopes, the <em>prefix</em>, followed by the text provided with the test
- * itself, the <em>suffix</em>, with one space between each component. Here's an example:
+ * A test's name is concatenation of the text of any surrounding scopes followed by the text provided with the test
+ * itself, with one space between each component. Here's an example:
  * </p>
  *
  * <pre class="stHighlight">
