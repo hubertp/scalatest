@@ -89,63 +89,55 @@ class ExampleTestNameSpec extends Spec with TestNameFixtureServices {
      "Testing 9 Scala code should be fun"
     )
   
-  object `Testing 1` { // test name is "Testing 1 Scala code should be fun"
+  object `Testing 1` { 
     object `Scala code` {
       def `should be fun` {}
     }
   }
 
-  object `Testing 2 ` { // test name is "Testing 2 Scala code should be fun"
+  object `Testing 2 ` { 
     object `Scala code` {
       def `should be fun` {}
     }
   }
 
-  object `Testing 3` { // test name is "Testing 3 Scala code should be fun"
+  object `Testing 3` { 
     object ` Scala code` {
       def `should be fun` {}
     }
   }
 
-  object `Testing 4` { // test name is "Testing 4 Scala code should be fun"
+  object `Testing 4` { 
     object `Scala code ` {
       def `should be fun` {}
     }
   }
 
-  object `Testing 5` { // test name is "Testing 5 Scala code should be fun"
+  object `Testing 5` { 
     object `Scala code` {
       def ` should be fun` {}
     }
   }
 
-  // But a space at the beginning or end passes through:
-
-  object ` Testing 6` { // test name is " Testing 6 Scala code should be fun"
+  object ` Testing 6` { 
     object `Scala code` {
       def `should be fun` {}
     }
   }
 
-  object `Testing 7` { // test name is "Testing 7 Scala code should be fun "
+  object `Testing 7` { 
     object `Scala code` {
       def `should be fun ` {}
     }
   }
 
-  // Two spaces will be maintained. The only thing we do is opt to not
-  // add a space if there's one already there.
-  // That's a simple rule.
-
-  object `Testing 8 ` { // test name is "Testing 8  Scala code should be fun" 
-    // Two spaces in name
+  object `Testing 8 ` { 
     object ` Scala code` {
       def `should be fun` {}
     }
   }
 
-  object `Testing 9  ` { // test name is "Testing 9  Scala code should be fun" 
-    // Two spaces in name
+  object `Testing 9  ` { 
     object `Scala code` {
       def `should be fun` {}
     }
@@ -168,63 +160,55 @@ class ExampleTestNameFixtureSpec extends fixture.Spec with TestNameFixtureServic
      "Testing 9 Scala code should be fun"
     )
   
-  object `Testing 1` { // test name is "Testing 1 Scala code should be fun"
+  object `Testing 1` { 
     object `Scala code` {
       def `should be fun`(fixture: String) {}
     }
   }
 
-  object `Testing 2 ` { // test name is "Testing 2 Scala code should be fun"
+  object `Testing 2 ` { 
     object `Scala code` {
       def `should be fun`(fixture: String) {}
     }
   }
 
-  object `Testing 3` { // test name is "Testing 3 Scala code should be fun"
+  object `Testing 3` { 
     object ` Scala code` {
       def `should be fun`(fixture: String) {}
     }
   }
 
-  object `Testing 4` { // test name is "Testing 4 Scala code should be fun"
+  object `Testing 4` { 
     object `Scala code ` {
       def `should be fun`(fixture: String) {}
     }
   }
 
-  object `Testing 5` { // test name is "Testing 5 Scala code should be fun"
+  object `Testing 5` { 
     object `Scala code` {
       def ` should be fun`(fixture: String) {}
     }
   }
 
-  // But a space at the beginning or end passes through:
-
-  object ` Testing 6` { // test name is " Testing 6 Scala code should be fun"
+  object ` Testing 6` { 
     object `Scala code` {
       def `should be fun`(fixture: String) {}
     }
   }
 
-  object `Testing 7` { // test name is "Testing 7 Scala code should be fun "
+  object `Testing 7` { 
     object `Scala code` {
       def `should be fun `(fixture: String) {}
     }
   }
 
-  // Two spaces will be maintained. The only thing we do is opt to not
-  // add a space if there's one already there.
-  // That's a simple rule.
-
-  object `Testing 8 ` { // test name is "Testing 8  Scala code should be fun" 
-    // Two spaces in name
+  object `Testing 8 ` {  
     object ` Scala code` {
       def `should be fun`(fixture: String) {}
     }
   }
 
-  object `Testing 9  ` { // test name is "Testing 9  Scala code should be fun" 
-    // Two spaces in name
+  object `Testing 9  ` {  
     object `Scala code` {
       def `should be fun`(fixture: String) {}
     }
@@ -319,63 +303,55 @@ class ExampleTestNameFunSpec extends FunSpec with TestNameFixtureServices {
      "Testing 9 Scala code should be fun"
     )
   
-  describe("Testing 1") { // test name is "Testing 1 Scala code should be fun"
+  describe("Testing 1") { 
     describe("Scala code") {
       it("should be fun") {}
     }
   }
 
-  describe("Testing 2 ") { // test name is "Testing 2 Scala code should be fun"
+  describe("Testing 2 ") { 
     describe("Scala code") {
       it("should be fun") {}
     }
   }
 
-  describe("Testing 3") { // test name is "Testing 3 Scala code should be fun"
+  describe("Testing 3") { 
     describe(" Scala code") {
       it("should be fun") {}
     }
   }
 
-  describe("Testing 4") { // test name is "Testing 4 Scala code should be fun"
+  describe("Testing 4") { 
     describe("Scala code ") {
       it("should be fun") {}
     }
   }
 
-  describe("Testing 5") { // test name is "Testing 5 Scala code should be fun"
+  describe("Testing 5") { 
     describe("Scala code") {
       it(" should be fun") {}
     }
   }
 
-  // But a space at the beginning or end passes through:
-
-  describe(" Testing 6") { // test name is " Testing 6 Scala code should be fun"
+  describe(" Testing 6") { 
     describe("Scala code") {
       it("should be fun") {}
     }
   }
 
-  describe("Testing 7") { // test name is "Testing 7 Scala code should be fun "
+  describe("Testing 7") { 
     describe("Scala code") {
       it("should be fun ") {}
     }
   }
 
-  // Two spaces will be maintained. The only thing we do is opt to not
-  // add a space if there's one already there.
-  // That's a simple rule.
-
-  describe("Testing 8 ") { // test name is "Testing 8  Scala code should be fun" 
-    // Two spaces in name
+  describe("Testing 8 ") {  
     describe(" Scala code") {
       it("should be fun") {}
     }
   }
 
-  describe("Testing 9  ") { // test name is "Testing 9  Scala code should be fun" 
-    // Two spaces in name
+  describe("Testing 9  ") {  
     describe("Scala code") {
       it("should be fun") {}
     }
@@ -397,63 +373,55 @@ class ExampleTestNameFixtureFunSpec extends fixture.FunSpec with TestNameFixture
      "Testing 9 Scala code should be fun"
     )
   
-  describe("Testing 1") { // test name is "Testing 1 Scala code should be fun"
+  describe("Testing 1") { 
     describe("Scala code") {
       it("should be fun") { s => }
     }
   }
 
-  describe("Testing 2 ") { // test name is "Testing 2 Scala code should be fun"
+  describe("Testing 2 ") { 
     describe("Scala code") {
       it("should be fun") { s => }
     }
   }
 
-  describe("Testing 3") { // test name is "Testing 3 Scala code should be fun"
+  describe("Testing 3") { 
     describe(" Scala code") {
       it("should be fun") { s => }
     }
   }
 
-  describe("Testing 4") { // test name is "Testing 4 Scala code should be fun"
+  describe("Testing 4") { 
     describe("Scala code ") {
       it("should be fun") { s => }
     }
   }
 
-  describe("Testing 5") { // test name is "Testing 5 Scala code should be fun"
+  describe("Testing 5") { 
     describe("Scala code") {
       it(" should be fun") { s => }
     }
   }
 
-  // But a space at the beginning or end passes through:
-
-  describe(" Testing 6") { // test name is " Testing 6 Scala code should be fun"
+  describe(" Testing 6") { 
     describe("Scala code") {
       it("should be fun") { s => }
     }
   }
 
-  describe("Testing 7") { // test name is "Testing 7 Scala code should be fun "
+  describe("Testing 7") { 
     describe("Scala code") {
       it("should be fun ") { s => }
     }
   }
 
-  // Two spaces will be maintained. The only thing we do is opt to not
-  // add a space if there's one already there.
-  // That's a simple rule.
-
-  describe("Testing 8 ") { // test name is "Testing 8  Scala code should be fun" 
-    // Two spaces in name
+  describe("Testing 8 ") { 
     describe(" Scala code") {
       it("should be fun") { s => }
     }
   }
 
-  describe("Testing 9  ") { // test name is "Testing 9  Scala code should be fun" 
-    // Two spaces in name
+  describe("Testing 9  ") { 
     describe("Scala code") {
       it("should be fun") { s => }
     }
@@ -473,39 +441,31 @@ class ExampleTestNameFeatureSpec extends FeatureSpec with TestNameFixtureService
      "Feature: Testing 7 Scenario: Scala code should be fun"
     )
   
-  feature("Testing 1") { // test name is "Feature: Testing 1 Scenario: Scala code should be fun"
+  feature("Testing 1") { 
     scenario("Scala code should be fun") {}
   }
 
-  feature("Testing 2 ") { // test name is "Feature: Testing 2 Scenario: Scala code should be fun"
+  feature("Testing 2 ") { 
     scenario("Scala code should be fun") {}
   }
 
-  feature("Testing 3") { // test name is "Feature: Testing 3 Scenario: Scala code should be fun"
+  feature("Testing 3") { 
     scenario(" Scala code should be fun") {}
   }
 
-  feature("Testing 4") { // test name is "Feature: Testing 4 Scenario: Scala code should be fun "
+  feature("Testing 4") { 
     scenario("Scala code should be fun ") {}
   }
 
-  // But a space at the beginning or end passes through:
-
-  feature(" Testing 5") { // test name is "Feature:  Testing 5 Scenario: Scala code should be fun"
+  feature(" Testing 5") { 
     scenario("Scala code should be fun") {}
   }
 
-  // Two spaces will be maintained. The only thing we do is opt to not
-  // add a space if there's one already there.
-  // That's a simple rule.
-
-  feature("Testing 6 ") { // test name is "Feature: Testing 6 Scenario: Scala code should be fun" 
-    // Two spaces in name
+  feature("Testing 6 ") { 
     scenario(" Scala code should be fun") {}
   }
 
-  feature("Testing 7  ") { // test name is "Feature: Testing 7  Scenario: Scala code should be fun" 
-    // Two spaces in name
+  feature("Testing 7  ") {  
     scenario("Scala code should be fun") {}
   }
 }
@@ -523,39 +483,31 @@ class ExampleTestNameFixtureFeatureSpec extends fixture.FeatureSpec with TestNam
      "Feature: Testing 7 Scenario: Scala code should be fun"
     )
   
-  feature("Testing 1") { // test name is "Feature: Testing 1 Scenario: Scala code should be fun"
+  feature("Testing 1") { 
     scenario("Scala code should be fun") { s => }
   }
 
-  feature("Testing 2 ") { // test name is "Feature: Testing 2 Scenario: Scala code should be fun"
+  feature("Testing 2 ") { 
     scenario("Scala code should be fun") { s => }
   }
 
-  feature("Testing 3") { // test name is "Feature: Testing 3 Scenario: Scala code should be fun"
+  feature("Testing 3") { 
     scenario(" Scala code should be fun") { s => }
   }
 
-  feature("Testing 4") { // test name is "Feature: Testing 4 Scenario: Scala code should be fun "
+  feature("Testing 4") { 
     scenario("Scala code should be fun ") { s => }
   }
 
-  // But a space at the beginning or end passes through:
-
-  feature(" Testing 5") { // test name is "Feature:  Testing 5 Scenario: Scala code should be fun"
+  feature(" Testing 5") { 
     scenario("Scala code should be fun") { s => }
   }
 
-  // Two spaces will be maintained. The only thing we do is opt to not
-  // add a space if there's one already there.
-  // That's a simple rule.
-
-  feature("Testing 6 ") { // test name is "Feature: Testing 6 Scenario: Scala code should be fun" 
-    // Two spaces in name
+  feature("Testing 6 ") { 
     scenario(" Scala code should be fun") { s => }
   }
 
-  feature("Testing 7  ") { // test name is "Feature: Testing 7  Scenario: Scala code should be fun" 
-    // Two spaces in name
+  feature("Testing 7  ") { 
     scenario("Scala code should be fun") { s => }
   }
 }
@@ -574,31 +526,25 @@ class ExampleTestNameFlatSpec extends FlatSpec with TestNameFixtureServices {
      "Testing 7 should be fun to code in Scala"
     )
   
-  "Testing 1" should "be fun to code in Scala" in { // test name is "Testing 1 should be fun to code in Scala"
+  "Testing 1" should "be fun to code in Scala" in { 
   }
 
-  "Testing 2 " should "be fun to code in Scala" in { // test name is "Testing 2 should be fun to code in Scala"
+  "Testing 2 " should "be fun to code in Scala" in { 
   }
 
-  "Testing 3" should " be fun to code in Scala" in { // test name is "Testing 3 should be fun to code in Scala"
+  "Testing 3" should " be fun to code in Scala" in { 
   }
 
-  "Testing 4" should "be fun to code in Scala " in { // test name is "Testing 4 should be fun to code in Scala "
+  "Testing 4" should "be fun to code in Scala " in { 
   }
 
-  // But a space at the beginning or end passes through:
-
-  " Testing 5" should "be fun to code in Scala" in { // test name is " Testing 5 should be fun to code in Scala"
+  " Testing 5" should "be fun to code in Scala" in { 
   }
 
-  // Two spaces will be maintained. The only thing we do is opt to not
-  // add a space if there's one already there.
-  // That's a simple rule.
-
-  "Testing 6 " should " be fun to code in Scala" in { // test name is "Testing 6 should be fun to code in Scala" 
+  "Testing 6 " should " be fun to code in Scala" in {  
   }
 
-  "Testing 7  " should "be fun to code in Scala" in { // test name is "Testing 7  should be fun to code in Scala" 
+  "Testing 7  " should "be fun to code in Scala" in {  
   }
 }
 
@@ -615,31 +561,25 @@ class ExampleTestNameFixtureFlatSpec extends fixture.FlatSpec with TestNameFixtu
      "Testing 7 should be fun to code in Scala"
     )
   
-  "Testing 1" should "be fun to code in Scala" in { s => // test name is "Testing 1 should be fun to code in Scala"
+  "Testing 1" should "be fun to code in Scala" in { s => 
   }
 
-  "Testing 2 " should "be fun to code in Scala" in { s => // test name is "Testing 2 should be fun to code in Scala"
+  "Testing 2 " should "be fun to code in Scala" in { s => 
   }
 
-  "Testing 3" should " be fun to code in Scala" in { s => // test name is "Testing 3 should be fun to code in Scala"
+  "Testing 3" should " be fun to code in Scala" in { s => 
   }
 
-  "Testing 4" should "be fun to code in Scala " in { s => // test name is "Testing 4 should be fun to code in Scala "
+  "Testing 4" should "be fun to code in Scala " in { s => 
   }
 
-  // But a space at the beginning or end passes through:
-
-  " Testing 5" should "be fun to code in Scala" in { s => // test name is " Testing 5 should be fun to code in Scala"
+  " Testing 5" should "be fun to code in Scala" in { s => 
   }
 
-  // Two spaces will be maintained. The only thing we do is opt to not
-  // add a space if there's one already there.
-  // That's a simple rule.
-
-  "Testing 6 " should " be fun to code in Scala" in { s => // test name is "Testing 6 should be fun to code in Scala" 
+  "Testing 6 " should " be fun to code in Scala" in { s =>  
   }
 
-  "Testing 7  " should "be fun to code in Scala" in { s => // test name is "Testing 7  should be fun to code in Scala" 
+  "Testing 7  " should "be fun to code in Scala" in { s =>  
   }
 }
 
@@ -658,63 +598,55 @@ class ExampleTestNameFreeSpec extends FreeSpec with TestNameFixtureServices {
      "Testing 9 Scala code should be fun"
     )
   
-  "Testing 1" - { // test name is "Testing 1 Scala code should be fun"
+  "Testing 1" - { 
     "Scala code" - {
       "should be fun" in {}
     }
   }
 
-  "Testing 2 " - { // test name is "Testing 2 Scala code should be fun"
+  "Testing 2 " - { 
     "Scala code" - {
       "should be fun" in {}
     }
   }
 
-  "Testing 3" - { // test name is "Testing 3 Scala code should be fun"
+  "Testing 3" - { 
     " Scala code" - {
       "should be fun" in {}
     }
   }
 
-  "Testing 4" - { // test name is "Testing 4 Scala code should be fun"
+  "Testing 4" - { 
     "Scala code " - {
       "should be fun" in {}
     }
   }
 
-  "Testing 5" - { // test name is "Testing 5 Scala code should be fun"
+  "Testing 5" - { 
     "Scala code" - {
       " should be fun" in {}
     }
   }
 
-  // But a space at the beginning or end passes through:
-
-  " Testing 6" - { // test name is " Testing 6 Scala code should be fun"
+  " Testing 6" - { 
     "Scala code" - {
       "should be fun" in {}
     }
   }
 
-  "Testing 7" - { // test name is "Testing 7 Scala code should be fun "
+  "Testing 7" - { 
     "Scala code" - {
       "should be fun " in {}
     }
   }
 
-  // Two spaces will be maintained. The only thing we do is opt to not
-  // add a space if there's one already there.
-  // That's a simple rule.
-
-  "Testing 8 " - { // test name is "Testing 8  Scala code should be fun" 
-    // Two spaces in name
+  "Testing 8 " - { 
     " Scala code" - {
       "should be fun" in {}
     }
   }
 
-  "Testing 9  " - { // test name is "Testing 9  Scala code should be fun" 
-    // Two spaces in name
+  "Testing 9  " - { 
     "Scala code" - {
       "should be fun" in {}
     }
@@ -736,63 +668,55 @@ class ExampleTestNameFixtureFreeSpec extends fixture.FreeSpec with TestNameFixtu
      "Testing 9 Scala code should be fun"
     )
   
-  "Testing 1" - { // test name is "Testing 1 Scala code should be fun"
+  "Testing 1" - { 
     "Scala code" - {
       "should be fun" in { s => }
     }
   }
 
-  "Testing 2 " - { // test name is "Testing 2 Scala code should be fun"
+  "Testing 2 " - { 
     "Scala code" - {
       "should be fun" in { s => }
     }
   }
 
-  "Testing 3" - { // test name is "Testing 3 Scala code should be fun"
+  "Testing 3" - { 
     " Scala code" - {
       "should be fun" in { s => }
     }
   }
 
-  "Testing 4" - { // test name is "Testing 4 Scala code should be fun"
+  "Testing 4" - { 
     "Scala code " - {
       "should be fun" in { s => }
     }
   }
 
-  "Testing 5" - { // test name is "Testing 5 Scala code should be fun"
+  "Testing 5" - { 
     "Scala code" - {
       " should be fun" in { s => }
     }
   }
 
-  // But a space at the beginning or end passes through:
-
-  " Testing 6" - { // test name is " Testing 6 Scala code should be fun"
+  " Testing 6" - { 
     "Scala code" - {
       "should be fun" in { s => }
     }
   }
 
-  "Testing 7" - { // test name is "Testing 7 Scala code should be fun "
+  "Testing 7" - { 
     "Scala code" - {
       "should be fun " in { s => }
     }
   }
 
-  // Two spaces will be maintained. The only thing we do is opt to not
-  // add a space if there's one already there.
-  // That's a simple rule.
-
-  "Testing 8 " - { // test name is "Testing 8  Scala code should be fun" 
-    // Two spaces in name
+  "Testing 8 " - { 
     " Scala code" - {
       "should be fun" in { s => }
     }
   }
 
-  "Testing 9  " - { // test name is "Testing 9  Scala code should be fun" 
-    // Two spaces in name
+  "Testing 9  " - { 
     "Scala code" - {
       "should be fun" in { s => }
     }
@@ -856,63 +780,55 @@ class ExampleTestNameWordSpec extends WordSpec with TestNameFixtureServices {
      "Testing 9 should test Scala code should be fun"
     )
   
-  "Testing 1" should { // test name is "Testing 1 should test Scala code should be fun"
+  "Testing 1" should { 
     "test Scala code" should {
       "be fun" in {}
     }
   }
 
-  "Testing 2 " should { // test name is "Testing 2 should test Scala code should be fun"
+  "Testing 2 " should { 
     "test Scala code" should {
       "be fun" in {}
     }
   }
 
-  "Testing 3" should { // test name is "Testing 3 should test Scala code should be fun"
+  "Testing 3" should { 
     " test Scala code" should {
       "be fun" in {}
     }
   }
 
-  "Testing 4" should { // test name is "Testing 4 should test Scala code should be fun"
+  "Testing 4" should { 
     "test Scala code " should {
       "be fun" in {}
     }
   }
 
-  "Testing 5" should { // test name is "Testing 5 should test Scala code should be fun"
+  "Testing 5" should { 
     "test Scala code" should {
       " be fun" in {}
     }
   }
 
-  // But a space at the beginning or end passes through:
-
-  " Testing 6" should { // test name is " Testing 6 should test Scala code should be fun"
+  " Testing 6" should { 
     "test Scala code" should {
       "be fun" in {}
     }
   }
 
-  "Testing 7" should { // test name is "Testing 7 should test Scala code should be fun "
+  "Testing 7" should { 
     "test Scala code" should {
       "be fun " in {}
     }
   }
 
-  // Two spaces will be maintained. The only thing we do is opt to not
-  // add a space if there's one already there.
-  // That's a simple rule.
-
-  "Testing 8 " should { // test name is "Testing 8 should test Scala code should be fun" 
-    // Two spaces in name
+  "Testing 8 " should { 
     " test Scala code" should {
       "be fun" in {}
     }
   }
 
-  "Testing 9  " should { // test name is "Testing 9  should test Scala code should be fun" 
-    // Two spaces in name
+  "Testing 9  " should { 
     "test Scala code" should {
       "be fun" in {}
     }
@@ -934,63 +850,55 @@ class ExampleTestNameFixtureWordSpec extends fixture.WordSpec with TestNameFixtu
      "Testing 9 should test Scala code should be fun"
     )
   
-  "Testing 1" should { // test name is "Testing 1 should test Scala code should be fun"
+  "Testing 1" should { 
     "test Scala code" should {
       "be fun" in { s => }
     }
   }
 
-  "Testing 2 " should { // test name is "Testing 2 should test Scala code should be fun"
+  "Testing 2 " should { 
     "test Scala code" should {
       "be fun" in { s => }
     }
   }
 
-  "Testing 3" should { // test name is "Testing 3 should test Scala code should be fun"
+  "Testing 3" should { 
     " test Scala code" should {
       "be fun" in { s => }
     }
   }
 
-  "Testing 4" should { // test name is "Testing 4 should test Scala code should be fun"
+  "Testing 4" should { 
     "test Scala code " should {
       "be fun" in { s => }
     }
   }
 
-  "Testing 5" should { // test name is "Testing 5 should test Scala code should be fun"
+  "Testing 5" should { 
     "test Scala code" should {
       " be fun" in { s => }
     }
   }
 
-  // But a space at the beginning or end passes through:
-
-  " Testing 6" should { // test name is " Testing 6 should test Scala code should be fun"
+  " Testing 6" should { 
     "test Scala code" should {
       "be fun" in { s => }
     }
   }
 
-  "Testing 7" should { // test name is "Testing 7 should test Scala code should be fun "
+  "Testing 7" should { 
     "test Scala code" should {
       "be fun " in { s => }
     }
   }
 
-  // Two spaces will be maintained. The only thing we do is opt to not
-  // add a space if there's one already there.
-  // That's a simple rule.
-
-  "Testing 8 " should { // test name is "Testing 8 should test Scala code should be fun" 
-    // Two spaces in name
+  "Testing 8 " should { 
     " test Scala code" should {
       "be fun" in { s => }
     }
   }
 
-  "Testing 9  " should { // test name is "Testing 9  should test Scala code should be fun" 
-    // Two spaces in name
+  "Testing 9  " should { 
     "test Scala code" should {
       "be fun" in { s => }
     }
@@ -1012,63 +920,55 @@ class ExampleTestNamePathFreeSpec extends path.FreeSpec with TestNameFixtureServ
      "Testing 9 Scala code should be fun"
     )
   
-  "Testing 1" - { // test name is "Testing 1 Scala code should be fun"
+  "Testing 1" - { 
     "Scala code" - {
       "should be fun" in {}
     }
   }
 
-  "Testing 2 " - { // test name is "Testing 2 Scala code should be fun"
+  "Testing 2 " - { 
     "Scala code" - {
       "should be fun" in {}
     }
   }
 
-  "Testing 3" - { // test name is "Testing 3 Scala code should be fun"
+  "Testing 3" - { 
     " Scala code" - {
       "should be fun" in {}
     }
   }
 
-  "Testing 4" - { // test name is "Testing 4 Scala code should be fun"
+  "Testing 4" - { 
     "Scala code " - {
       "should be fun" in {}
     }
   }
 
-  "Testing 5" - { // test name is "Testing 5 Scala code should be fun"
+  "Testing 5" - { 
     "Scala code" - {
       " should be fun" in {}
     }
   }
 
-  // But a space at the beginning or end passes through:
-
-  " Testing 6" - { // test name is " Testing 6 Scala code should be fun"
+  " Testing 6" - { 
     "Scala code" - {
       "should be fun" in {}
     }
   }
 
-  "Testing 7" - { // test name is "Testing 7 Scala code should be fun "
+  "Testing 7" - { 
     "Scala code" - {
       "should be fun " in {}
     }
   }
 
-  // Two spaces will be maintained. The only thing we do is opt to not
-  // add a space if there's one already there.
-  // That's a simple rule.
-
-  "Testing 8 " - { // test name is "Testing 8  Scala code should be fun" 
-    // Two spaces in name
+  "Testing 8 " - { 
     " Scala code" - {
       "should be fun" in {}
     }
   }
 
-  "Testing 9  " - { // test name is "Testing 9  Scala code should be fun" 
-    // Two spaces in name
+  "Testing 9  " - { 
     "Scala code" - {
       "should be fun" in {}
     }
@@ -1090,63 +990,55 @@ class ExampleTestNamePathFunSpec extends path.FunSpec with TestNameFixtureServic
      "Testing 9 Scala code should be fun"
     )
   
-  describe("Testing 1") { // test name is "Testing 1 Scala code should be fun"
+  describe("Testing 1") { 
     describe("Scala code") {
       it("should be fun") {}
     }
   }
 
-  describe("Testing 2 ") { // test name is "Testing 2 Scala code should be fun"
+  describe("Testing 2 ") { 
     describe("Scala code") {
       it("should be fun") {}
     }
   }
 
-  describe("Testing 3") { // test name is "Testing 3 Scala code should be fun"
+  describe("Testing 3") { 
     describe(" Scala code") {
       it("should be fun") {}
     }
   }
 
-  describe("Testing 4") { // test name is "Testing 4 Scala code should be fun"
+  describe("Testing 4") { 
     describe("Scala code ") {
       it("should be fun") {}
     }
   }
 
-  describe("Testing 5") { // test name is "Testing 5 Scala code should be fun"
+  describe("Testing 5") { 
     describe("Scala code") {
       it(" should be fun") {}
     }
   }
 
-  // But a space at the beginning or end passes through:
-
-  describe(" Testing 6") { // test name is " Testing 6 Scala code should be fun"
+  describe(" Testing 6") { 
     describe("Scala code") {
       it("should be fun") {}
     }
   }
 
-  describe("Testing 7") { // test name is "Testing 7 Scala code should be fun "
+  describe("Testing 7") { 
     describe("Scala code") {
       it("should be fun ") {}
     }
   }
 
-  // Two spaces will be maintained. The only thing we do is opt to not
-  // add a space if there's one already there.
-  // That's a simple rule.
-
-  describe("Testing 8 ") { // test name is "Testing 8  Scala code should be fun" 
-    // Two spaces in name
+  describe("Testing 8 ") { 
     describe(" Scala code") {
       it("should be fun") {}
     }
   }
 
-  describe("Testing 9  ") { // test name is "Testing 9  Scala code should be fun" 
-    // Two spaces in name
+  describe("Testing 9  ") { 
     describe("Scala code") {
       it("should be fun") {}
     }
