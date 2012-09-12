@@ -41,6 +41,7 @@ class TestDataProp extends AllSuiteProp {
       assert(s.expectedTestData.name === s.testData.name)
       assert(s.expectedTestData.scopes === s.testData.scopes)
       assert(s.expectedTestData.text === s.testData.text)
+      assert(s.expectedTestData.tags === s.testData.tags)
     }
   }
 }
@@ -53,6 +54,8 @@ trait TestDataFixtureServices {
   val expectedTestData: TestData
 }
 
+object TestDataTag extends Tag("org.scalatest.tags.TestDataTag")
+
 @DoNotDiscover
 class ExampleTestDataSuite extends Suite with TestDataFixtureServices {
   val expectedTestData = new TestData {
@@ -60,13 +63,14 @@ class ExampleTestDataSuite extends Suite with TestDataFixtureServices {
     val name = "testMethod1"
     val scopes = IndexedSeq.empty
     val text = "testMethod1"
+    val tags = Set("org.scalatest.DoNotDiscover", "org.scalatest.SlowAsMolasses")
   }
   var testData: TestData = null
   override def withFixture(test: NoArgTest) {
     testData = test
     super.withFixture(test)
   }
-  
+  @SlowAsMolasses
   def testMethod1() {}
 }
 
@@ -77,13 +81,14 @@ class ExampleTestDataFixtureSuite extends fixture.Suite with TestDataFixtureServ
     val name = "testMethod1(FixtureParam)"
     val scopes = IndexedSeq.empty
     val text = "testMethod1(FixtureParam)"
+    val tags = Set("org.scalatest.DoNotDiscover", "org.scalatest.SlowAsMolasses")
   }
   var testData: TestData = null
   override def withFixture(test: OneArgTest) {
     testData = test
     super.withFixture(test)
   }
-  
+  @SlowAsMolasses
   def testMethod1(fixture: String) {}
 }
 
@@ -94,6 +99,7 @@ class ExampleTestDataSpec extends Spec with TestDataFixtureServices {
     val name = "Scope 1 Scope 2 test 1"
     val scopes = IndexedSeq("Scope 1", "Scope 2")
     val text = "test 1"
+    val tags = Set("org.scalatest.DoNotDiscover", "org.scalatest.SlowAsMolasses")
   }
   var testData: TestData = null
   override def withFixture(test: NoArgTest) {
@@ -103,6 +109,7 @@ class ExampleTestDataSpec extends Spec with TestDataFixtureServices {
   
   object `Scope 1` {
     object `Scope 2` {
+      @SlowAsMolasses
       def `test 1` {}
     }
   }
@@ -115,6 +122,7 @@ class ExampleTestDataFixtureSpec extends fixture.Spec with TestDataFixtureServic
     val name = "Scope 1 Scope 2 test 1"
     val scopes = IndexedSeq("Scope 1", "Scope 2")
     val text = "test 1"
+    val tags = Set("org.scalatest.DoNotDiscover", "org.scalatest.SlowAsMolasses")
   }
   var testData: TestData = null
   override def withFixture(test: OneArgTest) {
@@ -124,6 +132,7 @@ class ExampleTestDataFixtureSpec extends fixture.Spec with TestDataFixtureServic
   
   object `Scope 1` {
     object `Scope 2` {
+      @SlowAsMolasses
       def `test 1`(fixture: String) { }
     }
   }
@@ -136,6 +145,7 @@ class ExampleTestDataJUnit3Suite extends JUnit3Suite with TestDataFixtureService
     val name = "testMethod1"
     val scopes = IndexedSeq.empty
     val text = "testMethod1"
+    val tags = Set.empty[String]
   }
   var testData: TestData = this.testDataFor("testMethod1", Map("key1" -> "value1"))
   
@@ -149,11 +159,12 @@ class ExampleTestDataJUnitSuite extends JUnitSuite with TestDataFixtureServices 
     val name = "testMethod1"
     val scopes = IndexedSeq.empty
     val text = "testMethod1"
+    val tags = Set("org.scalatest.DoNotDiscover", "org.scalatest.Ignore")
   }
   var testData: TestData = this.testDataFor("testMethod1", Map("key1" -> "value1"))
 
-  @Test
-  def testMethod1() {}
+  @org.junit.Ignore
+  @Test def testMethod1() = ()
 }
 
 
@@ -165,9 +176,11 @@ class ExampleTestDataTestNGSuite extends TestNGSuite with TestDataFixtureService
     val name = "testMethod1"
     val scopes = IndexedSeq.empty
     val text = "testMethod1"
+    val tags = Set("org.scalatest.DoNotDiscover", "org.scalatest.Ignore")
   }
   var testData: TestData = this.testDataFor("testMethod1", Map("key1" -> "value1"))
   @TestNG
+  @Ignore
   def testMethod1() {}
 }
 
@@ -178,13 +191,14 @@ class ExampleTestDataFunSuite extends FunSuite with TestDataFixtureServices {
     val name = "Test 1"
     val scopes = IndexedSeq.empty
     val text = "Test 1"
+    val tags = Set("org.scalatest.DoNotDiscover", "org.scalatest.tags.TestDataTag")
   }
   var testData: TestData = null
   override def withFixture(test: NoArgTest) {
     testData = test
     super.withFixture(test)
   }
-  test("Test 1") {}
+  test("Test 1", TestDataTag) {}
 }
 
 @DoNotDiscover
@@ -194,13 +208,14 @@ class ExampleTestDataFixtureFunSuite extends fixture.FunSuite with TestDataFixtu
     val name = "Test 1"
     val scopes = IndexedSeq.empty
     val text = "Test 1"
+    val tags = Set("org.scalatest.DoNotDiscover", "org.scalatest.tags.TestDataTag")
   }
   var testData: TestData = null
   override def withFixture(test: OneArgTest) {
     testData = test
     super.withFixture(test)
   }
-  test("Test 1") { s => }
+  test("Test 1", TestDataTag) { s => }
 }
 
 @DoNotDiscover
@@ -210,6 +225,7 @@ class ExampleTestDataFunSpec extends FunSpec with TestDataFixtureServices {
     val name = "Scope 1 Scope 2 test 1"
     val scopes = IndexedSeq("Scope 1", "Scope 2")
     val text = "test 1"
+    val tags = Set("org.scalatest.DoNotDiscover", "org.scalatest.tags.TestDataTag")
   }
   var testData: TestData = null
   override def withFixture(test: NoArgTest) {
@@ -218,7 +234,7 @@ class ExampleTestDataFunSpec extends FunSpec with TestDataFixtureServices {
   }
   describe("Scope 1") {
     describe("Scope 2") {
-      it("test 1") {}
+      it("test 1", TestDataTag) {}
     }
   }
 }
@@ -230,6 +246,7 @@ class ExampleTestDataFixtureFunSpec extends fixture.FunSpec with TestDataFixture
     val name = "Scope 1 Scope 2 test 1"
     val scopes = IndexedSeq("Scope 1", "Scope 2")
     val text = "test 1"
+    val tags = Set("org.scalatest.DoNotDiscover", "org.scalatest.tags.TestDataTag")
   }
   var testData: TestData = null
   override def withFixture(test: OneArgTest) {
@@ -238,7 +255,7 @@ class ExampleTestDataFixtureFunSpec extends fixture.FunSpec with TestDataFixture
   }
   describe("Scope 1") {
     describe("Scope 2") {
-      it("test 1") { s => }
+      it("test 1", TestDataTag) { s => }
     }
   }
 }
@@ -250,6 +267,7 @@ class ExampleTestDataFeatureSpec extends FeatureSpec with TestDataFixtureService
     val name = "Feature: Feature 1 Scenario: Scenario 1"
     val scopes = IndexedSeq("Feature: Feature 1")
     val text = "Scenario: Scenario 1"
+    val tags = Set("org.scalatest.DoNotDiscover", "org.scalatest.tags.TestDataTag")
   }
   var testData: TestData = null
   override def withFixture(test: NoArgTest) {
@@ -257,7 +275,7 @@ class ExampleTestDataFeatureSpec extends FeatureSpec with TestDataFixtureService
     super.withFixture(test)
   }
   feature("Feature 1") {
-    scenario("Scenario 1") {}
+    scenario("Scenario 1", TestDataTag) {}
   }
 }
 
@@ -268,6 +286,7 @@ class ExampleTestDataFixtureFeatureSpec extends fixture.FeatureSpec with TestDat
     val name = "Feature: Feature 1 Scenario: Scenario 1"
     val scopes = IndexedSeq("Feature: Feature 1")
     val text = "Scenario: Scenario 1"
+    val tags = Set("org.scalatest.DoNotDiscover", "org.scalatest.tags.TestDataTag")
   }
   var testData: TestData = null
   override def withFixture(test: OneArgTest) {
@@ -275,7 +294,7 @@ class ExampleTestDataFixtureFeatureSpec extends fixture.FeatureSpec with TestDat
     super.withFixture(test)
   }
   feature("Feature 1") {
-    scenario("Scenario 1") { s => }
+    scenario("Scenario 1", TestDataTag) { s => }
   }
 }
 
@@ -286,13 +305,14 @@ class ExampleTestDataFlatSpec extends FlatSpec with TestDataFixtureServices {
     val name = "Scope 1 should test 1"
     val scopes = IndexedSeq("Scope 1")
     val text = "should test 1"
+    val tags = Set("org.scalatest.DoNotDiscover", "org.scalatest.tags.TestDataTag")
   }
   var testData: TestData = null
   override def withFixture(test: NoArgTest) {
     testData = test
     super.withFixture(test)
   }
-  "Scope 1" should "test 1" in {}
+  "Scope 1" should "test 1" taggedAs(TestDataTag) in {}
 }
 
 @DoNotDiscover
@@ -302,13 +322,14 @@ class ExampleTestDataFixtureFlatSpec extends fixture.FlatSpec with TestDataFixtu
     val name = "Scope 1 should test 1"
     val scopes = IndexedSeq("Scope 1")
     val text = "should test 1"
+    val tags = Set("org.scalatest.DoNotDiscover", "org.scalatest.tags.TestDataTag")
   }
   var testData: TestData = null
   override def withFixture(test: OneArgTest) {
     testData = test
     super.withFixture(test)
   }
-  "Scope 1" should "test 1" in { s => }
+  "Scope 1" should "test 1" taggedAs(TestDataTag) in { s => }
 }
 
 @DoNotDiscover
@@ -318,6 +339,7 @@ class ExampleTestDataFreeSpec extends FreeSpec with TestDataFixtureServices {
     val name = "Scope 1 Scope 2 test 1"
     val scopes = IndexedSeq("Scope 1", "Scope 2")
     val text = "test 1"
+    val tags = Set("org.scalatest.DoNotDiscover", "org.scalatest.tags.TestDataTag")
   }
   var testData: TestData = null
   override def withFixture(test: NoArgTest) {
@@ -326,7 +348,7 @@ class ExampleTestDataFreeSpec extends FreeSpec with TestDataFixtureServices {
   }
   "Scope 1" - {
     "Scope 2" - {
-      "test 1" in {}
+      "test 1" taggedAs(TestDataTag) in {}
     }
   }
 }
@@ -338,6 +360,7 @@ class ExampleTestDataFixtureFreeSpec extends fixture.FreeSpec with TestDataFixtu
     val name = "Scope 1 Scope 2 test 1"
     val scopes = IndexedSeq("Scope 1", "Scope 2")
     val text = "test 1"
+    val tags = Set("org.scalatest.DoNotDiscover", "org.scalatest.tags.TestDataTag")
   }
   var testData: TestData = null
   override def withFixture(test: OneArgTest) {
@@ -346,7 +369,7 @@ class ExampleTestDataFixtureFreeSpec extends fixture.FreeSpec with TestDataFixtu
   }
   "Scope 1" - {
     "Scope 2" - {
-      "test 1" in { s => }
+      "test 1" taggedAs(TestDataTag) in { s => }
     }
   }
 }
@@ -358,13 +381,14 @@ class ExampleTestDataPropSpec extends PropSpec with TestDataFixtureServices {
     val name = "Test 1"
     val scopes = IndexedSeq.empty
     val text = "Test 1"
+    val tags = Set("org.scalatest.DoNotDiscover", "org.scalatest.tags.TestDataTag")
   }
   var testData: TestData = null
   override def withFixture(test: NoArgTest) {
     testData = test
     super.withFixture(test)
   }
-  property("Test 1") {}
+  property("Test 1", TestDataTag) {}
 }
 
 @DoNotDiscover
@@ -374,13 +398,14 @@ class ExampleTestDataFixturePropSpec extends fixture.PropSpec with TestDataFixtu
     val name = "Test 1"
     val scopes = IndexedSeq.empty
     val text = "Test 1"
+    val tags = Set("org.scalatest.DoNotDiscover", "org.scalatest.tags.TestDataTag")
   }
   var testData: TestData = null
   override def withFixture(test: OneArgTest) {
     testData = test
     super.withFixture(test)
   }
-  property("Test 1") { s => }
+  property("Test 1", TestDataTag) { s => }
 }
 
 @DoNotDiscover
@@ -390,6 +415,7 @@ class ExampleTestDataWordSpec extends WordSpec with TestDataFixtureServices {
     val name = "Scope 1 should Scope 2 should test 1"
     val scopes = IndexedSeq("Scope 1 should", "Scope 2 should")
     val text = "test 1"
+    val tags = Set("org.scalatest.DoNotDiscover", "org.scalatest.tags.TestDataTag")
   }
   var testData: TestData = null
   override def withFixture(test: NoArgTest) {
@@ -398,7 +424,7 @@ class ExampleTestDataWordSpec extends WordSpec with TestDataFixtureServices {
   }
   "Scope 1" should {
     "Scope 2" should {
-      "test 1" in {}
+      "test 1" taggedAs(TestDataTag) in {}
     }
   }
 }
@@ -410,6 +436,7 @@ class ExampleTestDataFixtureWordSpec extends fixture.WordSpec with TestDataFixtu
     val name = "Scope 1 should Scope 2 should test 1"
     val scopes = IndexedSeq("Scope 1 should", "Scope 2 should")
     val text = "test 1"
+    val tags = Set("org.scalatest.DoNotDiscover", "org.scalatest.tags.TestDataTag")
   }
   var testData: TestData = null
   override def withFixture(test: OneArgTest) {
@@ -418,7 +445,7 @@ class ExampleTestDataFixtureWordSpec extends fixture.WordSpec with TestDataFixtu
   }
   "Scope 1" should {
     "Scope 2" should {
-      "test 1" in { s => }
+      "test 1" taggedAs(TestDataTag) in { s => }
     }
   }
 }
@@ -430,11 +457,12 @@ class ExampleTestDataPathFreeSpec extends path.FreeSpec with TestDataFixtureServ
     val name = "Scope 1 Scope 2 test 1"
     val scopes = IndexedSeq("Scope 1", "Scope 2")
     val text = "test 1"
+    val tags = Set("org.scalatest.DoNotDiscover", "org.scalatest.tags.TestDataTag")
   }
   def testData: TestData = testDataFor("Scope 1 Scope 2 test 1", Map("key1" -> "value1"))
   "Scope 1" - {
     "Scope 2" - {
-      "test 1" in {}
+      "test 1" taggedAs(TestDataTag) in {}
     }
   }
 }
@@ -446,11 +474,12 @@ class ExampleTestDataPathFunSpec extends path.FunSpec with TestDataFixtureServic
     val name = "Scope 1 Scope 2 test 1"
     val scopes = IndexedSeq("Scope 1", "Scope 2")
     val text = "test 1"
+    val tags = Set("org.scalatest.DoNotDiscover", "org.scalatest.tags.TestDataTag")
   }
   def testData: TestData = testDataFor("Scope 1 Scope 2 test 1", Map("key1" -> "value1"))
   describe("Scope 1") {
     describe("Scope 2") {
-      it("test 1") {}
+      it("test 1", TestDataTag) {}
     }
   }
 }

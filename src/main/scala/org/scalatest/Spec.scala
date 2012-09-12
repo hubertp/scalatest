@@ -1390,6 +1390,7 @@ trait Spec extends Suite { thisSuite =>
           val configMap = testData.configMap
           val scopes = testData.scopes
           val text = testData.text
+          val tags = testData.tags
         }
       )
     }
@@ -1449,7 +1450,7 @@ trait Spec extends Suite { thisSuite =>
    */
   final override val styleName: String = "org.scalatest.Spec"
     
-  override def testDataFor(testName: String, theConfigMap: Map[String, Any] = Map.empty): TestData = createTestDataFor(testName, theConfigMap)
+  override def testDataFor(testName: String, theConfigMap: Map[String, Any] = Map.empty): TestData = createTestDataFor(testName, theConfigMap, this)
 }
 
 private[scalatest] object Spec {

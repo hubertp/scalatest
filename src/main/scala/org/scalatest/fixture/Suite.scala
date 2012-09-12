@@ -106,6 +106,7 @@ trait Suite extends org.scalatest.Suite { thisSuite =>
         def apply() { thisOneArgTest(fixture) }
         val scopes = thisOneArgTest.scopes
         val text = thisOneArgTest.text
+        val tags = thisOneArgTest.tags
       }
   }
 
@@ -132,6 +133,7 @@ trait Suite extends org.scalatest.Suite { thisSuite =>
     private val testData = testDataFor(name, configMap)
     val scopes = testData.scopes
     val text = testData.text
+    val tags = testData.tags
   }
 
   private[fixture] class FixturelessTestFunAndConfigMap(override val name: String, test: () => Any, override val configMap: Map[String, Any])
@@ -141,6 +143,7 @@ trait Suite extends org.scalatest.Suite { thisSuite =>
     private val testData = testDataFor(name, configMap)
     val scopes = testData.scopes
     val text = testData.text
+    val tags = testData.tags
   }
 
   // TODO: add documentation here, so people know they can pass an Informer as the second arg.

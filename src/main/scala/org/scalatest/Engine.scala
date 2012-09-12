@@ -606,13 +606,24 @@ private[scalatest] sealed abstract class SuperEngine[T](concurrentBundleModResou
     }
   }
   
-  private[scalatest] def createTestDataFor(testName: String, theConfigMap: Map[String, Any]) = 
+  private[scalatest] def createTestDataFor(testName: String, theConfigMap: Map[String, Any], theSuite: Suite) = 
     new TestData {
       val configMap = theConfigMap 
       val name = testName
       val scopes = testScopes(testName)
       val text = testText(testName)
+      val tags = testTags(testName, theSuite)
     }
+  
+  private[scalatest] def testTags(testName: String, theSuite: Suite): Set[String] = {
+    val suiteTags = for { 
+      a <- theSuite.getClass.getDeclaredAnnotations
+      annotationClass = a.annotationType
+      if annotationClass.isAnnotationPresent(classOf[TagAnnotation])
+    } yield annotationClass.getName
+    val testTagSet = atomic.get.tagsMap.getOrElse(testName, Set.empty)
+    Set.empty ++ suiteTags ++ testTagSet
+  }
   
   private[scalatest] def testScopes(testName: String): IndexedSeq[String] = {
     @tailrec

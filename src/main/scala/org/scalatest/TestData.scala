@@ -111,5 +111,10 @@ trait TestData {
    * </p>
    */
   val text: String
+  
+  /**
+   * Tag names for this test.
+   */
+  val tags: Set[String]
 }
 

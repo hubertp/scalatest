@@ -2263,6 +2263,7 @@ one error found
           val configMap = testData.configMap
           val scopes = testData.scopes
           val text = testData.text
+          val tags = testData.tags
         }
       )
     }
@@ -2398,5 +2399,5 @@ one error found
    */
   final override val styleName: String = "org.scalatest.WordSpec"
     
-  override def testDataFor(testName: String, theConfigMap: Map[String, Any] = Map.empty): TestData = createTestDataFor(testName, theConfigMap)
+  override def testDataFor(testName: String, theConfigMap: Map[String, Any] = Map.empty): TestData = createTestDataFor(testName, theConfigMap, this)
 }
