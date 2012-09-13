@@ -850,7 +850,7 @@ object Runner {
               dispatchReporter,
               suitesList,
               junitsList,
-              new Stopper {},
+              Stopper.default,
               tagsToInclude,
               tagsToExclude,
               configMap,

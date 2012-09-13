@@ -143,7 +143,7 @@ private[scalatest] class RunnerJFrame(
   private val graphicRunReporter: Reporter = new GraphicRunReporter
   private val graphicRerunReporter: Reporter = new GraphicRerunReporter
 
-  private val stopper = new SimpleStopper
+  private val stopper = Stopper.default
 
   private val exitSemaphore = new Semaphore(1)
 

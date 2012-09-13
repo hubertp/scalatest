@@ -819,14 +819,13 @@ trait Suite extends Assertions with AbstractSuite with Serializable { thisSuite 
       run(
         None,
         Args(dispatch,
-        new Stopper {},
+        Stopper.default,
         filter,
         configMap,
         None,
         tracker,
         Set.empty)
       )
-    // TODO: Go through and change all "new Stopper {}" with new JustCantStop or something to save class files
       val suiteCompletedFormatter = formatterForSuiteCompleted(thisSuite)
       val duration = System.currentTimeMillis - suiteStartTime
       dispatch(SuiteCompleted(tracker.nextOrdinal(), thisSuite.suiteName, thisSuite.suiteId, Some(thisSuite.getClass.getName), thisSuite.decodedSuiteName, Some(duration), suiteCompletedFormatter, Some(getTopOfClass)))
