@@ -15,25 +15,10 @@
  */
 package org.scalatest
 
-import events.Event
-import org.scalatest.events.TestFailed
-
 private[scalatest] trait StopOnFailure extends SuiteMixin { thisSuite: Suite =>
   
-  class StopOnFailureReporter(dispatch: Reporter, stopper: Stopper) extends Reporter {
-    
-    def apply(event: Event) {
-      event match {
-        case testFailed: TestFailed => stopper.requestStop()
-        case _ => 
-      }
-      dispatch(event)
-    }
-    
-  }
-
   override abstract def run(testName: Option[String], args: Args) {
-    super.run(testName, args.copy(reporter = new StopOnFailureReporter(args.reporter, args.stopper)))
+    super.run(testName, args.copy(reporter = new StopOnFailureReporter(args.reporter, args.stopper, System.err)))
   }
   
 }

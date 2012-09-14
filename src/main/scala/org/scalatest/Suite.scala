@@ -1637,10 +1637,11 @@ trait Suite extends Assertions with AbstractSuite with Serializable { thisSuite 
   // so that exceptions are caught and transformed
   // into error messages on the standard error stream.
   private[scalatest] def wrapReporterIfNecessary(reporter: Reporter) = reporter match {
-    case dr: DispatchReporter => dr
     case cr: CatchReporter => cr
-    case _ => new CatchReporter(reporter)
+    case _ => createCatchReporter(reporter)
   }
+  
+  protected[scalatest] def createCatchReporter(reporter: Reporter) = new WrapperCatchReporter(reporter)
   
   /**
    * The fully qualified class name of the rerunner to rerun this suite.  This implementation will look at this.getClass and see if it is
