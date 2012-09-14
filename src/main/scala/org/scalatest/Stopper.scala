@@ -51,8 +51,6 @@ trait Stopper {
   def stopRequested: Boolean
 
   def requestStop()
-  
-  def reset()
 }
 
 /**
@@ -67,9 +65,6 @@ object Stopper {
     def stopRequested: Boolean = stopWasRequested
     def requestStop() {
       stopWasRequested = true
-    }
-    def reset() {
-      stopWasRequested = false
     }
   }
 
