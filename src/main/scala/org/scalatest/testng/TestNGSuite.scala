@@ -88,9 +88,13 @@ trait TestNGSuite extends Suite { thisSuite =>
    *                 I.e., <code>None</code> acts like a wildcard that means execute all relevant tests in this <code>TestNGSuite</code>.
    * @param args the <code>Args</code> for this run
    */
-  override def run(testName: Option[String], args: Args) {
+  override def run(testName: Option[String], args: Args): Status = {
     import args._
+    val status = new SimpleStatus
     runTestNG(testName, wrapReporterIfNecessary(reporter), filter, tracker)
+    status.succeed()
+    status.complete()
+    status
   }
 
   /**
@@ -359,7 +363,7 @@ trait TestNGSuite extends Suite { thisSuite =>
    *
    * @throws UnsupportedOperationException always.
    */
-  override final protected def runNestedSuites(args: Args) {
+  override final protected def runNestedSuites(args: Args): Status = {
 
     throw new UnsupportedOperationException
   }
@@ -382,7 +386,7 @@ trait TestNGSuite extends Suite { thisSuite =>
    *
    * @throws UnsupportedOperationException always.
    */
-  override protected final def runTests(testName: Option[String], args: Args) {
+  override protected final def runTests(testName: Option[String], args: Args): Status = {
     throw new UnsupportedOperationException
   }
 
@@ -403,7 +407,7 @@ trait TestNGSuite extends Suite { thisSuite =>
    *
    * @throws UnsupportedOperationException always.
    */
-  override protected final def runTest(testName: String, args: Args) {
+  override protected final def runTest(testName: String, args: Args): Status = {
     throw new UnsupportedOperationException
   }
 

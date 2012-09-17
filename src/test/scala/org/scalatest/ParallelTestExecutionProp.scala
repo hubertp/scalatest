@@ -27,18 +27,24 @@ class ParallelTestExecutionProp extends FunSuite
   with ParallelTestExecutionSuiteTimeoutExamples {
   
   class ControlledOrderDistributor extends Distributor {
-    val buf = ListBuffer.empty[(Suite, Args)]
-    def apply(suite: Suite, args: Args) {
-      buf += ((suite, args))
+    val buf = ListBuffer.empty[(Suite, Args, SimpleStatus)]
+    def apply(suite: Suite, args: Args): Status = {
+      val status = new SimpleStatus
+      buf += ((suite, args, status))
+      status
     }
     def executeInOrder() {
-      for ((suite, args) <- buf) {
+      for ((suite, args, status) <- buf) {
         suite.run(None, args)
+        status.succeed()
+        status.complete()
       }
     }
     def executeInReverseOrder() {
-      for ((suite, args) <- buf.reverse) {
+      for ((suite, args, status) <- buf.reverse) {
         suite.run(None, args)
+        status.succeed()
+        status.complete()
       }
     }
 
@@ -52,8 +58,10 @@ class ParallelTestExecutionProp extends FunSuite
       
       val buf = ListBuffer.empty[SuiteRunner]
       val execSvc: ExecutorService = Executors.newFixedThreadPool(2)
-      def apply(suite: Suite, args: Args) {
-        buf += new SuiteRunner(suite, args)
+      def apply(suite: Suite, args: Args): Status = {
+        val status = new SimpleStatus
+        buf += new SuiteRunner(suite, args, status)
+        status
       }
       def executeInOrder() {
         for (suiteRunner <- buf) {

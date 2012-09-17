@@ -13,7 +13,7 @@ class UnitedStates extends Suite {
 
   override def nestedSuites: IndexedSeq[Suite] = allStates.take(nestedSuiteCount).toIndexedSeq
 
-  override def run(testName: Option[String], args: Args) {
+  override def run(testName: Option[String], args: Args): org.scalatest.Status = {
 
     if (nestedSuiteCount < allStates.length)
       nestedSuiteCount += 1
@@ -36,7 +36,7 @@ trait StateSuite extends Suite {
 
   override def tags: Map[String, Set[String]] = Map()
 
-  override def run(testName: Option[String], args: Args) {
+  override def run(testName: Option[String], args: Args): org.scalatest.Status = {
 
     val testCount = testCounts(simpleName)
 
@@ -157,12 +157,13 @@ trait StateSuite extends Suite {
     val formatter = getIndentedText(testName, 1, true)
     report(TestFailed(tracker.nextOrdinal(), message, suiteName, suiteId, getDecodedName(suiteName), Some(getClass.getName), testName, testName, decodedTestName, Vector.empty, Some(throwable), Some(duration), Some(formatter), location, None))
   }
-  override def runTest(testName: String, args: Args) {
+  override def runTest(testName: String, args: Args): org.scalatest.Status = {
 
     if (!testStatuses(simpleName)(testName).isInstanceOf[Ignored])
       reportTestStarting(this, args.reporter, args.tracker, testName, testName, getDecodedName(testName), None, None)
 
     val formatter = getIndentedText(testName, 1, true)
+    val status = new org.scalatest.SimpleStatus
 
     testStatuses(simpleName)(testName) match {
       case Pending(duration, remaining) =>
@@ -171,6 +172,7 @@ trait StateSuite extends Suite {
         else
           testStatuses(simpleName)(testName) = Succeeded(duration)
         reportTestPending(this, args.reporter, args.tracker, testName, testName, getDecodedName(testName), duration, formatter, None)
+        status.succeed()
       case Ignored(duration, remaining) =>
         if (remaining > 1)
           testStatuses(simpleName)(testName) = Ignored(duration, remaining - 1)
@@ -186,7 +188,7 @@ trait StateSuite extends Suite {
           val message = getMessageForException(e)
           val formatter = getIndentedText(testName, 1, true)
           args.reporter(TestCanceled(args.tracker.nextOrdinal(), message, suiteName, suiteId, getDecodedName(suiteName), Some(getClass.getName), testName, testName, getDecodedName(testName), Vector.empty, Some(e), Some(duration), Some(formatter), Some(ToDoLocation), None))
-
+          status.succeed()
       case Failed(duration, remaining) =>
         if (remaining > 1)
           testStatuses(simpleName)(testName) = Failed(duration, remaining - 1)
@@ -195,8 +197,12 @@ trait StateSuite extends Suite {
         val e = intercept[TestFailedException] { fail("1 + 1 did not equal 3, even for very large values of 1") }
         handleFailedTest(e, testName, getDecodedName(testName), args.reporter, args.tracker, duration, None)
 
-      case Succeeded(duration) => reportTestSucceeded(this, args.reporter, args.tracker, testName, testName, getDecodedName(testName), duration, formatter, None, None)
+      case Succeeded(duration) => 
+        reportTestSucceeded(this, args.reporter, args.tracker, testName, testName, getDecodedName(testName), duration, formatter, None, None)
+        status.succeed()
     }
+    status.complete()
+    status
   }
 }
 

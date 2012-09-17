@@ -273,7 +273,7 @@ class SuiteSuite extends Suite with PrivateMethodTester with SharedHelpers with 
     assert(myReporter.suiteCompletedWasFiredAndHadADuration)
 
     class SuiteThatAborts extends Suite {
-      override def run(testName: Option[String], args: Args) {
+      override def run(testName: Option[String], args: Args): Status = {
         throw new RuntimeException("Aborting for testing purposes")
       }
     }
@@ -669,15 +669,16 @@ class SuiteSuite extends Suite with PrivateMethodTester with SharedHelpers with 
     
     class MasterSuite extends Suite {
       override def nestedSuites = Vector(new NoTagSuite(), new IgnoreSuite(), new SlowAsMolassesSuite(), new FastAsLightSuite())
-      override def runNestedSuites(args: Args) {
+      override def runNestedSuites(args: Args): Status = {
         super.runNestedSuites(args)
       }
     }
     
     class CounterDistributor extends Distributor {
       var count = 0
-      def apply(suite: Suite, args: Args) {
+      def apply(suite: Suite, args: Args): Status = {
         count += 1
+        new SimpleStatus(true, true)
       }
       def apply(suite: Suite, tracker: Tracker) {
         count += 1
@@ -744,7 +745,7 @@ class SuiteSuite extends Suite with PrivateMethodTester with SharedHelpers with 
     
     class MasterSuite extends Suite {
       override def nestedSuites = Vector(new NoTagSuite(), new IgnoreSuite(), new SlowAsMolassesSuite(), new FastAsLightSuite())
-      override def runNestedSuites(args: Args) {
+      override def runNestedSuites(args: Args): Status = {
         super.runNestedSuites(args)
       }
     }

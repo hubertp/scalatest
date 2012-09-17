@@ -33,6 +33,7 @@ import Suite.getIndentedTextForTest
 import Suite.getDecodedName
 import org.scalatest.events._
 import exceptions._
+import org.scalatest.SimpleStatus
 
 /**
  * A <code>Suite</code> that is also a <code>junit.framework.TestCase</code>. 
@@ -242,7 +243,7 @@ class JUnit3Suite extends TestCase with Suite with AssertionsForJUnit {
    *
    * @throws UnsupportedOperationException always.
    */
-  override final protected def runNestedSuites(args: Args) {
+  override final protected def runNestedSuites(args: Args): Status = {
 
     throw new UnsupportedOperationException
   }
@@ -265,7 +266,7 @@ class JUnit3Suite extends TestCase with Suite with AssertionsForJUnit {
    *
    * @throws UnsupportedOperationException always.
    */
-  override protected final def runTests(testName: Option[String], args: Args) {
+  override protected final def runTests(testName: Option[String], args: Args): Status = {
     throw new UnsupportedOperationException
   }
 
@@ -286,15 +287,16 @@ class JUnit3Suite extends TestCase with Suite with AssertionsForJUnit {
    *
    * @throws UnsupportedOperationException always.
    */
-  override protected final def runTest(testName: String, args: Args) {
+  override protected final def runTest(testName: String, args: Args): Status = {
         throw new UnsupportedOperationException
   }
 
-  override def run(testName: Option[String], args: Args) {
+  override def run(testName: Option[String], args: Args): Status = {
 
     import args._
 
     theTracker = tracker
+    val status = new SimpleStatus
 
     if (!filter.tagsToInclude.isDefined) {
       val testResult = new TestResult
@@ -308,6 +310,11 @@ class JUnit3Suite extends TestCase with Suite with AssertionsForJUnit {
           run(testResult)
       }
     }
+    
+    status.succeed()
+    status.complete()
+    
+    status
   }
   
   /**

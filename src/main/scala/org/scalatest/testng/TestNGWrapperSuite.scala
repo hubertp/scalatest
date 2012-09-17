@@ -58,7 +58,7 @@ class TestNGWrapperSuite(xmlSuiteFilenames: List[String]) extends TestNGSuite {
    * @param testName If present (Some), then only the method with the supplied name is executed and groups will be ignored.
    * @param args the <code>Args</code> for this run
    */
-  override def run(testName: Option[String], args: Args) {
+  override def run(testName: Option[String], args: Args): Status = {
 
     import args._
 
@@ -69,7 +69,11 @@ class TestNGWrapperSuite(xmlSuiteFilenames: List[String]) extends TestNGSuite {
       }
     val tagsToExclude = filter.tagsToExclude
 
+    val status = new SimpleStatus
     runTestNG(reporter, tagsToInclude, tagsToExclude, tracker)
+    status.succeed()
+    status.complete()
+    status
   }
 
   /**
