@@ -1149,8 +1149,6 @@ trait Suite extends Assertions with AbstractSuite with Serializable { thisSuite 
     if (args == null)
       throw new NullPointerException("args was null")
     
-    val status = new SimpleStatus
-
     import args._
 
     val (stopRequested, report, method, testStartTime) =
@@ -1205,7 +1203,7 @@ trait Suite extends Assertions with AbstractSuite with Serializable { thisSuite 
       )
       val duration = System.currentTimeMillis - testStartTime
       reportTestSucceeded(this, report, tracker, testName, testName, getDecodedName(testName), messageRecorderForThisTest.recordedEvents(false, false), duration, formatter, rerunner, Some(getTopOfMethod(method)))
-      status.succeed()
+      new SucceededStatus
     }
     catch { 
       case ite: InvocationTargetException =>
@@ -1215,7 +1213,7 @@ trait Suite extends Assertions with AbstractSuite with Serializable { thisSuite 
             val duration = System.currentTimeMillis - testStartTime
             // testWasPending = true so info's printed out in the finally clause show up yellow
             reportTestPending(this, report, tracker, testName, testName, getDecodedName(testName), messageRecorderForThisTest.recordedEvents(true, false), duration, formatter, Some(getTopOfMethod(method)))
-            status.succeed()
+            new SucceededStatus
           case e: TestCanceledException =>
             val duration = System.currentTimeMillis - testStartTime
             val message = getMessageForException(e)
@@ -1223,21 +1221,19 @@ trait Suite extends Assertions with AbstractSuite with Serializable { thisSuite 
             // testWasCanceled = true so info's printed out in the finally clause show up yellow
             report(TestCanceled(tracker.nextOrdinal(), message, thisSuite.suiteName, thisSuite.suiteId, Some(thisSuite.getClass.getName), thisSuite.decodedSuiteName, 
                                 testName, testName, getDecodedName(testName), messageRecorderForThisTest.recordedEvents(false, true), Some(e), Some(duration), Some(formatter), Some(TopOfMethod(thisSuite.getClass.getName, method.toGenericString())), rerunner))
-            status.succeed()                    
+            new SucceededStatus                 
           case e if !anErrorThatShouldCauseAnAbort(e) =>
             val duration = System.currentTimeMillis - testStartTime
             handleFailedTest(t, testName, messageRecorderForThisTest.recordedEvents(false, false), report, tracker, getEscapedIndentedTextForTest(testName, 1, true), duration)
+            new FailedStatus
           case e => throw e
         }
       case e if !anErrorThatShouldCauseAnAbort(e) =>
         val duration = System.currentTimeMillis - testStartTime
         handleFailedTest(e, testName, messageRecorderForThisTest.recordedEvents(false, false), report, tracker, getEscapedIndentedTextForTest(testName, 1, true), duration)
+        new FailedStatus
       case e: Throwable => throw e  
     }
-    finally {
-      status.complete()
-    }
-    status
   }
   
   /**
@@ -1517,7 +1513,7 @@ trait Suite extends Assertions with AbstractSuite with Serializable { thisSuite 
 
           val duration = System.currentTimeMillis - suiteStartTime
           report(SuiteCompleted(tracker.nextOrdinal(), nestedSuite.suiteName, nestedSuite.suiteId, Some(nestedSuite.getClass.getName), nestedSuite.decodedSuiteName, Some(duration), formatter, Some(TopOfClass(nestedSuite.getClass.getName)), nestedSuite.rerunner))
-          status
+          new SucceededStatus
         }
         catch {       
           case e: RuntimeException => {
@@ -1531,12 +1527,12 @@ trait Suite extends Assertions with AbstractSuite with Serializable { thisSuite 
 
             val duration = System.currentTimeMillis - suiteStartTime
             report(SuiteAborted(tracker.nextOrdinal(), rawString, nestedSuite.suiteName, nestedSuite.suiteId, Some(nestedSuite.getClass.getName), nestedSuite.decodedSuiteName, Some(e), Some(duration), formatter, Some(SeeStackDepthException), nestedSuite.rerunner))
-            new SimpleStatus(true, false)
+            new FailedStatus
           }
         }
       }
       else
-        new SimpleStatus(true, false)
+        new FailedStatus
     }
     
     val statusBuffer = new ListBuffer[Status]()

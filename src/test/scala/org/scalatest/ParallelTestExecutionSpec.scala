@@ -34,24 +34,28 @@ class ParallelTestExecutionSpec extends FunSpec with ShouldMatchers with EventHe
   describe("ParallelTestExecution") {
 
     class ControlledOrderDistributor extends Distributor {
-      val buf = ListBuffer.empty[(Suite, Args, SimpleStatus)]
+      val buf = ListBuffer.empty[(Suite, Args, StatefulStatus)]
       def apply(suite: Suite, args: Args): Status = {
-        val status = new SimpleStatus
+        val status = new StatefulStatus
         buf += ((suite, args, status))
         status
       }
       def executeInOrder() {
         for ((suite, args, status) <- buf) {
-          suite.run(None, args)
-          status.succeed()
-          status.complete()
+          val runStatus = suite.run(None, args)
+          if (!runStatus.succeeds())
+            status.fails()
+          
+          status.completes()
         }
       }
       def executeInReverseOrder() {
         for ((suite, args, status) <- buf.reverse) {
-          suite.run(None, args)
-          status.succeed()
-          status.complete()
+          val runStatus = suite.run(None, args)
+          if (!runStatus.succeeds())
+            status.fails()
+            
+          status.completes()
         }
       }
 
@@ -66,7 +70,7 @@ class ParallelTestExecutionSpec extends FunSpec with ShouldMatchers with EventHe
       val buf = ListBuffer.empty[SuiteRunner]
       val execSvc: ExecutorService = Executors.newFixedThreadPool(2)
       def apply(suite: Suite, args: Args): Status = {
-        val status = new SimpleStatus
+        val status = new StatefulStatus
         buf += new SuiteRunner(suite, args, status)
         status
       }

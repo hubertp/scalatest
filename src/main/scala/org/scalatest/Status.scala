@@ -1,32 +1,37 @@
 package org.scalatest
 import org.scalatest.tools.SuiteRunner
+import java.util.concurrent.CountDownLatch
 
-sealed trait Status {
-  def isCompleted: Boolean
-  def isSucceeded: Boolean
-  def waitUntilCompleted() {
-    while (!isCompleted) 
-      Thread.sleep(10)
-  }
+trait Status {
+  def succeeds(): Boolean
 }
 
-final class SimpleStatus(complete: Boolean = false, succeed: Boolean = false) extends Status {
-  private var completed = complete
-  private var succeeded = succeed
+final class SucceededStatus extends Status {
+  def succeeds() = true
+}
+
+final class FailedStatus extends Status {
+  def succeeds() = false
+}
+
+final class StatefulStatus extends Status {
+  @volatile private var latch = new CountDownLatch(1)
+  @volatile private var succeed = true
   
-  def isCompleted = completed
-  def isSucceeded = succeeded
-  
-  def complete() {
-    completed = true
+  def succeeds() = {
+    latch.await()
+    succeed
   }
   
-  def succeed() {
-    succeeded = true
+  private[scalatest] def fails() {
+    succeed = false
+  }
+  
+  private[scalatest] def completes() {
+    latch.countDown()
   }
 }
 
 final class CompositeStatus(statusSeq: IndexedSeq[Status]) extends Status {
-  def isCompleted: Boolean = statusSeq.forall(_.isCompleted)
-  def isSucceeded: Boolean = statusSeq.forall(_.isSucceeded)
+  def succeeds() = statusSeq.forall(_.succeeds())
 }

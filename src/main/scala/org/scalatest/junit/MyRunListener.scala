@@ -33,7 +33,8 @@ import exceptions._
 
   private[junit] class MyRunListener(report: Reporter,
                                      config: Map[String, Any],
-                                     theTracker: Tracker)
+                                     theTracker: Tracker, 
+                                     status: StatefulStatus)
   extends RunListener {
     val failedTests = Collections.synchronizedSet(new HashSet[String])
     def getTopOfMethod(className: String, methodName: String) = Some(TopOfMethod(className, "public void " + className + "." + methodName + "()"))
@@ -75,6 +76,8 @@ import exceptions._
         report(TestSucceeded(theTracker.nextOrdinal(), testClassName, testClass, Some(testClass), getDecodedName(testClassName), testName, testName, getDecodedName(testName), Vector.empty, None, Some(formatter), getTopOfMethod(testClass, testName)))
         // TODO: can I add a duration?
       }
+      else
+        status.fails()
     }
 
     override def testIgnored(description: Description) {

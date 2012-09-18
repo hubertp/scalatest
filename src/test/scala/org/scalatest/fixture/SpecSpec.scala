@@ -23,7 +23,7 @@ import org.scalatest.Suite._
 import org.scalatest.{ PrivateMethodTester, SharedHelpers, ShouldMatchers, BeforeAndAfterEach, BeforeAndAfterAll, 
                         Filter, Args, Stopper, Tracker, Ignore, SlowAsMolasses, FastAsLight, WeakAsAKitten, Specs, 
                         Reporter, Distributor, OptionValues, NotAllowedException, Resources, DoNotDiscover, WrapWith, 
-                        ConfigMapWrapperSuite, StringFixture, Status, SimpleStatus }
+                        ConfigMapWrapperSuite, StringFixture, Status, SucceededStatus }
 
 class SpecSpec extends org.scalatest.FunSpec with PrivateMethodTester with SharedHelpers {
 
@@ -2331,7 +2331,7 @@ class SpecSpec extends org.scalatest.FunSpec with PrivateMethodTester with Share
         var count = 0
         def apply(suite: org.scalatest.Suite, args: Args): Status = {
           count += 1
-          new SimpleStatus(true, true)
+          new SucceededStatus
         }
         def apply(suite: org.scalatest.Suite, tracker: Tracker) {
           count += 1

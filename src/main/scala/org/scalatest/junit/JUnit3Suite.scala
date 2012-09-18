@@ -33,7 +33,6 @@ import Suite.getIndentedTextForTest
 import Suite.getDecodedName
 import org.scalatest.events._
 import exceptions._
-import org.scalatest.SimpleStatus
 
 /**
  * A <code>Suite</code> that is also a <code>junit.framework.TestCase</code>. 
@@ -296,11 +295,11 @@ class JUnit3Suite extends TestCase with Suite with AssertionsForJUnit {
     import args._
 
     theTracker = tracker
-    val status = new SimpleStatus
+    val status = new StatefulStatus
 
     if (!filter.tagsToInclude.isDefined) {
       val testResult = new TestResult
-      testResult.addListener(new MyTestListener(wrapReporterIfNecessary(reporter), tracker))
+      testResult.addListener(new MyTestListener(wrapReporterIfNecessary(reporter), tracker, status))
       testName match {
         case None => new TestSuite(this.getClass).run(testResult)
         case Some(tn) =>
@@ -311,9 +310,7 @@ class JUnit3Suite extends TestCase with Suite with AssertionsForJUnit {
       }
     }
     
-    status.succeed()
-    status.complete()
-    
+    status.completes()
     status
   }
   
@@ -332,7 +329,7 @@ class JUnit3Suite extends TestCase with Suite with AssertionsForJUnit {
     }
 }
 
-private[scalatest] class MyTestListener(report: Reporter, tracker: Tracker) extends TestListener {
+private[scalatest] class MyTestListener(report: Reporter, tracker: Tracker, status: StatefulStatus) extends TestListener {
 
   // TODO: worry about threading
   private val failedTestsSet = scala.collection.mutable.Set[Test]()
@@ -411,6 +408,7 @@ private[scalatest] class MyTestListener(report: Reporter, tracker: Tracker) exte
     }
     else {
       failedTestsSet -= testCase  
+      status.fails()
     }
   }
 

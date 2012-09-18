@@ -192,12 +192,12 @@ trait BeforeAndAfter extends SuiteMixin { this: Suite =>
       case None =>
     }
 
-    val status: Status = try {
+    try {
       super.runTest(testName, args)
     }
     catch {
       case e: Exception => thrownException = Some(e)
-      new SimpleStatus(true, false)
+      new FailedStatus
     }
     finally {
       try {
@@ -220,7 +220,6 @@ trait BeforeAndAfter extends SuiteMixin { this: Suite =>
           }
       }
     }
-    status
   }
 
   /**

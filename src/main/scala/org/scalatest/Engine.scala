@@ -196,8 +196,6 @@ private[scalatest] sealed abstract class SuperEngine[T](concurrentBundleModResou
     if (args == null)
       throw new NullPointerException("args was null")
     
-    val status = new SimpleStatus
-
     import args._
 
     val (stopRequested, report, testStartTime) =
@@ -243,7 +241,7 @@ private[scalatest] sealed abstract class SuperEngine[T](concurrentBundleModResou
                           else
                             Vector.empty)
       reportTestSucceeded(theSuite, report, tracker, testName, theTest.testText, getDecodedName(testName), recordEvents, durationToReport, formatter, theSuite.rerunner, theTest.location)
-      status.succeed()
+      new SucceededStatus
     }
     catch { // XXX
       case _: TestPendingException =>
@@ -255,7 +253,7 @@ private[scalatest] sealed abstract class SuperEngine[T](concurrentBundleModResou
                            else
                              Vector.empty)
         reportTestPending(theSuite, report, tracker, testName, theTest.testText, getDecodedName(testName), recordEvents, duration, formatter, theTest.location)
-        status.succeed()
+        new SucceededStatus
       case e: TestCanceledException =>
         val duration = System.currentTimeMillis - testStartTime
         // testWasCanceled = true so info's printed out in the finally clause show up yellow
@@ -265,7 +263,7 @@ private[scalatest] sealed abstract class SuperEngine[T](concurrentBundleModResou
                            else
                              Vector.empty)
         reportTestCanceled(theSuite, report, e, testName, theTest.testText, getDecodedName(testName), recordEvents, theSuite.rerunner, tracker, duration, getIndentedTextForTest(theTest.testText, theTest.indentationLevel, includeIcon), theTest.location)
-        status.succeed()
+        new SucceededStatus
       case e if !anErrorThatShouldCauseAnAbort(e) =>
         val duration = System.currentTimeMillis - testStartTime
         val durationToReport = theTest.recordedDuration.getOrElse(duration)
@@ -275,19 +273,18 @@ private[scalatest] sealed abstract class SuperEngine[T](concurrentBundleModResou
                            else
                              Vector.empty)
         reportTestFailed(theSuite, report, e, testName, theTest.testText, getDecodedName(testName), recordEvents, theSuite.rerunner, tracker, durationToReport, getIndentedTextForTest(theTest.testText, theTest.indentationLevel, includeIcon),  Some(SeeStackDepthException))
+        new FailedStatus()
       case e: Throwable => throw e
     }
     finally {
       /*messageRecorderForThisTest.fireRecordedMessages(testWasPending, testWasCanceled)
       if (theTest.recordedMessages.isDefined)
         theTest.recordedMessages.get.fireRecordedMessages(testWasPending, theSuite, report, tracker, testName, theTest.indentationLevel + 1, includeIcon)*/
-      status.complete()
       val shouldBeInformerForThisTest = atomicInformer.getAndSet(oldInformer)
       val swapAndCompareSucceeded = shouldBeInformerForThisTest eq informerForThisTest
       if (!swapAndCompareSucceeded)
         throw new ConcurrentModificationException(Resources("concurrentInformerMod", theSuite.getClass.getName))
     }
-    status
   }
 
   private def runTestsInBranch(

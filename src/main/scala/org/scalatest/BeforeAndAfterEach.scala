@@ -264,13 +264,13 @@ trait BeforeAndAfterEach extends SuiteMixin {
     var thrownException: Option[Throwable] = None
 
     beforeEach(testDataFor(testName, args.configMap))
-    val status = try {
+    try {
       super.runTest(testName, args)
     }
     catch {
       case e: Exception => 
         thrownException = Some(e)
-        new SimpleStatus(true, false)
+        new FailedStatus
     }
     finally {
       try {
@@ -288,6 +288,5 @@ trait BeforeAndAfterEach extends SuiteMixin {
           }
       }
     }
-    status
   }
 }

@@ -2310,7 +2310,7 @@ class SpecSpec extends FunSpec with PrivateMethodTester with SharedHelpers {
         var count = 0
         def apply(suite: Suite, args: Args): Status = {
           count += 1
-          new SimpleStatus(true, true)
+          new SucceededStatus
         }
         def apply(suite: Suite, tracker: Tracker) {
           count += 1

@@ -262,11 +262,11 @@ trait JUnitSuite extends Suite with AssertionsForJUnit { thisSuite =>
     import args._
 
     theTracker = tracker
-    val status = new SimpleStatus
+    val status = new StatefulStatus
 
     if (!filter.tagsToInclude.isDefined) {
       val jUnitCore = new JUnitCore
-      jUnitCore.addListener(new MyRunListener(wrapReporterIfNecessary(reporter), configMap, tracker))
+      jUnitCore.addListener(new MyRunListener(wrapReporterIfNecessary(reporter), configMap, tracker, status))
       val myClass = this.getClass
       testName match {
         case None => jUnitCore.run(myClass)
@@ -277,9 +277,7 @@ trait JUnitSuite extends Suite with AssertionsForJUnit { thisSuite =>
       }
     }
     
-    status.succeed()
-    status.complete()
-    
+    status.completes()
     status
   }
   

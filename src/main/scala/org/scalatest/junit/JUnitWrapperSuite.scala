@@ -56,15 +56,15 @@ class JUnitWrapperSuite(junitClassName: String, loader: ClassLoader) extends Sui
     import args._
 
     theTracker = tracker
-    val status = new SimpleStatus
+    val status = new StatefulStatus
 
     val jUnitCore = new JUnitCore
 
-    jUnitCore.addListener(new MyRunListener(reporter, configMap, tracker))
+    jUnitCore.addListener(new MyRunListener(reporter, configMap, tracker, status))
 
     jUnitCore.run(junitClass)
-    status.succeed()
-    status.complete()
+    
+    status.completes()
     status
   }
 
