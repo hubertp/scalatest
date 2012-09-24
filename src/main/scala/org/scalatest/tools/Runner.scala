@@ -2138,7 +2138,7 @@ object Runner {
               val tagsToInclude = if (suiteConfig.requireSelectedTag) tagsToIncludeSet ++ Set(SELECTED_TAG) else tagsToIncludeSet
               val filter = Filter(if (tagsToInclude.isEmpty) None else Some(tagsToInclude), tagsToExcludeSet, suiteConfig.excludeNestedSuites, suiteConfig.dynaTags)
               val runArgs = Args(dispatch, stopRequested, filter, configMap, None, tracker, chosenStyleSet)
-              val status = new StatefulStatus()
+              val status = new ScalaTestStatefulStatus()
               val suiteRunner = new SuiteRunner(suiteConfig.suite, runArgs, status)
               suiteRunner.run()
             }

@@ -24,7 +24,7 @@ import Suite.formatterForSuiteCompleted
 import Suite.formatterForSuiteAborted
 import org.scalatest.exceptions.NotAllowedException
 
-private[scalatest] class SuiteRunner(suite: Suite, args: Args, status: StatefulStatus) extends Runnable {
+private[scalatest] class SuiteRunner(suite: Suite, args: Args, status: ScalaTestStatefulStatus) extends Runnable {
 
   private val stopRequested = args.stopper
 

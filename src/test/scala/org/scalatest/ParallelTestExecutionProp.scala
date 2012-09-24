@@ -27,9 +27,9 @@ class ParallelTestExecutionProp extends FunSuite
   with ParallelTestExecutionSuiteTimeoutExamples {
   
   class ControlledOrderDistributor extends Distributor {
-    val buf = ListBuffer.empty[(Suite, Args, StatefulStatus)]
+    val buf = ListBuffer.empty[(Suite, Args, ScalaTestStatefulStatus)]
     def apply(suite: Suite, args: Args): Status = {
-      val status = new StatefulStatus
+      val status = new ScalaTestStatefulStatus
       buf += ((suite, args, status))
       status
     }
@@ -61,7 +61,7 @@ class ParallelTestExecutionProp extends FunSuite
       val buf = ListBuffer.empty[SuiteRunner]
       val execSvc: ExecutorService = Executors.newFixedThreadPool(2)
       def apply(suite: Suite, args: Args): Status = {
-        val status = new StatefulStatus
+        val status = new ScalaTestStatefulStatus
         buf += new SuiteRunner(suite, args, status)
         status
       }

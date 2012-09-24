@@ -37,7 +37,7 @@ package org.scalatest.testng {
       }
 
       whenExecuting {
-        val status = new StatefulStatus
+        val status = new ScalaTestStatefulStatus
         (new SuccessTestNGSuite()).runTestNG(reporter, new Tracker, status)
         status.completes()
       }
@@ -52,7 +52,7 @@ package org.scalatest.testng {
       }
 
       whenExecuting {
-        val status = new StatefulStatus
+        val status = new ScalaTestStatefulStatus
         (new FailureTestNGSuite()).runTestNG(reporter, new Tracker, status)
         status.completes
       }
@@ -63,7 +63,7 @@ package org.scalatest.testng {
       val testReporter = new TestReporter
 
       // when
-      val status = new StatefulStatus
+      val status = new ScalaTestStatefulStatus
       (new FailureTestNGSuite()).runTestNG(testReporter, new Tracker, status)
       status.completes
 
@@ -86,7 +86,7 @@ package org.scalatest.testng {
 
       // when runnning the suite with method that has invocationCount = 10")
       whenExecuting {
-        val status = new StatefulStatus
+        val status = new ScalaTestStatefulStatus
         (new TestNGSuiteWithInvocationCount()).runTestNG(reporter, new Tracker, status)
         status.completes()
       }
@@ -107,7 +107,7 @@ package org.scalatest.testng {
 
       // when runnning the suite with a test that should fail and a test that should be skipped
       whenExecuting {
-        val status = new StatefulStatus
+        val status = new ScalaTestStatefulStatus
         (new SuiteWithSkippedTest()).runTestNG(reporter, new Tracker, status)
         status.completes()
       }
@@ -122,7 +122,7 @@ package org.scalatest.testng {
       }
 
       whenExecuting {
-        val status = new StatefulStatus
+        val status = new ScalaTestStatefulStatus
         (new SuiteWithTwoTests()).runTestNG("testThatPasses", reporter, new Tracker, status)
         status.completes()
       }
@@ -133,7 +133,7 @@ package org.scalatest.testng {
       val testReporter = new TestReporter
 
       // when - run the failing suite
-      val status = new StatefulStatus
+      val status = new ScalaTestStatefulStatus
       new FailureTestNGSuite().runTestNG(testReporter, new Tracker, status)
       status.completes()
 
@@ -150,7 +150,7 @@ package org.scalatest.testng {
       val testReporter = new TestReporter
 
       // when - run the passing suite
-      val status = new StatefulStatus
+      val status = new ScalaTestStatefulStatus
       new SuccessTestNGSuite().runTestNG(testReporter, new Tracker, status)
       status.completes()
 

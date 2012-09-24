@@ -34,7 +34,7 @@ import exceptions._
   private[junit] class MyRunListener(report: Reporter,
                                      config: Map[String, Any],
                                      theTracker: Tracker, 
-                                     status: StatefulStatus)
+                                     status: ScalaTestStatefulStatus)
   extends RunListener {
     val failedTests = Collections.synchronizedSet(new HashSet[String])
     def getTopOfMethod(className: String, methodName: String) = Some(TopOfMethod(className, "public void " + className + "." + methodName + "()"))

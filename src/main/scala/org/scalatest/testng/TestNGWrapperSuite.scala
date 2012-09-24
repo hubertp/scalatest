@@ -69,7 +69,7 @@ class TestNGWrapperSuite(xmlSuiteFilenames: List[String]) extends TestNGSuite {
       }
     val tagsToExclude = filter.tagsToExclude
 
-    val status = new StatefulStatus
+    val status = new ScalaTestStatefulStatus
     runTestNG(reporter, tagsToInclude, tagsToExclude, tracker, status)
 
     status.completes()
@@ -80,7 +80,7 @@ class TestNGWrapperSuite(xmlSuiteFilenames: List[String]) extends TestNGSuite {
    * Runs all tests in the xml suites.
    * @param   reporter   the reporter to be notified of test events (success, failure, etc)
    */
-  override private[testng] def runTestNG(reporter: Reporter, tracker: Tracker, status: StatefulStatus) {
+  override private[testng] def runTestNG(reporter: Reporter, tracker: Tracker, status: ScalaTestStatefulStatus) {
     runTestNG(reporter, Set[String](), Set[String](), tracker, status)
   }
 
@@ -97,7 +97,7 @@ class TestNGWrapperSuite(xmlSuiteFilenames: List[String]) extends TestNGSuite {
    * @param   status   Run status.
    */ 
   private[testng] def runTestNG(reporter: Reporter, groupsToInclude: Set[String], 
-      groupsToExclude: Set[String], tracker: Tracker, status: StatefulStatus) {
+      groupsToExclude: Set[String], tracker: Tracker, status: ScalaTestStatefulStatus) {
     
     val testng = new TestNG
     handleGroups(groupsToInclude, groupsToExclude, testng)

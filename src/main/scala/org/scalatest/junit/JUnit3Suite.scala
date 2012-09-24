@@ -295,7 +295,7 @@ class JUnit3Suite extends TestCase with Suite with AssertionsForJUnit {
     import args._
 
     theTracker = tracker
-    val status = new StatefulStatus
+    val status = new ScalaTestStatefulStatus
 
     if (!filter.tagsToInclude.isDefined) {
       val testResult = new TestResult
@@ -329,7 +329,7 @@ class JUnit3Suite extends TestCase with Suite with AssertionsForJUnit {
     }
 }
 
-private[scalatest] class MyTestListener(report: Reporter, tracker: Tracker, status: StatefulStatus) extends TestListener {
+private[scalatest] class MyTestListener(report: Reporter, tracker: Tracker, status: ScalaTestStatefulStatus) extends TestListener {
 
   // TODO: worry about threading
   private val failedTestsSet = scala.collection.mutable.Set[Test]()

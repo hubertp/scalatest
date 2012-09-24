@@ -38,7 +38,7 @@ private[scalatest] class ConcurrentDistributor(args: Args, execSvc: ExecutorServ
       throw new NullPointerException("suite is null")
     if (args == null)
       throw new NullPointerException("args is null")
-    val status = new StatefulStatus
+    val status = new ScalaTestStatefulStatus
     val suiteRunner = new SuiteRunner(suite, args, status)
     val future: Future[_] = execSvc.submit(suiteRunner)
     futureQueue.put(future)
