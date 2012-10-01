@@ -103,7 +103,7 @@ private[scalatest] class JUnitXmlReporter(directory: String) extends Reporter {
 
     val orderedEvents = events.toList.filter { e => 
       e match {
-        case e: TestStarting => e.suiteId == suiteId
+        case e: TestStarting   => e.suiteId == suiteId
         case e: TestSucceeded  => e.suiteId == suiteId
         case e: TestIgnored    => e.suiteId == suiteId
         case e: TestFailed     => e.suiteId == suiteId
@@ -168,7 +168,12 @@ private[scalatest] class JUnitXmlReporter(directory: String) extends Reporter {
           testsuite.time = e.timeStamp - testsuite.timeStamp
           idx += 1
 
-        case e: TestIgnored    => idx += 1
+        case e: TestIgnored    =>
+          val testcase = Testcase(e.testName, e.suiteClassName, e.timeStamp)
+          testcase.ignored = true
+          testsuite.testcases += testcase
+          idx += 1
+
         case e: InfoProvided   => idx += 1
         case e: MarkupProvided => idx += 1
         case e: ScopeOpened    => idx += 1
@@ -335,6 +340,10 @@ private[scalatest] class JUnitXmlReporter(directory: String) extends Reporter {
           {
             failureXml(testcase.failure)
           }
+          {
+            if (testcase.ignored)
+              <skipped/>
+          }
           </testcase>
         }
       }
@@ -485,6 +494,7 @@ private[scalatest] class JUnitXmlReporter(directory: String) extends Reporter {
     var time = 0L
     var pending = false
     var canceled = false
+    var ignored = false
     var failure: Option[TestFailed] = None
   }
 }
