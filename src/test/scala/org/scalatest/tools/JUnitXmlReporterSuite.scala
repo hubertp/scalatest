@@ -20,6 +20,10 @@ import org.scalatest.events.Ordinal
 import org.scalatest.events.SuiteStarting
 import org.scalatest.events.SuiteAborted
 import org.scalatest.events.SuiteCompleted
+import org.scalatest.events.TestStarting
+import org.scalatest.events.TestSucceeded
+import org.scalatest.events.TestIgnored
+import org.scalatest.events.RecordableEvent
 
 import java.io.File
 
@@ -30,6 +34,13 @@ class JUnitXmlReporterSuite extends FunSuite {
   val ord1b = ord1a.next
   val ord1c = ord1b.next
   val ord1d = ord1c.next
+
+  val ord2 = new Ordinal(223)
+  val ord2a = ord2.next
+  val ord2b = ord2a.next
+  val ord2c = ord2b.next
+  val ord2d = ord2c.next
+  val ord2e = ord2d.next
 
   val start1 =
     SuiteStarting(
@@ -84,6 +95,61 @@ class JUnitXmlReporterSuite extends FunSuite {
       "thread1",
       123456)
       
+  val start3 =
+    SuiteStarting(
+      ord2a,
+      "suite3",
+      "suite id 3",
+      None,
+      None,
+      None,
+      None,
+      None,
+      "thread1",
+      123123)
+
+  val complete3 =
+    SuiteCompleted(
+      ord2e,
+      "suite3",
+      "suite id 3",
+      None,
+      None,
+      None,
+      None,
+      None,
+      None,
+      "thread1",
+      123456)
+      
+  val startTest1 =
+    TestStarting(
+      ordinal = ord2b,
+      suiteName = "suite3",
+      suiteId = "suite id 3",
+      suiteClassName = Some("Suite3Class"),
+      testName = "a pass test",
+      testText = "a pass test text")
+      
+  val endTest1 =
+    TestSucceeded (
+      ordinal = ord2c,
+      suiteName = "suite3",
+      suiteId = "suite id 3",
+      suiteClassName = Some("Suite3Class"),
+      testName = "a pass test",
+      testText = "a pass test text",
+      recordedEvents = Array[RecordableEvent]())
+      
+  val ignoreTest1 =
+    TestIgnored (
+      ordinal = ord2d,
+      suiteName = "suite3",
+      suiteId = "suite id 3",
+      suiteClassName = Some("Suite3Class"),
+      testName = "an ignored test",
+      testText = "an ignored test text")
+
   val reporter = new JUnitXmlReporter("target")
 
   test("SuiteAborted and SuiteCompleted are recognized as test terminators") {
@@ -100,5 +166,16 @@ class JUnitXmlReporterSuite extends FunSuite {
 
     file1.delete
     file2.delete
+  }
+
+  test("test case gets reported") {
+    reporter(start3)
+    reporter(startTest1)
+    reporter(endTest1)
+    reporter(ignoreTest1)
+    reporter(complete3)
+
+    val loadnode = xml.XML.loadFile("target/TEST-suite3.xml")
+    assert(!(loadnode \\ "skipped").isEmpty)
   }
 }
