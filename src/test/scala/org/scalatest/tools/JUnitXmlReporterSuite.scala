@@ -23,6 +23,7 @@ import org.scalatest.events.SuiteCompleted
 import org.scalatest.events.TestStarting
 import org.scalatest.events.TestSucceeded
 import org.scalatest.events.TestIgnored
+import org.scalatest.events.TestFailed
 import org.scalatest.events.RecordableEvent
 
 import java.io.File
@@ -41,6 +42,8 @@ class JUnitXmlReporterSuite extends FunSuite {
   val ord2c = ord2b.next
   val ord2d = ord2c.next
   val ord2e = ord2d.next
+  val ord2f = ord2e.next
+  val ord2g = ord2f.next
 
   val start1 =
     SuiteStarting(
@@ -108,20 +111,6 @@ class JUnitXmlReporterSuite extends FunSuite {
       "thread1",
       123123)
 
-  val complete3 =
-    SuiteCompleted(
-      ord2e,
-      "suite3",
-      "suite id 3",
-      None,
-      None,
-      None,
-      None,
-      None,
-      None,
-      "thread1",
-      123456)
-      
   val startTest1 =
     TestStarting(
       ordinal = ord2b,
@@ -150,6 +139,40 @@ class JUnitXmlReporterSuite extends FunSuite {
       testName = "an ignored test",
       testText = "an ignored test text")
 
+  val startTest2 =
+    TestStarting(
+      ordinal = ord2e,
+      suiteName = "suite3",
+      suiteId = "suite id 3",
+      suiteClassName = Some("Suite3Class"),
+      testName = "a fail test",
+      testText = "a fail test text")
+
+  val failTest2 =
+    TestFailed (
+      ordinal = ord2f,
+      message = "failTest2 message text",
+      suiteName = "suite3",
+      suiteId = "suite id 3",
+      suiteClassName = Some("Suite3Class"),
+      testName = "a fail test",
+      testText = "a fail test text",
+      recordedEvents = Array[RecordableEvent]())
+
+  val complete3 =
+    SuiteCompleted(
+      ord2g,
+      "suite3",
+      "suite id 3",
+      None,
+      None,
+      None,
+      None,
+      None,
+      None,
+      "thread1",
+      123456)
+      
   val reporter = new JUnitXmlReporter("target")
 
   test("SuiteAborted and SuiteCompleted are recognized as test terminators") {
@@ -173,9 +196,12 @@ class JUnitXmlReporterSuite extends FunSuite {
     reporter(startTest1)
     reporter(endTest1)
     reporter(ignoreTest1)
+    reporter(startTest2)
+    reporter(failTest2)
     reporter(complete3)
 
     val loadnode = xml.XML.loadFile("target/TEST-suite3.xml")
     assert(!(loadnode \\ "skipped").isEmpty)
+    assert(!(loadnode \\ "failure").isEmpty)
   }
 }

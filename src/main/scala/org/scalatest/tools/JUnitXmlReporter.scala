@@ -338,11 +338,10 @@ private[scalatest] class JUnitXmlReporter(directory: String) extends Reporter {
             time      = { "" + testcase.time / 1000.0     }
           >
           {
-            failureXml(testcase.failure)
-          }
-          {
             if (testcase.ignored)
               <skipped/>
+            else
+              failureXml(testcase.failure)
           }
           </testcase>
         }
