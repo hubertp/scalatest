@@ -151,10 +151,8 @@ private[scalatest] class JUnitXmlReporter(directory: String) extends Reporter {
       event match {
         case e: TestStarting =>
           val (testEndIndex, testcase) = processTest(orderedEvents, e, idx)
-          if (!testcase.pending && !testcase.canceled) {
-            testsuite.testcases += testcase
-            if (testcase.failure != None) testsuite.failures += 1
-          }
+          testsuite.testcases += testcase
+          if (testcase.failure != None) testsuite.failures += 1
           idx = testEndIndex + 1
 
         case e: SuiteAborted =>
@@ -338,7 +336,7 @@ private[scalatest] class JUnitXmlReporter(directory: String) extends Reporter {
             time      = { "" + testcase.time / 1000.0     }
           >
           {
-            if (testcase.ignored)
+            if (testcase.ignored || testcase.pending || testcase.canceled)
               <skipped/>
             else
               failureXml(testcase.failure)

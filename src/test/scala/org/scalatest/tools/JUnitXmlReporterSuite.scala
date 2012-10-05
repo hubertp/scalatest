@@ -24,6 +24,8 @@ import org.scalatest.events.TestStarting
 import org.scalatest.events.TestSucceeded
 import org.scalatest.events.TestIgnored
 import org.scalatest.events.TestFailed
+import org.scalatest.events.TestPending
+import org.scalatest.events.TestCanceled
 import org.scalatest.events.RecordableEvent
 
 import java.io.File
@@ -44,6 +46,11 @@ class JUnitXmlReporterSuite extends FunSuite {
   val ord2e = ord2d.next
   val ord2f = ord2e.next
   val ord2g = ord2f.next
+  val ord2h = ord2g.next
+  val ord2i = ord2h.next
+  val ord2j = ord2i.next
+  val ord2k = ord2j.next
+  val ord2l = ord2k.next
 
   val start1 =
     SuiteStarting(
@@ -159,9 +166,48 @@ class JUnitXmlReporterSuite extends FunSuite {
       testText = "a fail test text",
       recordedEvents = Array[RecordableEvent]())
 
+  val startTest3 =
+    TestStarting(
+      ordinal = ord2g,
+      suiteName = "suite3",
+      suiteId = "suite id 3",
+      suiteClassName = Some("Suite3Class"),
+      testName = "a pending test",
+      testText = "a pending test text")
+
+  val pendingTest3 =
+    TestPending (
+      ordinal = ord2h,
+      suiteName = "suite3",
+      suiteId = "suite id 3",
+      suiteClassName = Some("Suite3Class"),
+      testName = "a pending test",
+      testText = "a pending test text",
+      recordedEvents = Array[RecordableEvent]())
+
+  val startTest4 =
+    TestStarting(
+      ordinal = ord2i,
+      suiteName = "suite3",
+      suiteId = "suite id 3",
+      suiteClassName = Some("Suite3Class"),
+      testName = "a canceled test",
+      testText = "a canceled test text")
+
+  val canceledTest4 =
+    TestCanceled (
+      ordinal = ord2j,
+      message = "bailed out",
+      suiteName = "suite3",
+      suiteId = "suite id 3",
+      suiteClassName = Some("Suite3Class"),
+      testName = "a canceled test",
+      testText = "a canceled test text",
+      recordedEvents = Array[RecordableEvent]())
+
   val complete3 =
     SuiteCompleted(
-      ord2g,
+      ord2k,
       "suite3",
       "suite id 3",
       None,
@@ -198,10 +244,30 @@ class JUnitXmlReporterSuite extends FunSuite {
     reporter(ignoreTest1)
     reporter(startTest2)
     reporter(failTest2)
+    reporter(startTest3)
+    reporter(pendingTest3)
+    reporter(startTest4)
+    reporter(canceledTest4)
     reporter(complete3)
 
     val loadnode = xml.XML.loadFile("target/TEST-suite3.xml")
-    assert(!(loadnode \\ "skipped").isEmpty)
-    assert(!(loadnode \\ "failure").isEmpty)
+    val testcases = loadnode \\ "testcase"
+
+    val tcIgnored =
+      testcases.find(tc => (tc \ "@name").toString == "an ignored test").get
+
+    val tcFailed = 
+      testcases.find(tc => (tc \ "@name").toString == "a fail test").get
+
+    val tcPending = 
+      testcases.find(tc => (tc \ "@name").toString == "a pending test").get
+
+    val tcCanceled = 
+      testcases.find(tc => (tc \ "@name").toString == "a canceled test").get
+
+    assert(!(tcIgnored \ "skipped").isEmpty)
+    assert(!(tcFailed \ "failure").isEmpty)
+    assert(!(tcPending \ "skipped").isEmpty)
+    assert(!(tcCanceled \ "skipped").isEmpty)
   }
 }
