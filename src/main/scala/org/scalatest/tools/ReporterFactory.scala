@@ -175,7 +175,7 @@ private[scalatest] class ReporterFactory {
         case JunitXmlReporterConfiguration(configSet, directory) => createJunitXmlReporter(configSet, directory)
         case DashboardReporterConfiguration(configSet, directory, numFilesToArchive) => createDashboardReporter(configSet, directory, numFilesToArchive)
         case XmlReporterConfiguration(configSet, directory) => createXmlReporter(configSet, directory)
-        case HtmlReporterConfiguration(configSet, fileName) => createHtmlReporter(configSet, fileName, loader.getResource("org/scalatest/HtmlReporter.css"))  // TODO: to support passed in custom css
+        case HtmlReporterConfiguration(configSet, fileName, cssFileName) => createHtmlReporter(configSet, fileName, cssFileName)
         case CustomReporterConfiguration(configSet, reporterClassName) => createCustomReporter(configSet, reporterClassName, loader) 
         case GraphicReporterConfiguration(configSet) => throw new RuntimeException("Should never happen.")
         case SocketReporterConfiguration(host, port) => createSocketReporter(host, port)

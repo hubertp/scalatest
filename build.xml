@@ -395,13 +395,14 @@
       -->
     <target name="runtest" depends="compile,copyprops,taskdefscalatest">
         <mkdir dir="target/dash" />
+    	<mkdir dir="target/html" />
         <scalatest fork="true" runpath="${test.runpath}" parallel="true" haltonfailure="true">
             <jvmarg value="-XX:MaxPermSize=512m"/>
             <reporter type="graphic"/>
             <reporter type="dashboard" directory="target/dash" numfiles="3" />
             <reporter type="junitxml" directory="target"/>
             <reporter type="stdout" config="D"/>
-        	<reporter type="html" filename="target/doc/result.html" config="D" />
+        	<reporter type="html" filename="target/html/result.html" config="D" />
             <membersonly package="org.scalatest" />
             <membersonly package="org.scalatest.fixture" />
             <membersonly package="org.scalatest.concurrent" />

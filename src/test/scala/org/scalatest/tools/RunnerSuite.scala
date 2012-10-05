@@ -17,6 +17,8 @@ package org.scalatest.tools
 
 import org.scalatest._
 import java.util.regex.Pattern
+import java.net.URL
+import java.io.File
 
 class RunnerSuite() extends Suite with PrivateMethodTester {
 
@@ -887,6 +889,12 @@ class RunnerSuite() extends Suite with PrivateMethodTester {
     intercept[IllegalArgumentException] {
       Runner.parseReporterArgsIntoConfigurations(List("-C")) // Can't have -C last, because need a reporter class
     }
+    intercept[IllegalArgumentException] {
+      Runner.parseReporterArgsIntoConfigurations(List("-h"))
+    }
+    intercept[IllegalArgumentException] {
+      Runner.parseReporterArgsIntoConfigurations(List("-h", "result.html", "-css"))
+    }
     expectResult(new ReporterConfigurations(Some(new GraphicReporterConfiguration(Set())), Nil, Nil, Nil, Nil, None, None, Nil, Nil, Nil)) {
       Runner.parseReporterArgsIntoConfigurations(List("-g"))
     }
@@ -928,6 +936,12 @@ class RunnerSuite() extends Suite with PrivateMethodTester {
     }
     expectResult(new ReporterConfigurations(None, Nil, Nil, Nil, Nil, None, None, Nil, Nil, List(new SocketReporterConfiguration("localhost", 8888), new SocketReporterConfiguration("another host", 1234)))) {
       Runner.parseReporterArgsIntoConfigurations(List("-k", "localhost", "8888", "-k", "another host", "1234"))
+    }
+    expectResult(new ReporterConfigurations(None, Nil, Nil, Nil, Nil, None, None, List(new HtmlReporterConfiguration(Set(), "result.html", new File("target/jar_contents/org/scalatest/HtmlReporter.css").toURI.toURL)), Nil, Nil)) {
+      Runner.parseReporterArgsIntoConfigurations(List("-h", "result.html"))
+    }
+    expectResult(new ReporterConfigurations(None, Nil, Nil, Nil, Nil, None, None, List(new HtmlReporterConfiguration(Set(), "result.html", new File("MyStyle.css").toURI.toURL)), Nil, Nil)) {
+      Runner.parseReporterArgsIntoConfigurations(List("-h", "result.html", "-css", "MyStyle.css"))
     }
   }
 

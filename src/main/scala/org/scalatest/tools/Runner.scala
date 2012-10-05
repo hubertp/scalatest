@@ -881,7 +881,7 @@ object Runner {
   private[scalatest] def checkArgsForValidity(args: Array[String]) = {
 
     val lb = new ListBuffer[String]
-    val it = args.iterator
+    val it = args.iterator.buffered
     while (it.hasNext) {
       val s = it.next
       if (
@@ -891,7 +891,6 @@ object Runner {
         s.startsWith("-u") ||
         s.startsWith("-d") ||
         s.startsWith("-a") ||
-        s.startsWith("-h") ||
         s.startsWith("-r") ||
         s.startsWith("-C") ||
         s.startsWith("-n") ||
@@ -919,6 +918,14 @@ object Runner {
           it.next
         if (it.hasNext)
           it.next
+      }
+      else if (s.startsWith("-h")) {
+        if (it.hasNext)
+          it.next
+        if (it.hasNext && it.head == "-css") {
+          it.next
+          it.next
+        }
       }
       else if (!s.startsWith("-D") && !s.startsWith("-g") && !s.startsWith("-o") && !s.startsWith("-e") && !s.startsWith("-c") && !s.startsWith("-P")) {
         lb += s
@@ -1046,6 +1053,11 @@ object Runner {
         reporters += s
         if (it.hasNext)
           reporters += it.next
+        if (it.hasNext && it.head == "-css") {
+          reporters += it.next
+          if (it.hasNext)
+            reporters += it.next
+        }
       }
       else if (s.startsWith("-n")) {
         includes += s
@@ -1111,7 +1123,7 @@ object Runner {
         if (it.hasNext)
           wildcard += it.next
       }
-      else if (s.startsWith("-c")) {
+      else if (s.startsWith("-c") && s != "-css") { // -css is used by HtmlReporter (-h) only currently
         println("WARNING: -c has been deprecated and will be reused for a different (but still very cool) purpose in ScalaTest 2.0. Please change all uses of -c to -P.")
         concurrent += s
       }
@@ -1348,8 +1360,16 @@ object Runner {
             throw new IllegalArgumentException("-x needs to be followed by a directory name arg: ")
           }
         case "-h" =>
-          if (it.hasNext)
+          if (it.hasNext) {
             it.next // scroll past the filename
+            if (it.hasNext && it.head == "-css") {
+              it.next // scroll past the -css
+              if (it.hasNext)
+                it.next // scroll past the css file name
+              else
+                throw new IllegalArgumentException("-css needs to be followed by a file name arg: ")
+            }
+          }
           else
             throw new IllegalArgumentException("-h needs to be followed by a file name arg: ")
         case "-r" =>
@@ -1472,8 +1492,24 @@ object Runner {
       val lb = new ListBuffer[HtmlReporterConfiguration]
       while (it.hasNext) {
         val arg = it.next
-        if (arg.startsWith("-h"))
-          lb += new HtmlReporterConfiguration(parseConfigSet(arg), it.next)
+        if (arg.startsWith("-h") && it.hasNext) {
+          if (it.hasNext) {
+            val configSet = parseConfigSet(arg)
+            val fileName = it.next
+            val cssFile = 
+              if (it.hasNext && it.next == "-css") {
+                if (it.hasNext)
+                  new File(it.next).toURI.toURL
+                else
+                  throw new IllegalArgumentException("-css cannot be last, expected CSS file name to follow.")
+              }
+              else
+                classOf[Suite].getClassLoader.getResource("org/scalatest/HtmlReporter.css")
+            lb += new HtmlReporterConfiguration(configSet, fileName, cssFile)
+          }
+          else
+            throw new IllegalArgumentException("-h cannot be last, expected HTML output file name to follow.")
+        }
       }
       lb.toList
     }
