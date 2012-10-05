@@ -264,6 +264,7 @@
         <copy todir="${jar.contents}/images">
             <fileset dir="${images}" />
         </copy>
+    	<copy file="${resources}/org/scalatest/HtmlReporter.css" todir="${jar.contents}/org/scalatest" />
     </target>
 
     <target name="compile-tests" depends="compile-main">

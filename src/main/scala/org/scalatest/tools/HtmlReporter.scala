@@ -37,12 +37,14 @@ import scala.xml.XML
 import java.util.UUID
 import scala.xml.Node
 import scala.annotation.tailrec
+import java.net.URL
+import scala.io.Source
 
 /**
  * A <code>Reporter</code> that prints test status information in HTML format to a file.
  */
 private[scalatest] class HtmlReporter(pw: PrintWriter, presentAllDurations: Boolean,
-        presentInColor: Boolean, presentStackTraces: Boolean, presentFullStackTraces: Boolean) extends ResourcefulReporter {
+        presentInColor: Boolean, presentStackTraces: Boolean, presentFullStackTraces: Boolean, cssUrl: URL) extends ResourcefulReporter {
 
   private val pegDown = new PegDownProcessor
   
@@ -61,14 +63,16 @@ private[scalatest] class HtmlReporter(pw: PrintWriter, presentAllDurations: Bool
     presentAllDurations: Boolean,
     presentInColor: Boolean,
     presentShortStackTraces: Boolean,
-    presentFullStackTraces: Boolean
+    presentFullStackTraces: Boolean, 
+    cssUrl: URL
   ) =
     this(
       new PrintWriter(new BufferedOutputStream(new FileOutputStream(new File(filename)), BufferSize)),
       presentAllDurations,
       presentInColor,
       presentShortStackTraces,
-      presentFullStackTraces
+      presentFullStackTraces, 
+      cssUrl
     )
 
   private def withPossibleLineNumber(stringToPrint: String, throwable: Option[Throwable]): String = {
@@ -144,12 +148,6 @@ private[scalatest] class HtmlReporter(pw: PrintWriter, presentAllDurations: Bool
       case _ => 0
   }
   
-  private def makeHtmlHeader() {
-    pw.println("<html>")
-    pw.println("<head><title>ScalaTest Run Result</title></head>")
-    pw.println("<body bgcolor=\"black\">")
-  }
-  
   private def makeHtmlFile(resourceName: String, duration: Option[Long], summary: Option[Summary]) {
     pw.println {
       """
@@ -162,16 +160,10 @@ private[scalatest] class HtmlReporter(pw: PrintWriter, presentAllDurations: Bool
     }
   }
   
-  private def getSolidStatusColor(succeeded: Boolean) = 
-    if (succeeded)
-      green
-    else
-      red
-      
   private def getHeaderStatusColor(summary: Option[Summary]) = 
     summary match {
-      case Some(summary) => getSolidStatusColor(summary.testsFailedCount == 0)
-      case None => "C20000"
+      case Some(summary) => if (summary.testsFailedCount == 0) "scalatest-header-passed" else "scalatest-header-failed"
+      case None => "scalatest-header-failed"
     }
   
   private def getHtml(resourceName: String, duration: Option[Long], summary: Option[Summary]) = 
@@ -181,95 +173,7 @@ private[scalatest] class HtmlReporter(pw: PrintWriter, presentAllDurations: Bool
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
         <meta http-equiv="Expires" content="-1" />
         <meta http-equiv="Pragma" content="no-cache" />
-        <style type="text/css"> { PCDATA("""
-          body {
-            margin: 0;
-            padding: 0;
-            background: #fff;
-            font-size: 80%;
-          }
-    
-          #scalatest-header {
-            background: """ + getHeaderStatusColor(summary) + """; 
-            color: #fff; 
-            height: 4.5em;
-          }
-            
-          #title {
-            font-size: 2.0em;
-            float: left;
-            font-family: "Lucida Grande", Helvetica, sans-serif;
-          }
-
-          .scalatest-report h1 {
-            margin: 0px 10px 0px 10px;
-            padding: 10px;
-            font-family: "Lucida Grande", Helvetica, sans-serif;
-            font-size: 1.8em;
-            position: absolute;
-          }
-
-          #display-filters {
-            
-            padding: 0px 0 0 0px;
-            font-family: "Lucida Grande", Helvetica, sans-serif;
-            font-size: 0.5em;
-          }
-
-          #summary {
-            float:right;
-            padding: 5px 10px;
-            font-family: "Lucida Grande", Helvetica, sans-serif;
-            text-align: right;
-          }
-
-          #summary p {
-            margin: 0 0 0 2px;
-          }
-            
-          .scope {
-            margin: 0 10px 5px;
-            background: """ + green + """;
-            color: #fff;
-            font-weight: bold;
-            font: normal 11px "Lucida Grande", Helvetica, sans-serif;
-          }
-
-          .test_passed {
-            margin: 0 10px 5px;
-            border-left: 5px solid #65C400;
-            border-bottom: 1px solid #65C400;
-            background: #DBFFB4; color: #3D7700;
-          }
-
-          .test_yellow {
-            margin: 0 10px 5px;
-            border-left: 5px solid #FAF834;
-            border-bottom: 1px solid #FAF834;
-            background: #FCFB98; color: #131313;
-          }
-
-          .test_failed {
-            margin: 0 10px 5px;
-            border-left: 5px solid #C20000;
-            border-bottom: 1px solid #C20000;
-            color: #C20000; background: #FFFBD3;
-          }
-            
-          .gray { 
-            color: grey; 
-          }
-          
-          .dark { 
-            font-weight: bold; 
-          }
-            
-          .label { 
-            color: #444444; 
-            font-weight: bold; 
-          }
-          """) }
-        </style>
+        <style type="text/css"> { PCDATA(Source.fromURL(cssUrl).mkString) } </style>
         <script type="text/javascript">
           { PCDATA("""
           var tagMap = {};    
@@ -346,7 +250,7 @@ private[scalatest] class HtmlReporter(pw: PrintWriter, presentAllDurations: Bool
   }
   
   private def header(resourceName: String, duration: Option[Long], summary: Option[Summary]) = 
-    <div id="scalatest-header">
+    <div id="scalatest-header" class={ getHeaderStatusColor(summary) }>
       <div id="title">
         ScalaTest Results
         { getStatistic(summary) }
@@ -453,7 +357,7 @@ private[scalatest] class HtmlReporter(pw: PrintWriter, presentAllDurations: Bool
                   val elementId = generateElementId
                   tagMap.put(elementId, IGNORED_BIT)
                   setBit(scopeStack, tagMap, IGNORED_BIT)
-                  test(elementId, List(string), getIndentLevel(formatter) + 1, "test_yellow")
+                  test(elementId, List(string), getIndentLevel(formatter) + 1, "test_ignored")
                 case None =>
                   NodeSeq.Empty
               }
@@ -472,7 +376,7 @@ private[scalatest] class HtmlReporter(pw: PrintWriter, presentAllDurations: Bool
                 val elementId = generateElementId
                 tagMap.put(elementId, PENDING_BIT)
                 setBit(scopeStack, tagMap, PENDING_BIT)
-                test(elementId, List(string), getIndentLevel(formatter) + 1, "test_yellow")
+                test(elementId, List(string), getIndentLevel(formatter) + 1, "test_pending")
               case None =>
                 NodeSeq.Empty
             }
@@ -485,7 +389,7 @@ private[scalatest] class HtmlReporter(pw: PrintWriter, presentAllDurations: Bool
             val elementId = generateElementId
             tagMap.put(elementId, CANCELED_BIT)
             setBit(scopeStack, tagMap, CANCELED_BIT)
-            testWithDetails(elementId, List(stringToPrint), message, throwable, getIndentLevel(formatter) + 1, "test_yellow")
+            testWithDetails(elementId, List(stringToPrint), message, throwable, getIndentLevel(formatter) + 1, "test_canceled")
             
             // TODO: Print recorded events, when merge into trunk.
             
@@ -503,7 +407,7 @@ private[scalatest] class HtmlReporter(pw: PrintWriter, presentAllDurations: Bool
               val topElementId = scopeStack.top
               tagMap.put(elementId, tagMap(topElementId))
             }
-            test(elementId, List(infoContent), getIndentLevel(formatter) + 1, "test_passed")
+            test(elementId, List(infoContent), getIndentLevel(formatter) + 1, "info")
         
           case MarkupProvided(ordinal, text, nameInfo, formatter, location, payload, threadName, timeStamp) => 
 
@@ -518,7 +422,7 @@ private[scalatest] class HtmlReporter(pw: PrintWriter, presentAllDurations: Bool
               val topElementId = scopeStack.top
               tagMap.put(elementId, tagMap(topElementId))
             }
-            markup(elementId, text, getIndentLevel(formatter) + 1, "test_passed")
+            markup(elementId, text, getIndentLevel(formatter) + 1, "markup")
             // TO CONTINUE: XML element must be last
             
           case _ => NodeSeq.Empty
@@ -528,7 +432,7 @@ private[scalatest] class HtmlReporter(pw: PrintWriter, presentAllDurations: Bool
     </div>
         
   private def suite(elementId: String, suiteName: String, indentLevel: Int) = 
-    <div id={ elementId } class="scope" style={ "margin-left: " + (20 * indentLevel) + "px;" }>
+    <div id={ elementId } class="suite" style={ "margin-left: " + (20 * indentLevel) + "px;" }>
       <dl>
         <dt>{ suiteName }</dt>
       </dl>
@@ -744,18 +648,7 @@ private[scalatest] class HtmlReporter(pw: PrintWriter, presentAllDurations: Bool
   //  else Resources("indentOnce", indent(s, times - 1)) 
 }
 
-private[tools] object HtmlReporter {
-  
-  final val htmlGreen = "green"
-  final val htmlCyan = "cyan"
-  final val htmlYellow = "yellow"
-  final val htmlRed = "red"
-  
-    
-  final val green = "#65C400"
-  final val red = "#C20000"
-  final val yellow = "yellow"
-    
+private[tools] object HtmlReporter {  
   final val SUCCEEDED_BIT = 1
   final val FAILED_BIT = 2
   final val IGNORED_BIT = 4

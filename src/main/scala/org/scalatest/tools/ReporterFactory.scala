@@ -2,6 +2,7 @@ package org.scalatest.tools
 import org.scalatest.Reporter
 import org.scalatest.Resources
 import org.scalatest.DispatchReporter
+import java.net.URL
 
 private[scalatest] class ReporterFactory {
   
@@ -119,14 +120,15 @@ private[scalatest] class ReporterFactory {
     new XmlReporter(directory)
   }
   
-  protected def createHtmlReporter(configSet: Set[ReporterConfigParam], fileName: String) = {
+  protected def createHtmlReporter(configSet: Set[ReporterConfigParam], fileName: String, cssUrl: URL) = {
     if (configSetMinusNonFilterParams(configSet).isEmpty)
       new HtmlReporter(
         fileName,
         configSet.contains(PresentAllDurations),
         !configSet.contains(PresentWithoutColor),
         configSet.contains(PresentShortStackTraces) || configSet.contains(PresentFullStackTraces),
-        configSet.contains(PresentFullStackTraces) // If they say both S and F, F overrules
+        configSet.contains(PresentFullStackTraces), // If they say both S and F, F overrules
+        cssUrl
       )
       else
         new FilterReporter(
@@ -135,7 +137,8 @@ private[scalatest] class ReporterFactory {
             configSet.contains(PresentAllDurations),
             !configSet.contains(PresentWithoutColor),
             configSet.contains(PresentShortStackTraces) || configSet.contains(PresentFullStackTraces),
-            configSet.contains(PresentFullStackTraces) // If they say both S and F, F overrules
+            configSet.contains(PresentFullStackTraces), // If they say both S and F, F overrules
+            cssUrl
           ),
           configSet
         )
@@ -172,7 +175,7 @@ private[scalatest] class ReporterFactory {
         case JunitXmlReporterConfiguration(configSet, directory) => createJunitXmlReporter(configSet, directory)
         case DashboardReporterConfiguration(configSet, directory, numFilesToArchive) => createDashboardReporter(configSet, directory, numFilesToArchive)
         case XmlReporterConfiguration(configSet, directory) => createXmlReporter(configSet, directory)
-        case HtmlReporterConfiguration(configSet, fileName) => createHtmlReporter(configSet, fileName)
+        case HtmlReporterConfiguration(configSet, fileName) => createHtmlReporter(configSet, fileName, loader.getResource("org/scalatest/HtmlReporter.css"))  // TODO: to support passed in custom css
         case CustomReporterConfiguration(configSet, reporterClassName) => createCustomReporter(configSet, reporterClassName, loader) 
         case GraphicReporterConfiguration(configSet) => throw new RuntimeException("Should never happen.")
         case SocketReporterConfiguration(host, port) => createSocketReporter(host, port)
