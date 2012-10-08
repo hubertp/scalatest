@@ -166,6 +166,56 @@ private[scalatest] class HtmlReporter(pw: PrintWriter, presentAllDurations: Bool
       case None => "scalatest-header-failed"
     }
   
+  private def getPieChartScript(summary: Option[Summary]) = 
+    summary match {
+      case Some(summary) => 
+        val statusData: Array[String] = 
+          Array(
+            if (summary.testsSucceededCount > 0) "['Succeeded', " + summary.testsSucceededCount + "]" else null, 
+            if (summary.testsFailedCount > 0) "['Failed', " + summary.testsFailedCount + "]" else null, 
+            if (summary.testsIgnoredCount > 0) "['Ignored', " + summary.testsIgnoredCount + "]" else null, 
+            if (summary.testsPendingCount > 0) "['Pending', " + summary.testsPendingCount + "]" else null, 
+            if (summary.testsCanceledCount > 0) "['Canceled', " + summary.testsCanceledCount + "]" else null
+          ).filter(_ != null)
+          
+        val colorData: Array[String] = 
+          Array(
+            if (summary.testsSucceededCount > 0) "'#339933'" else null, 
+            if (summary.testsFailedCount > 0) "'#993333'" else null, 
+            if (summary.testsIgnoredCount > 0) "'#FF6600'" else null, 
+            if (summary.testsPendingCount > 0) "'#33CCCC'" else null, 
+            if (summary.testsCanceledCount > 0) "'#FFCC00'" else null
+          ).filter(_ != null)
+          
+        """
+          function drawChart() {
+            showPieChart();
+            var data = google.visualization.arrayToDataTable(
+            [
+        """ +
+        statusData.mkString("['Status', 'Count'],\n", ",\n", "\n") +
+        """
+            ]);
+
+            var options = {
+              title: 'Test Run Results', 
+        """ + 
+        colorData.mkString("colors: [", ", ", "]\n") +
+        """
+            };
+
+            var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
+            chart.draw(data, options);
+          }
+        
+          if (typeof google !== 'undefined') {
+            google.load("visualization", "1", {packages:["corechart"]});
+            google.setOnLoadCallback(drawChart);
+          }            
+        """
+      case None => "hidePieChart();"
+    }
+  
   private def getHtml(resourceName: String, duration: Option[Long], summary: Option[Summary]) = 
     <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
       <head>
@@ -174,6 +224,7 @@ private[scalatest] class HtmlReporter(pw: PrintWriter, presentAllDurations: Bool
         <meta http-equiv="Expires" content="-1" />
         <meta http-equiv="Pragma" content="no-cache" />
         <style type="text/css"> { PCDATA(Source.fromURL(cssUrl).mkString) } </style>
+        <script type="text/javascript" src="https://www.google.com/jsapi"></script>
         <script type="text/javascript">
           { PCDATA("""
           var tagMap = {};    
@@ -221,12 +272,17 @@ private[scalatest] class HtmlReporter(pw: PrintWriter, presentAllDurations: Bool
                 }
               }
             }
-          """) }
+              
+            function showPieChart() {
+              document.getElementById('chart_div').style.display = "block";
+            }
+          """ + getPieChartScript(summary)) }
         </script>
       </head>
       <body>
         <div class="scalatest-report"> 
-          { header(resourceName, duration, summary) } 
+          { header(resourceName, duration, summary) }
+          <div id="chart_div" style="display: none; width: 700px; height: 300px;"></div>
           { results(eventList.sorted.toList) } 
         </div>
         <script type="text/javascript">
