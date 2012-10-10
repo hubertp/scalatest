@@ -39,41 +39,26 @@ import scala.xml.Node
 import scala.annotation.tailrec
 import java.net.URL
 import scala.io.Source
+import java.nio.channels.Channels
 
 /**
  * A <code>Reporter</code> that prints test status information in HTML format to a file.
  */
-private[scalatest] class HtmlReporter(pw: PrintWriter, presentAllDurations: Boolean,
-        presentInColor: Boolean, presentStackTraces: Boolean, presentFullStackTraces: Boolean, cssUrl: URL) extends ResourcefulReporter {
+private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations: Boolean,
+        presentInColor: Boolean, presentStackTraces: Boolean, presentFullStackTraces: Boolean, cssUrl: URL) extends Reporter {
 
-  private val pegDown = new PegDownProcessor
+  private val directory = new File(directoryPath)
+  if (!directory.exists)
+    directory.mkdirs()
+    
+  val cssInputStream = cssUrl.openStream
+  val cssOutputStream = new FileOutputStream(new File(directory, "styles.css"))
+  cssOutputStream getChannel() transferFrom(Channels.newChannel(cssInputStream), 0, Long.MaxValue)
+  cssInputStream.close()
+  cssOutputStream.flush()
+  cssOutputStream.close()
   
-  /**
-  * Construct a <code>PrintReporter</code> with passed
-  * <code>String</code> file name. Information about events reported to instances of this
-  * class will be written to the specified file using the
-  * default character encoding.
-  *
-  * @param filename the <code>String</code> name of the file to which to print reported info
-  * @throws NullPointerException if passed <code>filename</code> reference is <code>null</code>
-  * @throws IOException if unable to open the specified file for writing
-  */
-  def this(
-    filename: String,
-    presentAllDurations: Boolean,
-    presentInColor: Boolean,
-    presentShortStackTraces: Boolean,
-    presentFullStackTraces: Boolean, 
-    cssUrl: URL
-  ) =
-    this(
-      new PrintWriter(new BufferedOutputStream(new FileOutputStream(new File(filename)), BufferSize)),
-      presentAllDurations,
-      presentInColor,
-      presentShortStackTraces,
-      presentFullStackTraces, 
-      cssUrl
-    )
+  private val pegDown = new PegDownProcessor
 
   private def withPossibleLineNumber(stringToPrint: String, throwable: Option[Throwable]): String = {
     throwable match {
@@ -148,7 +133,8 @@ private[scalatest] class HtmlReporter(pw: PrintWriter, presentAllDurations: Bool
       case _ => 0
   }
   
-  private def makeHtmlFile(resourceName: String, duration: Option[Long], summary: Option[Summary]) {
+  private def makeIndexFile(resourceName: String, duration: Option[Long], summary: Option[Summary]) {
+    val pw = new PrintWriter(new BufferedOutputStream(new FileOutputStream(new File(directory, "index.html")), BufferSize))
     pw.println {
       """
 <?xml version="1.0" encoding="UTF-8"?>
@@ -158,6 +144,7 @@ private[scalatest] class HtmlReporter(pw: PrintWriter, presentAllDurations: Bool
         
       """ + getHtml(resourceName, duration, summary) 
     }
+    pw.flush()
   }
   
   private def getHeaderStatusColor(summary: Option[Summary]) = 
@@ -224,7 +211,7 @@ private[scalatest] class HtmlReporter(pw: PrintWriter, presentAllDurations: Bool
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
         <meta http-equiv="Expires" content="-1" />
         <meta http-equiv="Pragma" content="no-cache" />
-        <style type="text/css"> { PCDATA(Source.fromURL(cssUrl).mkString) } </style>
+        <link href="styles.css" rel="stylesheet" />
         <script type="text/javascript" src="https://www.google.com/jsapi"></script>
         <script type="text/javascript">
           { PCDATA("""
@@ -649,27 +636,18 @@ private[scalatest] class HtmlReporter(pw: PrintWriter, presentAllDurations: Bool
 
       case RunCompleted(ordinal, duration, summary, formatter, location, payload, threadName, timeStamp) => 
 
-        makeHtmlFile("runCompleted", duration, summary)
+        makeIndexFile("runCompleted", duration, summary)
 
       case RunStopped(ordinal, duration, summary, formatter, location, payload, threadName, timeStamp) =>
 
-        makeHtmlFile("runStopped", duration, summary)
+        makeIndexFile("runStopped", duration, summary)
 
       case RunAborted(ordinal, message, throwable, duration, summary, formatter, location, payload, threadName, timeStamp) => 
 
-        makeHtmlFile("runAborted", duration, summary)
+        makeIndexFile("runAborted", duration, summary)
         
       case _ => eventList += event
     }
-
-    pw.flush()
-  }
-
-  // Closes the print writer. Subclasses StandardOutReporter and StandardErrReporter override dispose to do nothing
-  // so that those aren't closed.
-  override def dispose() {
-    pw.flush()
-    pw.close()
   }
   
   private def getDuration(resourceName: String, duration: Option[Long]) = {

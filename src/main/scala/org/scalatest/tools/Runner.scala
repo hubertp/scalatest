@@ -1371,7 +1371,7 @@ object Runner {
             }
           }
           else
-            throw new IllegalArgumentException("-h needs to be followed by a file name arg: ")
+            throw new IllegalArgumentException("-h needs to be followed by a directory name arg: ")
         case "-r" =>
           if (it.hasNext)
             it.next // scroll past the reporter class
@@ -1495,7 +1495,7 @@ object Runner {
         if (arg.startsWith("-h") && it.hasNext) {
           if (it.hasNext) {
             val configSet = parseConfigSet(arg)
-            val fileName = it.next
+            val directory = it.next
             val cssFile = 
               if (it.hasNext && it.next == "-css") {
                 if (it.hasNext)
@@ -1505,10 +1505,10 @@ object Runner {
               }
               else
                 classOf[Suite].getClassLoader.getResource("org/scalatest/HtmlReporter.css")
-            lb += new HtmlReporterConfiguration(configSet, fileName, cssFile)
+            lb += new HtmlReporterConfiguration(configSet, directory, cssFile)
           }
           else
-            throw new IllegalArgumentException("-h cannot be last, expected HTML output file name to follow.")
+            throw new IllegalArgumentException("-h cannot be last, expected HTML output directory name to follow.")
         }
       }
       lb.toList

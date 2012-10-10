@@ -572,11 +572,11 @@ class ScalaTestAntTask extends Task {
   {
     addReporterOption(args, reporter, "-h")
 
-    if (reporter.getFilename == null)
+    if (reporter.getDirectory == null)
       throw new BuildException(
-        "reporter type 'html' requires 'filename' attribute")
+        "reporter type 'html' requires 'directory' attribute")
 
-    args += reporter.getFilename
+    args += reporter.getDirectory
     
     if (reporter.getCss != null) {
       args += "-css"

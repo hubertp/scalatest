@@ -120,10 +120,10 @@ private[scalatest] class ReporterFactory {
     new XmlReporter(directory)
   }
   
-  protected def createHtmlReporter(configSet: Set[ReporterConfigParam], fileName: String, cssUrl: URL) = {
+  protected def createHtmlReporter(configSet: Set[ReporterConfigParam], directory: String, cssUrl: URL) = {
     if (configSetMinusNonFilterParams(configSet).isEmpty)
       new HtmlReporter(
-        fileName,
+        directory,
         configSet.contains(PresentAllDurations),
         !configSet.contains(PresentWithoutColor),
         configSet.contains(PresentShortStackTraces) || configSet.contains(PresentFullStackTraces),
@@ -133,7 +133,7 @@ private[scalatest] class ReporterFactory {
       else
         new FilterReporter(
           new HtmlReporter(
-            fileName,
+            directory,
             configSet.contains(PresentAllDurations),
             !configSet.contains(PresentWithoutColor),
             configSet.contains(PresentShortStackTraces) || configSet.contains(PresentFullStackTraces),
@@ -175,7 +175,7 @@ private[scalatest] class ReporterFactory {
         case JunitXmlReporterConfiguration(configSet, directory) => createJunitXmlReporter(configSet, directory)
         case DashboardReporterConfiguration(configSet, directory, numFilesToArchive) => createDashboardReporter(configSet, directory, numFilesToArchive)
         case XmlReporterConfiguration(configSet, directory) => createXmlReporter(configSet, directory)
-        case HtmlReporterConfiguration(configSet, fileName, cssFileName) => createHtmlReporter(configSet, fileName, cssFileName)
+        case HtmlReporterConfiguration(configSet, directory, cssFileName) => createHtmlReporter(configSet, directory, cssFileName)
         case CustomReporterConfiguration(configSet, reporterClassName) => createCustomReporter(configSet, reporterClassName, loader) 
         case GraphicReporterConfiguration(configSet) => throw new RuntimeException("Should never happen.")
         case SocketReporterConfiguration(host, port) => createSocketReporter(host, port)
