@@ -45,7 +45,7 @@ import java.nio.channels.Channels
  * A <code>Reporter</code> that prints test status information in HTML format to a file.
  */
 private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations: Boolean,
-        presentInColor: Boolean, presentStackTraces: Boolean, presentFullStackTraces: Boolean, cssUrl: URL) extends Reporter {
+        presentInColor: Boolean, presentStackTraces: Boolean, presentFullStackTraces: Boolean, cssUrl: URL) extends ResourcefulReporter {
 
   private val directory = new File(directoryPath)
   if (!directory.exists)
@@ -57,6 +57,13 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
   cssInputStream.close()
   cssOutputStream.flush()
   cssOutputStream.close()
+  
+  val sortTableInputStream = classOf[Suite].getClassLoader.getResource("org/scalatest/sorttable.js").openStream
+  val sortTableOutputStream = new FileOutputStream(new File(directory, "sorttable.js"))
+  sortTableOutputStream getChannel() transferFrom(Channels.newChannel(sortTableInputStream), 0, Long.MaxValue)
+  sortTableInputStream.close()
+  sortTableOutputStream.flush()
+  sortTableOutputStream.close()
   
   private val pegDown = new PegDownProcessor
 
@@ -142,7 +149,7 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
   PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
         
-      """ + getHtml(resourceName, duration, summary) 
+      """ + getIndexHtml(resourceName, duration, summary) 
     }
     pw.flush()
   }
@@ -204,7 +211,7 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
       case None => "hidePieChart();"
     }
   
-  private def getHtml(resourceName: String, duration: Option[Long], summary: Option[Summary]) = 
+  private def getIndexHtml(resourceName: String, duration: Option[Long], summary: Option[Summary]) = 
     <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
       <head>
         <title>ScalaTest Results</title>
@@ -213,6 +220,7 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
         <meta http-equiv="Pragma" content="no-cache" />
         <link href="styles.css" rel="stylesheet" />
         <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+        <script type="text/javascript" src="sorttable.js"></script>
         <script type="text/javascript">
           { PCDATA("""
           var tagMap = {};    
@@ -254,7 +262,7 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
                   var bitSet = tagMap[key];
                   var element = document.getElementById(key);
                   if ((bitSet & mask) != 0) 
-                    element.style.display = "block";
+                    element.style.display = "table-row";
                   else 
                     element.style.display = "none";
                 }
@@ -271,7 +279,7 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
         <div class="scalatest-report"> 
           { header(resourceName, duration, summary) }
           <div id="chart_div" style="display: none; width: 700px; height: 300px;"></div>
-          { results(eventList.sorted.toList) } 
+          { suiteResults } 
         </div>
         <script type="text/javascript">
           { PCDATA(tagMapScript) }
@@ -318,9 +326,53 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
   
   val tagMap = collection.mutable.HashMap[String, Int]()
         
-  private def results(eventList: List[Event]) = 
-    <div class="results"> {
-      val scopeStack = new collection.mutable.Stack[String]()
+  private def suiteResults = 
+    <table class="sortable">
+      <tr>
+        <td>Suite</td>
+        <td>Succeeded</td>
+        <td>Failed</td>
+        <td>Ignored</td>
+        <td>Pending</td>
+        <td>Canceled</td>
+        <td>Total</td>
+      </tr>
+    {
+      val sortedSuiteList = suiteList.sortWith((a, b) => a.startEvent.suiteName < b.startEvent.suiteName).toArray
+      sortedSuiteList map { r =>
+        val elementId = generateElementId
+        // use imperative style here for performance
+        var succeededCount = 0
+        var failedCount = 0
+        var ignoredCount = 0
+        var pendingCount = 0
+        var canceledCount = 0
+        var bits = 0
+        r.eventList.foreach { e => 
+          e match {
+            case testSucceeded: TestSucceeded => 
+              succeededCount +=1
+              bits |= SUCCEEDED_BIT
+            case testFailed: TestFailed => 
+              failedCount += 1
+              bits |= FAILED_BIT
+            case testIgnored: TestIgnored => 
+              ignoredCount += 1
+              bits |= IGNORED_BIT
+            case testPending: TestPending => 
+              pendingCount += 1
+              bits |= PENDING_BIT
+            case testCanceled: TestCanceled => 
+              canceledCount += 1
+              bits |= CANCELED_BIT
+            case _ => 
+          }
+        }
+        tagMap.put(elementId, bits)
+        suiteSummary(elementId, r.startEvent.suiteName, succeededCount, failedCount, ignoredCount, pendingCount, canceledCount)
+      }
+    
+      /*val scopeStack = new collection.mutable.Stack[String]()
       eventList.map { e => 
         e match {
           
@@ -471,9 +523,43 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
             
           case _ => NodeSeq.Empty
         }
-      }
+      }*/
     }
-    </div>
+    </table>
+  
+  private def suiteNameStyle(succeededCount: Int, failedCount: Int, ignoredCount: Int, pendingCount: Int, canceledCount: Int) = 
+    if (failedCount > 0)
+      "suite_name_with_failed"
+    else if (ignoredCount > 0 || pendingCount > 0 || canceledCount > 0)
+      "suite_name_passed"
+    else
+      "suite_name_passed_all"
+      
+  private def countStyle(prefix: String, count: Int) = 
+    if (count == 0)
+      prefix + "_zero"
+    else
+      prefix
+      
+  private def totalStyle(succeededCount: Int, failedCount: Int, ignoredCount: Int, pendingCount: Int, canceledCount: Int) = 
+    if (failedCount > 0)
+      "total_with_failed"
+    else if (ignoredCount > 0 || pendingCount > 0 || canceledCount > 0)
+      "total_passed"
+    else
+      "total_passed_all"
+    
+  private def suiteSummary(elementId: String, suiteName: String, succeededCount: Int, 
+                            failedCount: Int, ignoredCount: Int, pendingCount: Int, canceledCount: Int) = 
+    <tr id={ elementId }>
+      <td class={ suiteNameStyle(succeededCount, failedCount, ignoredCount, pendingCount, canceledCount) }>{ suiteName }</td>
+      <td class={ countStyle("succeeded", succeededCount) }>{ succeededCount }</td>
+      <td class={ countStyle("failed", failedCount) }>{ failedCount }</td>
+      <td class={ countStyle("ignored", ignoredCount) }>{ ignoredCount }</td>
+      <td class={ countStyle("pending", pendingCount) }>{ pendingCount }</td>
+      <td class={ countStyle("canceled", canceledCount) }>{ canceledCount }</td>
+      <td class={ totalStyle(succeededCount, failedCount, ignoredCount, pendingCount, canceledCount) }>{ succeededCount + failedCount + ignoredCount + pendingCount + canceledCount }</td>
+    </tr>
         
   private def suite(elementId: String, suiteName: String, indentLevel: Int) = 
     <div id={ elementId } class="suite" style={ "margin-left: " + (20 * indentLevel) + "px;" }>
@@ -626,28 +712,100 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
     "};\n" + 
     "applyFilter();"
 
-  private val eventList = new ListBuffer[Event]()
+  case class SuiteResult(suiteId: String, suiteName: String, suiteClassName: Option[String], startEvent: SuiteStarting, endEvent: Event, eventList: IndexedSeq[Event])
+    
+  private var eventList = new ListBuffer[Event]()
+  private val suiteList = new ListBuffer[SuiteResult]()
+  private var runEndEvent: Option[Event] = None
         
   def apply(event: Event) {
-    
+        
     event match {
 
       case RunStarting(ordinal, testCount, configMap, formatter, location, payload, threadName, timeStamp) => 
 
       case RunCompleted(ordinal, duration, summary, formatter, location, payload, threadName, timeStamp) => 
-
-        makeIndexFile("runCompleted", duration, summary)
+        runEndEvent = Some(event)
 
       case RunStopped(ordinal, duration, summary, formatter, location, payload, threadName, timeStamp) =>
-
-        makeIndexFile("runStopped", duration, summary)
+        runEndEvent = Some(event)
 
       case RunAborted(ordinal, message, throwable, duration, summary, formatter, location, payload, threadName, timeStamp) => 
-
-        makeIndexFile("runAborted", duration, summary)
+        runEndEvent = Some(event)
         
+      case SuiteCompleted(ordinal, suiteName, suiteId, suiteClassName, duration, formatter, location, rerunner, payload, threadName, timeStamp) =>
+        val (suiteEvents, otherEvents) = extractSuiteEvents(suiteId)
+        eventList = otherEvents
+        val sortedSuiteEvents = suiteEvents.sorted
+        sortedSuiteEvents.head match {
+          case suiteStarting: SuiteStarting => 
+            suiteList += SuiteResult(suiteId, suiteName, suiteClassName, suiteStarting, event, sortedSuiteEvents.tail.toIndexedSeq)
+          case other => 
+            throw new IllegalStateException("Expected SuiteStarting in the head of suite events, but we got: " + other.getClass.getName)
+        }
+            
+      case SuiteAborted(ordinal, message, suiteName, suiteId, suiteClassName, throwable, duration, formatter, location, rerunner, payload, threadName, timeStamp) =>
+        val (suiteEvents, otherEvents) = extractSuiteEvents(suiteId)
+        eventList = otherEvents
+        val sortedSuiteEvents = suiteEvents.sorted
+        sortedSuiteEvents.head match {
+          case suiteStarting: SuiteStarting => 
+            suiteList += SuiteResult(suiteId, suiteName, suiteClassName, suiteStarting, event, sortedSuiteEvents.tail.toIndexedSeq)
+          case other => 
+            throw new IllegalStateException("Expected SuiteStarting in the head of suite events, but we got: " + other.getClass.getName)
+        }
+      
       case _ => eventList += event
     }
+  }
+      
+  def extractSuiteEvents(suiteId: String) = eventList partition { e => 
+    e match {
+      case e: TestStarting => e.suiteId == suiteId
+      case e: TestSucceeded  => e.suiteId == suiteId
+      case e: TestIgnored    => e.suiteId == suiteId
+      case e: TestFailed     => e.suiteId == suiteId
+      case e: TestPending    => e.suiteId == suiteId
+      case e: TestCanceled   => e.suiteId == suiteId
+      case e: InfoProvided   => 
+        e.nameInfo match {
+          case Some(nameInfo) => 
+            nameInfo.suiteID == suiteId
+          case None => false
+        }
+      case e: MarkupProvided => 
+        e.nameInfo match {
+          case Some(nameInfo) => 
+            nameInfo.suiteID == suiteId
+          case None => false
+        }
+      case e: ScopeOpened    => e.nameInfo.suiteID == suiteId
+      case e: ScopeClosed    => e.nameInfo.suiteID == suiteId
+      case e: SuiteStarting  => e.suiteId == suiteId
+      case _ => false
+    }
+  }
+      
+  def dispose() {
+    runEndEvent match {
+      case Some(event) => 
+        event match {
+          case RunCompleted(ordinal, duration, summary, formatter, location, payload, threadName, timeStamp) => 
+            makeIndexFile("runCompleted", duration, summary)
+
+          case RunStopped(ordinal, duration, summary, formatter, location, payload, threadName, timeStamp) =>
+            makeIndexFile("runStopped", duration, summary)
+
+          case RunAborted(ordinal, message, throwable, duration, summary, formatter, location, payload, threadName, timeStamp) => 
+            makeIndexFile("runAborted", duration, summary)
+            
+          case other =>
+            throw new IllegalStateException("Expected run ending event only, but got: " + other.getClass.getName)
+        }
+      case None => // If no run end event (e.g. when run in sbt), just use runCompleted
+        makeIndexFile("runCompleted", None, None)
+    }
+    
   }
   
   private def getDuration(resourceName: String, duration: Option[Long]) = {
