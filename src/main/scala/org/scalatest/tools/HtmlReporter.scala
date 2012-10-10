@@ -199,6 +199,7 @@ private[scalatest] class HtmlReporter(pw: PrintWriter, presentAllDurations: Bool
 
             var options = {
               title: 'Test Run Results', 
+              sliceVisibilityThreshold: 0, 
         """ + 
         colorData.mkString("colors: [", ", ", "]\n") +
         """
