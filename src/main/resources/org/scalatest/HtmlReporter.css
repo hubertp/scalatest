@@ -49,6 +49,41 @@ body {
   margin: 0 0 0 2px;
 }
 
+#chart_div {
+  width: 200px; 
+  height: 200px;
+}
+
+#summary_view_row_1_legend_succeeded {
+  background-color: #339933;
+  color: #fff;
+  font-family: "Lucida Grande", Helvetica, sans-serif;
+}
+
+#summary_view_row_1_legend_failed {
+  background-color: #993333;
+  color: #fff;
+  font-family: "Lucida Grande", Helvetica, sans-serif;
+}
+
+#summary_view_row_1_legend_ignored {
+  background-color: #FF6600;
+  color: #fff;
+  font-family: "Lucida Grande", Helvetica, sans-serif;
+}
+
+#summary_view_row_1_legend_pending {
+  background-color: #33CCCC;
+  color: #fff;
+  font-family: "Lucida Grande", Helvetica, sans-serif;
+}
+
+#summary_view_row_1_legend_canceled {
+  background-color: #FFCC00;
+  color: #fff;
+  font-family: "Lucida Grande", Helvetica, sans-serif;
+}
+
 /* Sortable tables */
 table.sortable thead {
   background-color: #eee;

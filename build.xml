@@ -266,6 +266,7 @@
         </copy>
     	<copy file="${resources}/org/scalatest/HtmlReporter.css" todir="${jar.contents}/org/scalatest" />
     	<copy file="${resources}/org/scalatest/sorttable.js" todir="${jar.contents}/org/scalatest" />
+	    <copy file="${resources}/org/scalatest/d3.v2.min.js" todir="${jar.contents}/org/scalatest" />
     </target>
 
     <target name="compile-tests" depends="compile-main">

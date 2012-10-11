@@ -51,7 +51,20 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
   if (!directory.exists)
     directory.mkdirs()
     
-  val cssInputStream = cssUrl.openStream
+  private def copyResource(url: URL, targetFileName: String) {
+    val inputStream = url.openStream
+    val outputStream = new FileOutputStream(new File(directory, targetFileName))
+    outputStream getChannel() transferFrom(Channels.newChannel(inputStream), 0, Long.MaxValue)
+    inputStream.close()
+    outputStream.flush()
+    outputStream.close()
+  }
+  
+  copyResource(cssUrl, "styles.css")
+  copyResource(classOf[Suite].getClassLoader.getResource("org/scalatest/sorttable.js"), "sorttable.js")
+  copyResource(classOf[Suite].getClassLoader.getResource("org/scalatest/d3.v2.min.js"), "d3.v2.min.js")
+    
+  /*val cssInputStream = cssUrl.openStream
   val cssOutputStream = new FileOutputStream(new File(directory, "styles.css"))
   cssOutputStream getChannel() transferFrom(Channels.newChannel(cssInputStream), 0, Long.MaxValue)
   cssInputStream.close()
@@ -63,7 +76,7 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
   sortTableOutputStream getChannel() transferFrom(Channels.newChannel(sortTableInputStream), 0, Long.MaxValue)
   sortTableInputStream.close()
   sortTableOutputStream.flush()
-  sortTableOutputStream.close()
+  sortTableOutputStream.close()*/
   
   private val pegDown = new PegDownProcessor
 
@@ -160,7 +173,94 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
       case None => "scalatest-header-failed"
     }
   
-  private def getPieChartScript(summary: Option[Summary]) = 
+  private def getPieChartScript = {
+    val (succeeded, failed, ignored, pending, canceled) = suiteList.foldLeft((0, 0, 0, 0, 0)) { case ((succeeded, failed, ignored, pending, canceled), r) =>
+      (succeeded + r.testsSucceededCount, failed + r.testsFailedCount, ignored + r.testsIgnoredCount, 
+       pending + r.testsPendingCount, canceled + r.testsCanceledCount)
+    }
+    
+    """
+    /* modified from http://www.permadi.com/tutorial/cssGettingBackgroundColor/index.html - */
+    function getBgColor(elementId) 
+    {
+      var element = document.getElementById(elementId);
+      if (element.currentStyle)
+        return element.currentStyle.backgroundColor;
+      if (window.getComputedStyle)
+      {
+        var elementStyle=window.getComputedStyle(element,"");
+        if (elementStyle)
+          return elementStyle.getPropertyValue("background-color");
+      }
+      // Return 0 if both methods failed.  
+      return 0;
+    }
+    
+    function getWidth(elementId) 
+    {
+      var element = document.getElementById(elementId);
+      if (element.currentStyle)
+        return element.currentStyle.width;
+      if (window.getComputedStyle)
+      {
+        var elementStyle=window.getComputedStyle(element,"");
+        if (elementStyle)
+          return elementStyle.getPropertyValue("width");
+      }
+      // Return 0 if both methods failed.  
+      return 0;
+    }
+    
+    function getHeight(elementId) 
+    {
+      var element = document.getElementById(elementId);
+      if (element.currentStyle)
+        return element.currentStyle.height;
+      if (window.getComputedStyle)
+      {
+        var elementStyle=window.getComputedStyle(element,"");
+        if (elementStyle)
+          return elementStyle.getPropertyValue("height");
+      }
+      // Return 0 if both methods failed.  
+      return 0;
+    }
+    
+    """ + 
+    "var data = [" + succeeded + ", " + failed + ", " + ignored + ", " + pending + ", " + canceled + "];" + 
+    "var color = [getBgColor('summary_view_row_1_legend_succeeded'), " + 
+    "             getBgColor('summary_view_row_1_legend_failed'), " + 
+    "             getBgColor('summary_view_row_1_legend_ignored'), " + 
+    "             getBgColor('summary_view_row_1_legend_pending'), " +
+    "             getBgColor('summary_view_row_1_legend_canceled')" + 
+    "            ];" + 
+    """
+    var width = 200,
+        height = 200,
+        outerRadius = Math.min(width, height) / 2,
+        innerRadius = 0,
+        donut = d3.layout.pie(),
+        arc = d3.svg.arc().innerRadius(innerRadius).outerRadius(outerRadius);
+    
+    var vis = d3.select("#chart_div")
+                .append("svg")
+                .data([data])
+                .attr("width", width)
+                .attr("height", height);
+    
+    var arcs = vis.selectAll("g.arc")
+                  .data(donut)
+                  .enter().append("g")
+                  .attr("class", "arc")
+                  .attr("transform", "translate(" + outerRadius + "," + outerRadius + ")");
+    
+    arcs.append("path")
+        .attr("fill", function(d, i) { return color[i]; })
+        .attr("d", arc);
+    """
+  }
+  
+  /*private def getPieChartScript(summary: Option[Summary]) = 
     summary match {
       case Some(summary) => 
         val statusData: Array[String] = 
@@ -209,7 +309,7 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
           }            
         """
       case None => "hidePieChart();"
-    }
+    }*/
   
   private def getIndexHtml(resourceName: String, duration: Option[Long], summary: Option[Summary]) = 
     <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
@@ -219,7 +319,7 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
         <meta http-equiv="Expires" content="-1" />
         <meta http-equiv="Pragma" content="no-cache" />
         <link href="styles.css" rel="stylesheet" />
-        <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+        <script type="text/javascript" src="d3.v2.min.js"></script>
         <script type="text/javascript" src="sorttable.js"></script>
         <script type="text/javascript">
           { PCDATA("""
@@ -268,19 +368,45 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
                 }
               }
             }
-              
-            function showPieChart() {
-              document.getElementById('chart_div').style.display = "block";
-            }
-          """ + getPieChartScript(summary)) }
+          """) }
         </script>
       </head>
       <body>
         <div class="scalatest-report"> 
           { header(resourceName, duration, summary) }
-          <div id="chart_div" style="display: none; width: 700px; height: 300px;"></div>
-          { suiteResults } 
+          <table id="summary_view">
+            <tr id="summary_view_row_1">
+              <td id="summary_view_row_1_chart">
+                <span id="chart_div"></span>
+              </td>
+              <td id="summary_view_row_1_legend">
+                <table id="summary_view_row_1_legend_table">
+                  <tr id="summary_view_row_1_legend_table_row_succeeded">
+                    <td id="summary_view_row_1_legend_succeeded">Succeeded</td>
+                  </tr>
+                  <tr id="summary_view_row_1_legend_table_row_failed">
+                    <td id="summary_view_row_1_legend_failed">Failed</td>
+                  </tr>
+                  <tr id="summary_view_row_1_legend_table_row_ignored">
+                    <td id="summary_view_row_1_legend_ignored">Ignored</td>
+                  </tr>
+                  <tr id="summary_view_row_1_legend_table_row_pending">
+                    <td id="summary_view_row_1_legend_pending">Pending</td>
+                  </tr>
+                  <tr id="summary_view_row_1_legend_table_row_canceled">
+                    <td id="summary_view_row_1_legend_canceled">Canceled</td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            <tr id="summary_view_row_2">
+              <td id="summary_view_row_2_results" colspan="2">{ suiteResults }</td>
+            </tr>
+          </table>
         </div>
+        <script type="text/javascript">
+          { PCDATA(getPieChartScript) }
+        </script>
         <script type="text/javascript">
           { PCDATA(tagMapScript) }
         </script>
@@ -712,7 +838,8 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
     "};\n" + 
     "applyFilter();"
 
-  case class SuiteResult(suiteId: String, suiteName: String, suiteClassName: Option[String], startEvent: SuiteStarting, endEvent: Event, eventList: IndexedSeq[Event])
+  case class SuiteResult(suiteId: String, suiteName: String, suiteClassName: Option[String], startEvent: SuiteStarting, endEvent: Event, eventList: IndexedSeq[Event], 
+                          testsSucceededCount: Int, testsFailedCount: Int, testsIgnoredCount: Int, testsPendingCount: Int, testsCanceledCount: Int)
     
   private var eventList = new ListBuffer[Event]()
   private val suiteList = new ListBuffer[SuiteResult]()
@@ -739,7 +866,16 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
         val sortedSuiteEvents = suiteEvents.sorted
         sortedSuiteEvents.head match {
           case suiteStarting: SuiteStarting => 
-            suiteList += SuiteResult(suiteId, suiteName, suiteClassName, suiteStarting, event, sortedSuiteEvents.tail.toIndexedSeq)
+            suiteList += sortedSuiteEvents.foldLeft(SuiteResult(suiteId, suiteName, suiteClassName, suiteStarting, event, sortedSuiteEvents.tail.toIndexedSeq, 0, 0, 0, 0, 0)) { case (r, e) => 
+              e match {
+                case testSucceeded: TestSucceeded => r.copy(testsSucceededCount = r.testsSucceededCount + 1)
+                case testFailed: TestFailed => r.copy(testsFailedCount = r.testsFailedCount + 1)
+                case testIgnored: TestIgnored => r.copy(testsIgnoredCount = r.testsIgnoredCount + 1)
+                case testPending: TestPending => r.copy(testsPendingCount = r.testsPendingCount + 1)
+                case testCanceled: TestCanceled => r.copy(testsCanceledCount = r.testsCanceledCount + 1)
+                case _ => r
+              }
+            }
           case other => 
             throw new IllegalStateException("Expected SuiteStarting in the head of suite events, but we got: " + other.getClass.getName)
         }
@@ -750,7 +886,16 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
         val sortedSuiteEvents = suiteEvents.sorted
         sortedSuiteEvents.head match {
           case suiteStarting: SuiteStarting => 
-            suiteList += SuiteResult(suiteId, suiteName, suiteClassName, suiteStarting, event, sortedSuiteEvents.tail.toIndexedSeq)
+            suiteList += sortedSuiteEvents.foldLeft(SuiteResult(suiteId, suiteName, suiteClassName, suiteStarting, event, sortedSuiteEvents.tail.toIndexedSeq, 0, 0, 0, 0, 0)) { case (r, e) => 
+              e match {
+                case testSucceeded: TestSucceeded => r.copy(testsSucceededCount = r.testsSucceededCount + 1)
+                case testFailed: TestFailed => r.copy(testsFailedCount = r.testsFailedCount + 1)
+                case testIgnored: TestIgnored => r.copy(testsIgnoredCount = r.testsIgnoredCount + 1)
+                case testPending: TestPending => r.copy(testsPendingCount = r.testsPendingCount + 1)
+                case testCanceled: TestCanceled => r.copy(testsCanceledCount = r.testsCanceledCount + 1)
+                case _ => r
+              }
+            }
           case other => 
             throw new IllegalStateException("Expected SuiteStarting in the head of suite events, but we got: " + other.getClass.getName)
         }
