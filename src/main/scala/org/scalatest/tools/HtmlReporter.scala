@@ -196,36 +196,6 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
       return 0;
     }
     
-    function getWidth(elementId) 
-    {
-      var element = document.getElementById(elementId);
-      if (element.currentStyle)
-        return element.currentStyle.width;
-      if (window.getComputedStyle)
-      {
-        var elementStyle=window.getComputedStyle(element,"");
-        if (elementStyle)
-          return elementStyle.getPropertyValue("width");
-      }
-      // Return 0 if both methods failed.  
-      return 0;
-    }
-    
-    function getHeight(elementId) 
-    {
-      var element = document.getElementById(elementId);
-      if (element.currentStyle)
-        return element.currentStyle.height;
-      if (window.getComputedStyle)
-      {
-        var elementStyle=window.getComputedStyle(element,"");
-        if (elementStyle)
-          return elementStyle.getPropertyValue("height");
-      }
-      // Return 0 if both methods failed.  
-      return 0;
-    }
-    
     """ + 
     "var data = [" + succeeded + ", " + failed + ", " + ignored + ", " + pending + ", " + canceled + "];" + 
     "var color = [getBgColor('summary_view_row_1_legend_succeeded'), " + 
@@ -235,8 +205,8 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
     "             getBgColor('summary_view_row_1_legend_canceled')" + 
     "            ];" + 
     """
-    var width = 200,
-        height = 200,
+    var width = document.getElementById('chart_div').offsetWidth,
+        height = document.getElementById('chart_div').offsetHeight,
         outerRadius = Math.min(width, height) / 2,
         innerRadius = 0,
         donut = d3.layout.pie(),
@@ -377,7 +347,7 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
           <table id="summary_view">
             <tr id="summary_view_row_1">
               <td id="summary_view_row_1_chart">
-                <span id="chart_div"></span>
+                <div id="chart_div"></div>
               </td>
               <td id="summary_view_row_1_legend">
                 <table id="summary_view_row_1_legend_table">
