@@ -54,6 +54,19 @@ body {
   height: 200px;
 }
 
+#summary_view {
+  float: left;
+}
+
+#details_view {
+  padding-right: 15px;
+  position: fixed;
+  float: right;
+  width: 100%;
+  height: 500px;
+  font-family: "Lucida Grande", Helvetica, sans-serif;
+}
+
 #summary_view_row_1_chart {
   text-align:right;
   padding-top: 30px;

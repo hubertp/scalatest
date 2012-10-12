@@ -140,11 +140,14 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
       case _ => 0
   }
   
-  private def makeSuiteFile(suiteResult: SuiteResult) {
-    val name = suiteResult.suiteClassName match {
+  private def getSuiteFileName(suiteResult: SuiteResult) = 
+    suiteResult.suiteClassName match {
       case Some(suiteClassName) => suiteClassName
       case None => suiteResult.suiteName
     }
+  
+  private def makeSuiteFile(suiteResult: SuiteResult) {
+    val name = getSuiteFileName(suiteResult)
     
     val pw = new PrintWriter(new BufferedOutputStream(new FileOutputStream(new File(directory, name + ".html")), BufferSize))
     try {
@@ -440,6 +443,10 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
                 }
               }
             }
+              
+            function showDetails(suiteName) {
+              document.getElementById('details_view').innerHTML = "<iframe src='" + suiteName + ".html' width='100%' height='100%'></iframe>";
+            }
           """) }
         </script>
       </head>
@@ -485,12 +492,21 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
               <td id="summary_view_row_2_results" colspan="2">{ suiteResults }</td>
             </tr>
           </table>
+          <div id="details_view">
+            Click on suite name to view details.
+          </div>
         </div>
         <script type="text/javascript">
           { PCDATA(getPieChartScript(summary)) }
         </script>
         <script type="text/javascript">
           { PCDATA(tagMapScript) }
+        </script>
+        <script type="text/javascript">
+          { PCDATA("""
+              document.getElementById('details_view').style.left = (document.getElementById('summary_view').offsetWidth + 30) + "px";
+            """)
+          }
         </script>
       </body>
     </html>
@@ -573,161 +589,8 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
           }
         }
         tagMap.put(elementId, bits)
-        suiteSummary(elementId, r.startEvent.suiteName, succeededCount, failedCount, ignoredCount, pendingCount, canceledCount)
+        suiteSummary(elementId, r.startEvent.suiteName, getSuiteFileName(r), succeededCount, failedCount, ignoredCount, pendingCount, canceledCount)
       }
-    
-      /*val scopeStack = new collection.mutable.Stack[String]()
-      eventList.map { e => 
-        e match {
-          
-          case SuiteStarting(ordinal, suiteName, suiteId, suiteClassName, formatter, location, rerunnable, payload, threadName, timeStamp) =>
-            val stringToPrint = stringToPrintWhenNoError("suiteStarting", formatter, suiteName, None)
-            stringToPrint match {
-              case Some(string) => 
-                val elementId = generateElementId
-                tagMap.put(elementId, 0)
-                scopeStack.push(elementId)
-                suite(elementId, suiteName, getIndentLevel(formatter))
-              case None => 
-                NodeSeq.Empty
-            }
-            
-          case SuiteCompleted(ordinal, suiteName, suiteId, suiteClassName, duration, formatter, location, rerunner, payload, threadName, timeStamp) =>
-            scopeStack.clear()
-            NodeSeq.Empty
-            
-          case SuiteAborted(ordinal, message, suiteName, suiteId, suiteClassName, throwable, duration, formatter, location, rerunner, payload, threadName, timeStamp) =>
-            scopeStack.clear()
-            NodeSeq.Empty
-            
-          case ScopeOpened(ordinal, message, nameInfo, formatter, location, payload, threadName, timeStamp) => 
-            val testNameInfo = nameInfo.testName
-            val stringToPrint = stringToPrintWhenNoError("scopeOpened", formatter, nameInfo.suiteName, nameInfo.testName)
-            stringToPrint match {
-              case Some(string) => 
-                val elementId = generateElementId
-                tagMap.put(elementId, 0)
-                scopeStack.push(elementId)
-                scope(elementId, string, getIndentLevel(formatter) + 1)
-              case None => 
-                NodeSeq.Empty
-            }
-            
-          case ScopeClosed(ordinal, message, nameInfo, formatter, location, payload, threadName, timeStamp) =>
-            scopeStack.pop
-            NodeSeq.Empty
-          
-          case TestSucceeded(ordinal, suiteName, suiteID, suiteClassName, testName, testText, recordedEvents, duration, formatter, location, rerunnable, payload, threadName, timeStamp) => 
-            
-            val stringToPrint = stringToPrintWhenNoError("testSucceeded", formatter, suiteName, Some(testName), duration)
-
-            stringToPrint match {
-              case Some(string) => 
-                val elementId = generateElementId
-                tagMap.put(elementId, SUCCEEDED_BIT)
-                setBit(scopeStack, tagMap, SUCCEEDED_BIT)
-                test(elementId, List(string), getIndentLevel(formatter) + 1, "test_passed")
-              case None =>
-                NodeSeq.Empty
-            }
-            
-            // TODO: Print recorded events, when merge into trunk.
-            
-          case TestFailed(ordinal, message, suiteName, suiteID, suiteClassName, testName, testText, recordedEvents, throwable, duration, formatter, location, rerunnable, payload, threadName, timeStamp) => 
-
-            val stringToPrint = stringsToPrintOnError("failedNote", "testFailed", message, throwable, formatter, Some(suiteName), Some(testName), duration)
-            val elementId = generateElementId
-            tagMap.put(elementId, FAILED_BIT)
-            setBit(scopeStack, tagMap, FAILED_BIT)
-            testWithDetails(elementId, List(stringToPrint), message, throwable, getIndentLevel(formatter) + 1, "test_failed")            
-            
-            // TODO: Print recorded events, when merge into trunk.
-            
-          case TestIgnored(ordinal, suiteName, suiteID, suiteClassName, testName, testText, formatter, location, payload, threadName, timeStamp) => 
-
-            val stringToPrint =
-              formatter match {
-                case Some(IndentedText(formattedText, _, _)) => Some(Resources("specTextAndNote", formattedText, Resources("ignoredNote")))
-                case Some(MotionToSuppress) => None
-                case _ => Some(Resources("testIgnored", suiteName + ": " + testName))
-              }
- 
-              stringToPrint match {
-                case Some(string) => 
-                  val elementId = generateElementId
-                  tagMap.put(elementId, IGNORED_BIT)
-                  setBit(scopeStack, tagMap, IGNORED_BIT)
-                  test(elementId, List(string), getIndentLevel(formatter) + 1, "test_ignored")
-                case None =>
-                  NodeSeq.Empty
-              }
-              
-          case TestPending(ordinal, suiteName, suiteID, suiteClassName, testName, testText, recordedEvents, duration, formatter, location, payload, threadName, timeStamp) =>
-
-            val stringToPrint =
-              formatter match {
-                case Some(IndentedText(formattedText, _, _)) => Some(Resources("specTextAndNote", formattedText, Resources("pendingNote")))
-                case Some(MotionToSuppress) => None
-                case _ => Some(Resources("testPending", suiteName + ": " + testName))
-              }
-
-            stringToPrint match {
-              case Some(string) => 
-                val elementId = generateElementId
-                tagMap.put(elementId, PENDING_BIT)
-                setBit(scopeStack, tagMap, PENDING_BIT)
-                test(elementId, List(string), getIndentLevel(formatter) + 1, "test_pending")
-              case None =>
-                NodeSeq.Empty
-            }
-            
-            // TODO: Print recorded events, when merge into trunk.
-            
-          case TestCanceled(ordinal, message, suiteName, suiteID, suiteClassName, testName, testText, recordedEvents, throwable, duration, formatter, location, payload, threadName, timeStamp) =>
-
-            val stringToPrint = stringsToPrintOnError("canceledNote", "testCanceled", message, throwable, formatter, Some(suiteName), Some(testName), duration)
-            val elementId = generateElementId
-            tagMap.put(elementId, CANCELED_BIT)
-            setBit(scopeStack, tagMap, CANCELED_BIT)
-            testWithDetails(elementId, List(stringToPrint), message, throwable, getIndentLevel(formatter) + 1, "test_canceled")
-            
-            // TODO: Print recorded events, when merge into trunk.
-            
-          case InfoProvided(ordinal, message, nameInfo, throwable, formatter, location, payload, threadName, timeStamp) =>
-
-            val (suiteName, testName) =
-              nameInfo match {
-                case Some(NameInfo(suiteName, _, _, testName)) => (Some(suiteName), testName)
-                case None => (None, None)
-              }
-            val infoContent = stringsToPrintOnError("infoProvidedNote", "infoProvided", message, throwable, formatter, suiteName, testName, None)
-            
-            val elementId = generateElementId
-            if (scopeStack.size > 0) {
-              val topElementId = scopeStack.top
-              tagMap.put(elementId, tagMap(topElementId))
-            }
-            test(elementId, List(infoContent), getIndentLevel(formatter) + 1, "info")
-        
-          case MarkupProvided(ordinal, text, nameInfo, formatter, location, payload, threadName, timeStamp) => 
-
-            val (suiteName, testName) =
-              nameInfo match {
-                case Some(NameInfo(suiteName, _, _, testName)) => (Some(suiteName), testName)
-                case None => (None, None)
-              }
-        
-            val elementId = generateElementId
-            if (scopeStack.size > 0) {
-              val topElementId = scopeStack.top
-              tagMap.put(elementId, tagMap(topElementId))
-            }
-            markup(elementId, text, getIndentLevel(formatter) + 1, "markup")
-            // TO CONTINUE: XML element must be last
-            
-          case _ => NodeSeq.Empty
-        }
-      }*/
     }
     </table>
   
@@ -753,10 +616,10 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
     else
       "total_passed_all"
     
-  private def suiteSummary(elementId: String, suiteName: String, succeededCount: Int, 
+  private def suiteSummary(elementId: String, suiteName: String, suiteFileName: String, succeededCount: Int, 
                             failedCount: Int, ignoredCount: Int, pendingCount: Int, canceledCount: Int) = 
     <tr id={ elementId }>
-      <td class={ suiteNameStyle(succeededCount, failedCount, ignoredCount, pendingCount, canceledCount) }>{ suiteName }</td>
+      <td class={ suiteNameStyle(succeededCount, failedCount, ignoredCount, pendingCount, canceledCount) }><a href={ "javascript: showDetails('" + suiteFileName + "')" }>{ suiteName }</a></td>
       <td class={ countStyle("succeeded", succeededCount) }>{ succeededCount }</td>
       <td class={ countStyle("failed", failedCount) }>{ failedCount }</td>
       <td class={ countStyle("ignored", ignoredCount) }>{ ignoredCount }</td>
