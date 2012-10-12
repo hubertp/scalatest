@@ -140,18 +140,191 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
       case _ => 0
   }
   
-  private def makeIndexFile(resourceName: String, duration: Option[Long]) {
-    val pw = new PrintWriter(new BufferedOutputStream(new FileOutputStream(new File(directory, "index.html")), BufferSize))
-    pw.println {
-      """
+  private def makeSuiteFile(suiteResult: SuiteResult) {
+    val name = suiteResult.suiteClassName match {
+      case Some(suiteClassName) => suiteClassName
+      case None => suiteResult.suiteName
+    }
+    
+    val pw = new PrintWriter(new BufferedOutputStream(new FileOutputStream(new File(directory, name + ".html")), BufferSize))
+    try {
+      pw.println {
+        """
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html
   PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
         
-      """ + getIndexHtml(resourceName, duration) 
+        """ + getSuiteHtml(name, suiteResult) 
+      }
     }
-    pw.flush()
+    finally {
+      pw.flush()
+      pw.close()
+    }
+  }
+  
+  private def getSuiteHtml(name: String, suiteResult: SuiteResult) = 
+    <html>
+      <head>
+        <title>ScalaTest Suite { name } Results</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta http-equiv="Expires" content="-1" />
+        <meta http-equiv="Pragma" content="no-cache" />
+        <link href="styles.css" rel="stylesheet" />
+        <script type="text/javascript">
+          { PCDATA("""
+            function toggleDetails(contentId, linkId) {
+              var ele = document.getElementById(contentId);
+              var text = document.getElementById(linkId);
+              if(ele.style.display == "block") {
+                ele.style.display = "none";
+                text.innerHTML = "Show Details";
+              }
+              else {
+                ele.style.display = "block";
+                text.innerHTML = "Hide Details";
+              }
+            }
+            """)
+          }
+        </script>
+      </head>
+      <body>
+        {
+          val scopeStack = new collection.mutable.Stack[String]()
+          suiteResult.eventList.map { e => 
+            e match {
+              case ScopeOpened(ordinal, message, nameInfo, formatter, location, payload, threadName, timeStamp) => 
+                val testNameInfo = nameInfo.testName
+                val stringToPrint = stringToPrintWhenNoError("scopeOpened", formatter, nameInfo.suiteName, nameInfo.testName)
+                stringToPrint match {
+                  case Some(string) => 
+                    val elementId = generateElementId
+                    scopeStack.push(elementId)
+                    scope(elementId, string, getIndentLevel(formatter) + 1)
+                  case None => 
+                    NodeSeq.Empty
+                }
+            
+              case ScopeClosed(ordinal, message, nameInfo, formatter, location, payload, threadName, timeStamp) =>
+                scopeStack.pop
+                NodeSeq.Empty
+          
+              case TestSucceeded(ordinal, suiteName, suiteID, suiteClassName, testName, testText, recordedEvents, duration, formatter, location, rerunnable, payload, threadName, timeStamp) => 
+            
+                val stringToPrint = stringToPrintWhenNoError("testSucceeded", formatter, suiteName, Some(testName), duration)
+
+                stringToPrint match {
+                  case Some(string) => 
+                    val elementId = generateElementId
+                    test(elementId, List(string), getIndentLevel(formatter) + 1, "test_passed")
+                  case None =>
+                    NodeSeq.Empty
+                }
+            
+                // TODO: Print recorded events, when merge into trunk.
+            
+              case TestFailed(ordinal, message, suiteName, suiteID, suiteClassName, testName, testText, recordedEvents, throwable, duration, formatter, location, rerunnable, payload, threadName, timeStamp) => 
+
+                val stringToPrint = stringsToPrintOnError("failedNote", "testFailed", message, throwable, formatter, Some(suiteName), Some(testName), duration)
+                val elementId = generateElementId
+                testWithDetails(elementId, List(stringToPrint), message, throwable, getIndentLevel(formatter) + 1, "test_failed")            
+            
+                // TODO: Print recorded events, when merge into trunk.
+            
+              case TestIgnored(ordinal, suiteName, suiteID, suiteClassName, testName, testText, formatter, location, payload, threadName, timeStamp) => 
+
+                val stringToPrint =
+                  formatter match {
+                    case Some(IndentedText(formattedText, _, _)) => Some(Resources("specTextAndNote", formattedText, Resources("ignoredNote")))
+                    case Some(MotionToSuppress) => None
+                    case _ => Some(Resources("testIgnored", suiteName + ": " + testName))
+                  }
+ 
+                stringToPrint match {
+                  case Some(string) => 
+                    val elementId = generateElementId
+                    test(elementId, List(string), getIndentLevel(formatter) + 1, "test_ignored")
+                  case None =>
+                    NodeSeq.Empty
+                }
+              
+              case TestPending(ordinal, suiteName, suiteID, suiteClassName, testName, testText, recordedEvents, duration, formatter, location, payload, threadName, timeStamp) =>
+
+                val stringToPrint =
+                  formatter match {
+                    case Some(IndentedText(formattedText, _, _)) => Some(Resources("specTextAndNote", formattedText, Resources("pendingNote")))
+                    case Some(MotionToSuppress) => None
+                    case _ => Some(Resources("testPending", suiteName + ": " + testName))
+                  }
+
+                stringToPrint match {
+                  case Some(string) => 
+                    val elementId = generateElementId
+                    test(elementId, List(string), getIndentLevel(formatter) + 1, "test_pending")
+                  case None =>
+                    NodeSeq.Empty
+                }
+            
+                // TODO: Print recorded events, when merge into trunk.
+            
+              case TestCanceled(ordinal, message, suiteName, suiteID, suiteClassName, testName, testText, recordedEvents, throwable, duration, formatter, location, payload, threadName, timeStamp) =>
+
+                val stringToPrint = stringsToPrintOnError("canceledNote", "testCanceled", message, throwable, formatter, Some(suiteName), Some(testName), duration)
+                val elementId = generateElementId
+                testWithDetails(elementId, List(stringToPrint), message, throwable, getIndentLevel(formatter) + 1, "test_canceled")
+            
+                // TODO: Print recorded events, when merge into trunk.
+            
+              case InfoProvided(ordinal, message, nameInfo, throwable, formatter, location, payload, threadName, timeStamp) =>
+
+                val (suiteName, testName) =
+                  nameInfo match {
+                    case Some(NameInfo(suiteName, _, _, testName)) => (Some(suiteName), testName)
+                    case None => (None, None)
+                  }
+                val infoContent = stringsToPrintOnError("infoProvidedNote", "infoProvided", message, throwable, formatter, suiteName, testName, None)
+            
+                val elementId = generateElementId
+                test(elementId, List(infoContent), getIndentLevel(formatter) + 1, "info")
+        
+              case MarkupProvided(ordinal, text, nameInfo, formatter, location, payload, threadName, timeStamp) => 
+
+                val (suiteName, testName) =
+                  nameInfo match {
+                    case Some(NameInfo(suiteName, _, _, testName)) => (Some(suiteName), testName)
+                    case None => (None, None)
+                  }
+        
+                val elementId = generateElementId
+                markup(elementId, text, getIndentLevel(formatter) + 1, "markup")
+                // TO CONTINUE: XML element must be last
+            
+              case _ => NodeSeq.Empty
+            }
+          }
+        }
+      </body>
+    </html>
+  
+  private def makeIndexFile(resourceName: String, duration: Option[Long]) {
+    val pw = new PrintWriter(new BufferedOutputStream(new FileOutputStream(new File(directory, "index.html")), BufferSize))
+    try {
+      pw.println {
+        """
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+        
+        """ + getIndexHtml(resourceName, duration) 
+      }
+    }
+    finally {
+      pw.flush()
+      pw.close()
+    }
   }
   
   private def getHeaderStatusColor(summary: Summary) = 
@@ -235,20 +408,7 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
         <script type="text/javascript" src="sorttable.js"></script>
         <script type="text/javascript">
           { PCDATA("""
-          var tagMap = {};    
-              
-            function toggleDetails(contentId, linkId) {
-              var ele = document.getElementById(contentId);
-              var text = document.getElementById(linkId);
-              if(ele.style.display == "block") {
-                ele.style.display = "none";
-                text.innerHTML = "Show Details";
-              }
-              else {
-                ele.style.display = "block";
-                text.innerHTML = "Hide Details";
-              }
-            }
+            var tagMap = {};    
             
             var SUCCEEDED_BIT = 1;
             var FAILED_BIT = 2;
@@ -784,7 +944,7 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
         val sortedSuiteEvents = suiteEvents.sorted
         sortedSuiteEvents.head match {
           case suiteStarting: SuiteStarting => 
-            suiteList += sortedSuiteEvents.foldLeft(SuiteResult(suiteId, suiteName, suiteClassName, suiteStarting, event, sortedSuiteEvents.tail.toIndexedSeq, 0, 0, 0, 0, 0, true)) { case (r, e) => 
+            val suiteResult = sortedSuiteEvents.foldLeft(SuiteResult(suiteId, suiteName, suiteClassName, suiteStarting, event, sortedSuiteEvents.tail.toIndexedSeq, 0, 0, 0, 0, 0, true)) { case (r, e) => 
               e match {
                 case testSucceeded: TestSucceeded => r.copy(testsSucceededCount = r.testsSucceededCount + 1)
                 case testFailed: TestFailed => r.copy(testsFailedCount = r.testsFailedCount + 1)
@@ -794,6 +954,8 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
                 case _ => r
               }
             }
+            suiteList += suiteResult
+            makeSuiteFile(suiteResult)
           case other => 
             throw new IllegalStateException("Expected SuiteStarting in the head of suite events, but we got: " + other.getClass.getName)
         }
@@ -804,7 +966,7 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
         val sortedSuiteEvents = suiteEvents.sorted
         sortedSuiteEvents.head match {
           case suiteStarting: SuiteStarting => 
-            suiteList += sortedSuiteEvents.foldLeft(SuiteResult(suiteId, suiteName, suiteClassName, suiteStarting, event, sortedSuiteEvents.tail.toIndexedSeq, 0, 0, 0, 0, 0, false)) { case (r, e) => 
+            val suiteResult = sortedSuiteEvents.foldLeft(SuiteResult(suiteId, suiteName, suiteClassName, suiteStarting, event, sortedSuiteEvents.tail.toIndexedSeq, 0, 0, 0, 0, 0, false)) { case (r, e) => 
               e match {
                 case testSucceeded: TestSucceeded => r.copy(testsSucceededCount = r.testsSucceededCount + 1)
                 case testFailed: TestFailed => r.copy(testsFailedCount = r.testsFailedCount + 1)
@@ -814,6 +976,8 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
                 case _ => r
               }
             }
+            suiteList += suiteResult
+            makeSuiteFile(suiteResult)
           case other => 
             throw new IllegalStateException("Expected SuiteStarting in the head of suite events, but we got: " + other.getClass.getName)
         }
