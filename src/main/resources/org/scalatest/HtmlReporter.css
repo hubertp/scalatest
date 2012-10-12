@@ -54,33 +54,111 @@ body {
   height: 200px;
 }
 
-#summary_view_row_1_legend_succeeded {
+#summary_view_row_1_chart {
+  text-align:right;
+  padding-top: 30px;
+  padding-left: 30px;
+  padding-bottom: 30px;
+  width: 230px;
+}
+
+#summary_view_row_1_legend_succeeded_label {
   background-color: #339933;
   color: #fff;
   font-family: "Lucida Grande", Helvetica, sans-serif;
 }
 
-#summary_view_row_1_legend_failed {
+#summary_view_row_1_legend_succeeded_count {
+  padding-left: 5px;
+  text-align: right;
+  color: #339933;
+  font-family: "Lucida Grande", Helvetica, sans-serif;
+}
+
+#summary_view_row_1_legend_succeeded_percent {
+  padding-left: 5px;
+  text-align: right;
+  color: #339933;
+  font-family: "Lucida Grande", Helvetica, sans-serif;
+}
+
+#summary_view_row_1_legend_failed_label {
   background-color: #993333;
   color: #fff;
   font-family: "Lucida Grande", Helvetica, sans-serif;
 }
 
-#summary_view_row_1_legend_ignored {
+#summary_view_row_1_legend_failed_count {
+  padding-left: 5px;
+  text-align: right;
+  color: #993333;
+  font-family: "Lucida Grande", Helvetica, sans-serif;
+}
+
+#summary_view_row_1_legend_failed_percent {
+  padding-left: 5px;
+  text-align: right;
+  color: #993333;
+  font-family: "Lucida Grande", Helvetica, sans-serif;
+}
+
+#summary_view_row_1_legend_ignored_label {
   background-color: #FF6600;
   color: #fff;
   font-family: "Lucida Grande", Helvetica, sans-serif;
 }
 
-#summary_view_row_1_legend_pending {
+#summary_view_row_1_legend_ignored_count {
+  padding-left: 5px;
+  text-align: right;
+  color: #FF6600;
+  font-family: "Lucida Grande", Helvetica, sans-serif;
+}
+
+#summary_view_row_1_legend_ignored_percent {
+  padding-left: 5px;
+  text-align: right;
+  color: #FF6600;
+  font-family: "Lucida Grande", Helvetica, sans-serif;
+}
+
+#summary_view_row_1_legend_pending_label {
   background-color: #33CCCC;
   color: #fff;
   font-family: "Lucida Grande", Helvetica, sans-serif;
 }
 
-#summary_view_row_1_legend_canceled {
+#summary_view_row_1_legend_pending_count {
+  padding-left: 5px;
+  text-align: right;
+  color: #33CCCC;
+  font-family: "Lucida Grande", Helvetica, sans-serif;
+}
+
+#summary_view_row_1_legend_pending_percent {
+  padding-left: 5px;
+  text-align: right;
+  color: #33CCCC;
+  font-family: "Lucida Grande", Helvetica, sans-serif;
+}
+
+#summary_view_row_1_legend_canceled_label {
   background-color: #FFCC00;
   color: #fff;
+  font-family: "Lucida Grande", Helvetica, sans-serif;
+}
+
+#summary_view_row_1_legend_canceled_count {
+  padding-left: 5px;
+  text-align: right;
+  color: #FFCC00;
+  font-family: "Lucida Grande", Helvetica, sans-serif;
+}
+
+#summary_view_row_1_legend_canceled_percent {
+  padding-left: 5px;
+  text-align: right;
+  color: #FFCC00;
   font-family: "Lucida Grande", Helvetica, sans-serif;
 }
 

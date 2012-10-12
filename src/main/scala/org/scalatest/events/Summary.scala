@@ -35,6 +35,11 @@ final case class Summary(testsSucceededCount: Int, testsFailedCount: Int, testsI
    * tests that were ignored or reported as pending.
    */
   val testsCompletedCount = testsSucceededCount + testsFailedCount
+  
+  /**
+   * The total number of tests, which is the sum of the number of tests that succeeded, failed, ignored, pending and canceled.
+   */
+  val totalTestsCount = testsSucceededCount + testsFailedCount + testsIgnoredCount + testsPendingCount + testsCanceledCount
 }
 
 /**

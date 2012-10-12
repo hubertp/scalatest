@@ -40,6 +40,7 @@ import scala.annotation.tailrec
 import java.net.URL
 import scala.io.Source
 import java.nio.channels.Channels
+import java.text.DecimalFormat
 
 /**
  * A <code>Reporter</code> that prints test status information in HTML format to a file.
@@ -63,20 +64,6 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
   copyResource(cssUrl, "styles.css")
   copyResource(classOf[Suite].getClassLoader.getResource("org/scalatest/sorttable.js"), "sorttable.js")
   copyResource(classOf[Suite].getClassLoader.getResource("org/scalatest/d3.v2.min.js"), "d3.v2.min.js")
-    
-  /*val cssInputStream = cssUrl.openStream
-  val cssOutputStream = new FileOutputStream(new File(directory, "styles.css"))
-  cssOutputStream getChannel() transferFrom(Channels.newChannel(cssInputStream), 0, Long.MaxValue)
-  cssInputStream.close()
-  cssOutputStream.flush()
-  cssOutputStream.close()
-  
-  val sortTableInputStream = classOf[Suite].getClassLoader.getResource("org/scalatest/sorttable.js").openStream
-  val sortTableOutputStream = new FileOutputStream(new File(directory, "sorttable.js"))
-  sortTableOutputStream getChannel() transferFrom(Channels.newChannel(sortTableInputStream), 0, Long.MaxValue)
-  sortTableInputStream.close()
-  sortTableOutputStream.flush()
-  sortTableOutputStream.close()*/
   
   private val pegDown = new PegDownProcessor
 
@@ -153,7 +140,7 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
       case _ => 0
   }
   
-  private def makeIndexFile(resourceName: String, duration: Option[Long], summary: Option[Summary]) {
+  private def makeIndexFile(resourceName: String, duration: Option[Long]) {
     val pw = new PrintWriter(new BufferedOutputStream(new FileOutputStream(new File(directory, "index.html")), BufferSize))
     pw.println {
       """
@@ -162,22 +149,24 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
   PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
         
-      """ + getIndexHtml(resourceName, duration, summary) 
+      """ + getIndexHtml(resourceName, duration) 
     }
     pw.flush()
   }
   
-  private def getHeaderStatusColor(summary: Option[Summary]) = 
-    summary match {
-      case Some(summary) => if (summary.testsFailedCount == 0) "scalatest-header-passed" else "scalatest-header-failed"
-      case None => "scalatest-header-failed"
-    }
+  private def getHeaderStatusColor(summary: Summary) = 
+    if (summary.testsFailedCount == 0) "scalatest-header-passed" else "scalatest-header-failed"
   
-  private def getPieChartScript = {
+  private def getRunSummary: Summary = {
     val (succeeded, failed, ignored, pending, canceled) = suiteList.foldLeft((0, 0, 0, 0, 0)) { case ((succeeded, failed, ignored, pending, canceled), r) =>
       (succeeded + r.testsSucceededCount, failed + r.testsFailedCount, ignored + r.testsIgnoredCount, 
        pending + r.testsPendingCount, canceled + r.testsCanceledCount)
     }
+    Summary(succeeded, failed, ignored, pending, canceled, suiteList.length, suiteList.filter(!_.isCompleted).length)
+  }
+  
+  private def getPieChartScript(summary: Summary) = {
+    import summary._
     
     """
     /* modified from http://www.permadi.com/tutorial/cssGettingBackgroundColor/index.html - */
@@ -197,12 +186,12 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
     }
     
     """ + 
-    "var data = [" + succeeded + ", " + failed + ", " + ignored + ", " + pending + ", " + canceled + "];" + 
-    "var color = [getBgColor('summary_view_row_1_legend_succeeded'), " + 
-    "             getBgColor('summary_view_row_1_legend_failed'), " + 
-    "             getBgColor('summary_view_row_1_legend_ignored'), " + 
-    "             getBgColor('summary_view_row_1_legend_pending'), " +
-    "             getBgColor('summary_view_row_1_legend_canceled')" + 
+    "var data = [" + testsSucceededCount + ", " + testsFailedCount + ", " + testsIgnoredCount + ", " + testsPendingCount + ", " + testsCanceledCount + "];" + 
+    "var color = [getBgColor('summary_view_row_1_legend_succeeded_label'), " + 
+    "             getBgColor('summary_view_row_1_legend_failed_label'), " + 
+    "             getBgColor('summary_view_row_1_legend_ignored_label'), " + 
+    "             getBgColor('summary_view_row_1_legend_pending_label'), " +
+    "             getBgColor('summary_view_row_1_legend_canceled_label')" + 
     "            ];" + 
     """
     var width = document.getElementById('chart_div').offsetWidth,
@@ -230,58 +219,11 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
     """
   }
   
-  /*private def getPieChartScript(summary: Option[Summary]) = 
-    summary match {
-      case Some(summary) => 
-        val statusData: Array[String] = 
-          Array(
-            if (summary.testsSucceededCount > 0) "['Succeeded', " + summary.testsSucceededCount + "]" else null, 
-            if (summary.testsFailedCount > 0) "['Failed', " + summary.testsFailedCount + "]" else null, 
-            if (summary.testsIgnoredCount > 0) "['Ignored', " + summary.testsIgnoredCount + "]" else null, 
-            if (summary.testsPendingCount > 0) "['Pending', " + summary.testsPendingCount + "]" else null, 
-            if (summary.testsCanceledCount > 0) "['Canceled', " + summary.testsCanceledCount + "]" else null
-          ).filter(_ != null)
-          
-        val colorData: Array[String] = 
-          Array(
-            if (summary.testsSucceededCount > 0) "'#339933'" else null, 
-            if (summary.testsFailedCount > 0) "'#993333'" else null, 
-            if (summary.testsIgnoredCount > 0) "'#FF6600'" else null, 
-            if (summary.testsPendingCount > 0) "'#33CCCC'" else null, 
-            if (summary.testsCanceledCount > 0) "'#FFCC00'" else null
-          ).filter(_ != null)
-          
-        """
-          function drawChart() {
-            showPieChart();
-            var data = google.visualization.arrayToDataTable(
-            [
-        """ +
-        statusData.mkString("['Status', 'Count'],\n", ",\n", "\n") +
-        """
-            ]);
+  private def getIndexHtml(resourceName: String, duration: Option[Long]) = {
+    val summary = getRunSummary
+    import summary._
 
-            var options = {
-              title: 'Test Run Results', 
-              sliceVisibilityThreshold: 0, 
-        """ + 
-        colorData.mkString("colors: [", ", ", "]\n") +
-        """
-            };
-
-            var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
-            chart.draw(data, options);
-          }
-        
-          if (typeof google !== 'undefined') {
-            google.load("visualization", "1", {packages:["corechart"]});
-            google.setOnLoadCallback(drawChart);
-          }            
-        """
-      case None => "hidePieChart();"
-    }*/
-  
-  private def getIndexHtml(resourceName: String, duration: Option[Long], summary: Option[Summary]) = 
+    val decimalFormat = new DecimalFormat("#.##")
     <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
       <head>
         <title>ScalaTest Results</title>
@@ -352,19 +294,29 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
               <td id="summary_view_row_1_legend">
                 <table id="summary_view_row_1_legend_table">
                   <tr id="summary_view_row_1_legend_table_row_succeeded">
-                    <td id="summary_view_row_1_legend_succeeded">Succeeded</td>
+                    <td id="summary_view_row_1_legend_succeeded_label">Succeeded</td>
+                    <td id="summary_view_row_1_legend_succeeded_count">{ testsSucceededCount }</td>
+                    <td id="summary_view_row_1_legend_succeeded_percent">({ decimalFormat.format(testsSucceededCount * 100.0 / totalTestsCount) }%)</td>
                   </tr>
                   <tr id="summary_view_row_1_legend_table_row_failed">
-                    <td id="summary_view_row_1_legend_failed">Failed</td>
+                    <td id="summary_view_row_1_legend_failed_label">Failed</td>
+                    <td id="summary_view_row_1_legend_failed_count">{ testsFailedCount }</td>
+                    <td id="summary_view_row_1_legend_failed_percent">({ decimalFormat.format(testsFailedCount * 100.0 / totalTestsCount) }%)</td>
                   </tr>
                   <tr id="summary_view_row_1_legend_table_row_ignored">
-                    <td id="summary_view_row_1_legend_ignored">Ignored</td>
+                    <td id="summary_view_row_1_legend_ignored_label">Ignored</td>
+                    <td id="summary_view_row_1_legend_ignored_count">{ testsIgnoredCount }</td>
+                    <td id="summary_view_row_1_legend_ignored_percent">({ decimalFormat.format(testsIgnoredCount * 100.0 / totalTestsCount) }%)</td>
                   </tr>
                   <tr id="summary_view_row_1_legend_table_row_pending">
-                    <td id="summary_view_row_1_legend_pending">Pending</td>
+                    <td id="summary_view_row_1_legend_pending_label">Pending</td>
+                    <td id="summary_view_row_1_legend_pending_count">{ testsPendingCount }</td>
+                    <td id="summary_view_row_1_legend_pending_percent">({ decimalFormat.format(testsPendingCount * 100.0 / totalTestsCount) }%)</td>
                   </tr>
                   <tr id="summary_view_row_1_legend_table_row_canceled">
-                    <td id="summary_view_row_1_legend_canceled">Canceled</td>
+                    <td id="summary_view_row_1_legend_canceled_label">Canceled</td>
+                    <td id="summary_view_row_1_legend_canceled_count">{ testsCanceledCount }</td>
+                    <td id="summary_view_row_1_legend_canceled_percent">({ decimalFormat.format(testsCanceledCount * 100.0 / totalTestsCount) }%)</td>
                   </tr>
                 </table>
               </td>
@@ -375,29 +327,25 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
           </table>
         </div>
         <script type="text/javascript">
-          { PCDATA(getPieChartScript) }
+          { PCDATA(getPieChartScript(summary)) }
         </script>
         <script type="text/javascript">
           { PCDATA(tagMapScript) }
         </script>
       </body>
-</html>
+    </html>
+  }      
           
-  private def getStatistic(summary: Option[Summary]) = {
-    summary match {
-      case Some(summary) => 
-        <div id="display-filters">
-          <input id="succeeded_checkbox" name="succeeded_checkbox" type="checkbox" checked="checked" onchange="applyFilter()" /> <label for="passed_checkbox">Succeeded: { summary.testsSucceededCount }</label>
-          <input id="failed_checkbox" name="failed_checkbox" type="checkbox" checked="checked" onchange="applyFilter()" /> <label for="failed_checkbox">Failed: { summary.testsFailedCount }</label>
-          <input id="ignored_checkbox" name="ignored_checkbox" type="checkbox" checked="checked" onchange="applyFilter()" /> <label for="ignored_checkbox">Ignored: { summary.testsIgnoredCount }</label>
-          <input id="pending_checkbox" name="pending_checkbox" type="checkbox" checked="checked" onchange="applyFilter()" /> <label for="pending_checkbox">Pending: { summary.testsPendingCount }</label>
-          <input id="canceled_checkbox" name="canceled_checkbox" type="checkbox" checked="checked" onchange="applyFilter()" /> <label for="canceled_checkbox">Canceled: { summary.testsCanceledCount }</label>
-        </div>
-      case None => <div id="display-filters" />
-    }
-  }
+  private def getStatistic(summary: Summary) = 
+    <div id="display-filters">
+      <input id="succeeded_checkbox" name="succeeded_checkbox" type="checkbox" checked="checked" onchange="applyFilter()" /> <label for="passed_checkbox">Succeeded: { summary.testsSucceededCount }</label>
+      <input id="failed_checkbox" name="failed_checkbox" type="checkbox" checked="checked" onchange="applyFilter()" /> <label for="failed_checkbox">Failed: { summary.testsFailedCount }</label>
+      <input id="ignored_checkbox" name="ignored_checkbox" type="checkbox" checked="checked" onchange="applyFilter()" /> <label for="ignored_checkbox">Ignored: { summary.testsIgnoredCount }</label>
+      <input id="pending_checkbox" name="pending_checkbox" type="checkbox" checked="checked" onchange="applyFilter()" /> <label for="pending_checkbox">Pending: { summary.testsPendingCount }</label>
+      <input id="canceled_checkbox" name="canceled_checkbox" type="checkbox" checked="checked" onchange="applyFilter()" /> <label for="canceled_checkbox">Canceled: { summary.testsCanceledCount }</label>
+    </div>
   
-  private def header(resourceName: String, duration: Option[Long], summary: Option[Summary]) = 
+  private def header(resourceName: String, duration: Option[Long], summary: Summary) = 
     <div id="scalatest-header" class={ getHeaderStatusColor(summary) }>
       <div id="title">
         ScalaTest Results
@@ -809,7 +757,7 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
     "applyFilter();"
 
   case class SuiteResult(suiteId: String, suiteName: String, suiteClassName: Option[String], startEvent: SuiteStarting, endEvent: Event, eventList: IndexedSeq[Event], 
-                          testsSucceededCount: Int, testsFailedCount: Int, testsIgnoredCount: Int, testsPendingCount: Int, testsCanceledCount: Int)
+                          testsSucceededCount: Int, testsFailedCount: Int, testsIgnoredCount: Int, testsPendingCount: Int, testsCanceledCount: Int, isCompleted: Boolean)
     
   private var eventList = new ListBuffer[Event]()
   private val suiteList = new ListBuffer[SuiteResult]()
@@ -836,7 +784,7 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
         val sortedSuiteEvents = suiteEvents.sorted
         sortedSuiteEvents.head match {
           case suiteStarting: SuiteStarting => 
-            suiteList += sortedSuiteEvents.foldLeft(SuiteResult(suiteId, suiteName, suiteClassName, suiteStarting, event, sortedSuiteEvents.tail.toIndexedSeq, 0, 0, 0, 0, 0)) { case (r, e) => 
+            suiteList += sortedSuiteEvents.foldLeft(SuiteResult(suiteId, suiteName, suiteClassName, suiteStarting, event, sortedSuiteEvents.tail.toIndexedSeq, 0, 0, 0, 0, 0, true)) { case (r, e) => 
               e match {
                 case testSucceeded: TestSucceeded => r.copy(testsSucceededCount = r.testsSucceededCount + 1)
                 case testFailed: TestFailed => r.copy(testsFailedCount = r.testsFailedCount + 1)
@@ -856,7 +804,7 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
         val sortedSuiteEvents = suiteEvents.sorted
         sortedSuiteEvents.head match {
           case suiteStarting: SuiteStarting => 
-            suiteList += sortedSuiteEvents.foldLeft(SuiteResult(suiteId, suiteName, suiteClassName, suiteStarting, event, sortedSuiteEvents.tail.toIndexedSeq, 0, 0, 0, 0, 0)) { case (r, e) => 
+            suiteList += sortedSuiteEvents.foldLeft(SuiteResult(suiteId, suiteName, suiteClassName, suiteStarting, event, sortedSuiteEvents.tail.toIndexedSeq, 0, 0, 0, 0, 0, false)) { case (r, e) => 
               e match {
                 case testSucceeded: TestSucceeded => r.copy(testsSucceededCount = r.testsSucceededCount + 1)
                 case testFailed: TestFailed => r.copy(testsFailedCount = r.testsFailedCount + 1)
@@ -906,19 +854,19 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
       case Some(event) => 
         event match {
           case RunCompleted(ordinal, duration, summary, formatter, location, payload, threadName, timeStamp) => 
-            makeIndexFile("runCompleted", duration, summary)
+            makeIndexFile("runCompleted", duration)
 
           case RunStopped(ordinal, duration, summary, formatter, location, payload, threadName, timeStamp) =>
-            makeIndexFile("runStopped", duration, summary)
+            makeIndexFile("runStopped", duration)
 
           case RunAborted(ordinal, message, throwable, duration, summary, formatter, location, payload, threadName, timeStamp) => 
-            makeIndexFile("runAborted", duration, summary)
+            makeIndexFile("runAborted", duration)
             
           case other =>
             throw new IllegalStateException("Expected run ending event only, but got: " + other.getClass.getName)
         }
       case None => // If no run end event (e.g. when run in sbt), just use runCompleted
-        makeIndexFile("runCompleted", None, None)
+        makeIndexFile("runCompleted", None)
     }
     
   }
@@ -932,20 +880,11 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
     }
   }
   
-  private def getTotalTests(summary: Option[Summary]) = 
-    summary match {
-      case Some(summary) =>
-        Resources("totalNumberOfTestsRun", summary.testsCompletedCount.toString)
-      case None => ""
-    }
+  private def getTotalTests(summary: Summary) = 
+    Resources("totalNumberOfTestsRun", summary.testsCompletedCount.toString)    
     
-    
-  private def getSuiteSummary(summary: Option[Summary]) = 
-    summary match {
-      case Some(summary) => 
-        Resources("suiteSummary", summary.suitesCompletedCount.toString, summary.suitesAbortedCount.toString)
-      case None => ""
-    }
+  private def getSuiteSummary(summary: Summary) = 
+    Resources("suiteSummary", summary.suitesCompletedCount.toString, summary.suitesAbortedCount.toString)
 
   // We subtract one from test reports because we add "- " in front, so if one is actually zero, it will come here as -1
   // private def indent(s: String, times: Int) = if (times <= 0) s else ("  " * times) + s
