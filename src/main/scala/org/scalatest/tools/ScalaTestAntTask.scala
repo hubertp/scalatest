@@ -579,7 +579,7 @@ class ScalaTestAntTask extends Task {
     args += reporter.getDirectory
     
     if (reporter.getCss != null) {
-      args += "-css"
+      args += "-Y"
       args += reporter.getCss
     }
   }

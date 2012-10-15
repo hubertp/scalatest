@@ -922,7 +922,7 @@ object Runner {
       else if (s.startsWith("-h")) {
         if (it.hasNext)
           it.next
-        if (it.hasNext && it.head == "-css") {
+        if (it.hasNext && it.head == "-Y") {
           it.next
           it.next
         }
@@ -1053,7 +1053,7 @@ object Runner {
         reporters += s
         if (it.hasNext)
           reporters += it.next
-        if (it.hasNext && it.head == "-css") {
+        if (it.hasNext && it.head == "-Y") {
           reporters += it.next
           if (it.hasNext)
             reporters += it.next
@@ -1123,7 +1123,7 @@ object Runner {
         if (it.hasNext)
           wildcard += it.next
       }
-      else if (s.startsWith("-c") && s != "-css") { // -css is used by HtmlReporter (-h) only currently
+      else if (s.startsWith("-c")) {
         println("WARNING: -c has been deprecated and will be reused for a different (but still very cool) purpose in ScalaTest 2.0. Please change all uses of -c to -P.")
         concurrent += s
       }
@@ -1362,12 +1362,12 @@ object Runner {
         case "-h" =>
           if (it.hasNext) {
             it.next // scroll past the filename
-            if (it.hasNext && it.head == "-css") {
-              it.next // scroll past the -css
+            if (it.hasNext && it.head == "-Y") {
+              it.next // scroll past the -Y
               if (it.hasNext)
                 it.next // scroll past the css file name
               else
-                throw new IllegalArgumentException("-css needs to be followed by a file name arg: ")
+                throw new IllegalArgumentException("-Y needs to be followed by a file name arg: ")
             }
           }
           else
@@ -1497,11 +1497,11 @@ object Runner {
             val configSet = parseConfigSet(arg)
             val directory = it.next
             val cssFile = 
-              if (it.hasNext && it.next == "-css") {
+              if (it.hasNext && it.next == "-Y") {
                 if (it.hasNext)
                   new File(it.next).toURI.toURL
                 else
-                  throw new IllegalArgumentException("-css cannot be last, expected CSS file name to follow.")
+                  throw new IllegalArgumentException("-Y cannot be last, expected CSS file name to follow.")
               }
               else
                 classOf[Suite].getClassLoader.getResource("org/scalatest/HtmlReporter.css")
