@@ -603,7 +603,12 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
         <td>Total</td>
       </tr>
     {
-      val sortedSuiteList = suiteList.sortWith((a, b) => a.startEvent.suiteName < b.startEvent.suiteName).toArray
+      val sortedSuiteList = suiteList.sortWith { (a, b) => 
+        if (a.testsFailedCount == b.testsFailedCount)
+          a.startEvent.suiteName < b.startEvent.suiteName
+        else
+          a.testsFailedCount > b.testsFailedCount
+      }.toArray
       sortedSuiteList map { r =>
         val elementId = generateElementId
         import r._
