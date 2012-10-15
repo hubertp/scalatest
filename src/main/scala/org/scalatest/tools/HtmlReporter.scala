@@ -582,7 +582,7 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
     <table class="sortable">
       <tr>
         <td>Suite</td>
-        <td>Duration</td>
+        <td>Duration (ms.)</td>
         <td>Succeeded</td>
         <td>Failed</td>
         <td>Ignored</td>
@@ -639,7 +639,7 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
       
   private def durationDisplay(duration: Option[Long]) = 
     duration match {
-      case Some(duration) => duration + "ms."
+      case Some(duration) => duration
       case None => "-"
     }
     
