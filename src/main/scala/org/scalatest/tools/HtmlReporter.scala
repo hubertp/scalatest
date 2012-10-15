@@ -560,6 +560,7 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
     <table class="sortable">
       <tr>
         <td>Suite</td>
+        <td>Duration</td>
         <td>Succeeded</td>
         <td>Failed</td>
         <td>Ignored</td>
@@ -571,35 +572,15 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
       val sortedSuiteList = suiteList.sortWith((a, b) => a.startEvent.suiteName < b.startEvent.suiteName).toArray
       sortedSuiteList map { r =>
         val elementId = generateElementId
-        // use imperative style here for performance
-        var succeededCount = 0
-        var failedCount = 0
-        var ignoredCount = 0
-        var pendingCount = 0
-        var canceledCount = 0
-        var bits = 0
-        r.eventList.foreach { e => 
-          e match {
-            case testSucceeded: TestSucceeded => 
-              succeededCount +=1
-              bits |= SUCCEEDED_BIT
-            case testFailed: TestFailed => 
-              failedCount += 1
-              bits |= FAILED_BIT
-            case testIgnored: TestIgnored => 
-              ignoredCount += 1
-              bits |= IGNORED_BIT
-            case testPending: TestPending => 
-              pendingCount += 1
-              bits |= PENDING_BIT
-            case testCanceled: TestCanceled => 
-              canceledCount += 1
-              bits |= CANCELED_BIT
-            case _ => 
-          }
-        }
+        import r._
+        val bits = 
+          (if (testsSucceededCount > 0) SUCCEEDED_BIT else 0) +
+          (if (testsFailedCount > 0) FAILED_BIT else 0) +
+          (if (testsIgnoredCount > 0) IGNORED_BIT else 0) + 
+          (if (testsPendingCount > 0) PENDING_BIT else 0) + 
+          (if (testsCanceledCount > 0) CANCELED_BIT else 0)
         tagMap.put(elementId, bits)
-        suiteSummary(elementId, r.startEvent.suiteName, getSuiteFileName(r), succeededCount, failedCount, ignoredCount, pendingCount, canceledCount)
+        suiteSummary(elementId, r.startEvent.suiteName, getSuiteFileName(r), duration, testsSucceededCount, testsFailedCount, testsIgnoredCount, testsPendingCount, testsCanceledCount)
       }
     }
     </table>
@@ -611,6 +592,14 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
       "suite_name_passed"
     else
       "suite_name_passed_all"
+      
+  private def durationStyle(succeededCount: Int, failedCount: Int, ignoredCount: Int, pendingCount: Int, canceledCount: Int) = 
+    if (failedCount > 0)
+      "duration_with_failed"
+    else if (ignoredCount > 0 || pendingCount > 0 || canceledCount > 0)
+      "duration_passed"
+    else
+      "duration_passed_all"
       
   private def countStyle(prefix: String, count: Int) = 
     if (count == 0)
@@ -625,11 +614,18 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
       "total_passed"
     else
       "total_passed_all"
+      
+  private def durationDisplay(duration: Option[Long]) = 
+    duration match {
+      case Some(duration) => duration + "ms."
+      case None => "-"
+    }
     
-  private def suiteSummary(elementId: String, suiteName: String, suiteFileName: String, succeededCount: Int, 
+  private def suiteSummary(elementId: String, suiteName: String, suiteFileName: String, duration: Option[Long], succeededCount: Int, 
                             failedCount: Int, ignoredCount: Int, pendingCount: Int, canceledCount: Int) = 
     <tr id={ elementId }>
       <td class={ suiteNameStyle(succeededCount, failedCount, ignoredCount, pendingCount, canceledCount) }><a href={ "javascript: showDetails('" + suiteFileName + "')" }>{ suiteName }</a></td>
+      <td class={ durationStyle(succeededCount, failedCount, ignoredCount, pendingCount, canceledCount) }>{ durationDisplay(duration) }</td>
       <td class={ countStyle("succeeded", succeededCount) }>{ succeededCount }</td>
       <td class={ countStyle("failed", failedCount) }>{ failedCount }</td>
       <td class={ countStyle("ignored", ignoredCount) }>{ ignoredCount }</td>
@@ -789,7 +785,7 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
     "};\n" + 
     "applyFilter();"
 
-  case class SuiteResult(suiteId: String, suiteName: String, suiteClassName: Option[String], startEvent: SuiteStarting, endEvent: Event, eventList: IndexedSeq[Event], 
+  case class SuiteResult(suiteId: String, suiteName: String, suiteClassName: Option[String], duration: Option[Long], startEvent: SuiteStarting, endEvent: Event, eventList: IndexedSeq[Event], 
                           testsSucceededCount: Int, testsFailedCount: Int, testsIgnoredCount: Int, testsPendingCount: Int, testsCanceledCount: Int, isCompleted: Boolean)
     
   private var eventList = new ListBuffer[Event]()
@@ -817,7 +813,7 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
         val sortedSuiteEvents = suiteEvents.sorted
         sortedSuiteEvents.head match {
           case suiteStarting: SuiteStarting => 
-            val suiteResult = sortedSuiteEvents.foldLeft(SuiteResult(suiteId, suiteName, suiteClassName, suiteStarting, event, sortedSuiteEvents.tail.toIndexedSeq, 0, 0, 0, 0, 0, true)) { case (r, e) => 
+            val suiteResult = sortedSuiteEvents.foldLeft(SuiteResult(suiteId, suiteName, suiteClassName, duration, suiteStarting, event, sortedSuiteEvents.tail.toIndexedSeq, 0, 0, 0, 0, 0, true)) { case (r, e) => 
               e match {
                 case testSucceeded: TestSucceeded => r.copy(testsSucceededCount = r.testsSucceededCount + 1)
                 case testFailed: TestFailed => r.copy(testsFailedCount = r.testsFailedCount + 1)
@@ -839,7 +835,7 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
         val sortedSuiteEvents = suiteEvents.sorted
         sortedSuiteEvents.head match {
           case suiteStarting: SuiteStarting => 
-            val suiteResult = sortedSuiteEvents.foldLeft(SuiteResult(suiteId, suiteName, suiteClassName, suiteStarting, event, sortedSuiteEvents.tail.toIndexedSeq, 0, 0, 0, 0, 0, false)) { case (r, e) => 
+            val suiteResult = sortedSuiteEvents.foldLeft(SuiteResult(suiteId, suiteName, suiteClassName, duration, suiteStarting, event, sortedSuiteEvents.tail.toIndexedSeq, 0, 0, 0, 0, 0, false)) { case (r, e) => 
               e match {
                 case testSucceeded: TestSucceeded => r.copy(testsSucceededCount = r.testsSucceededCount + 1)
                 case testFailed: TestFailed => r.copy(testsFailedCount = r.testsFailedCount + 1)

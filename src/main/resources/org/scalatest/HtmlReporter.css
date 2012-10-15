@@ -209,6 +209,36 @@ table.sortable tr td.suite_name_with_failed {
   font: normal 11px "Lucida Grande", Helvetica, sans-serif;
 }
 
+table.sortable tr td.duration_passed_all {
+  text-align: right;
+  padding-left: 5px;
+  padding-right: 5px;
+  background-color: #65c400;
+  color: #fff;
+  font-weight: bold;
+  font: normal 11px "Lucida Grande", Helvetica, sans-serif;
+}
+
+table.sortable tr td.duration_passed {
+  text-align: right;
+  padding-left: 5px;
+  padding-right: 5px;
+  background-color: #65c400;
+  color: #fff;
+  font-weight: bold;
+  font: normal 11px "Lucida Grande", Helvetica, sans-serif;
+}
+
+table.sortable tr td.duration_with_failed {
+  text-align: right;
+  padding-left: 5px;
+  padding-right: 5px;
+  background-color: #C20000;
+  color: #fff;
+  font-weight: bold;
+  font: normal 11px "Lucida Grande", Helvetica, sans-serif;
+}
+
 table.sortable tr td.succeeded_zero {
   text-align: right;
   padding-left: 5px;
