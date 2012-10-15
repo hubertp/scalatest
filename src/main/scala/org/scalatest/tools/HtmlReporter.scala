@@ -602,26 +602,10 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
           (if (testsPendingCount > 0) PENDING_BIT else 0) + 
           (if (testsCanceledCount > 0) CANCELED_BIT else 0)
         tagMap.put(elementId, bits)
-        suiteSummary(elementId, r.startEvent.suiteName, getSuiteFileName(r), duration, testsSucceededCount, testsFailedCount, testsIgnoredCount, testsPendingCount, testsCanceledCount)
+        suiteSummary(elementId,  getSuiteFileName(r), r)
       }
     }
     </table>
-  
-  private def suiteNameStyle(succeededCount: Int, failedCount: Int, ignoredCount: Int, pendingCount: Int, canceledCount: Int) = 
-    if (failedCount > 0)
-      "suite_name_with_failed"
-    else if (ignoredCount > 0 || pendingCount > 0 || canceledCount > 0)
-      "suite_name_passed"
-    else
-      "suite_name_passed_all"
-      
-  private def durationStyle(succeededCount: Int, failedCount: Int, ignoredCount: Int, pendingCount: Int, canceledCount: Int) = 
-    if (failedCount > 0)
-      "duration_with_failed"
-    else if (ignoredCount > 0 || pendingCount > 0 || canceledCount > 0)
-      "duration_passed"
-    else
-      "duration_passed_all"
       
   private def countStyle(prefix: String, count: Int) = 
     if (count == 0)
@@ -629,32 +613,25 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
     else
       prefix
       
-  private def totalStyle(succeededCount: Int, failedCount: Int, ignoredCount: Int, pendingCount: Int, canceledCount: Int) = 
-    if (failedCount > 0)
-      "total_with_failed"
-    else if (ignoredCount > 0 || pendingCount > 0 || canceledCount > 0)
-      "total_passed"
-    else
-      "total_passed_all"
-      
   private def durationDisplay(duration: Option[Long]) = 
     duration match {
       case Some(duration) => duration
       case None => "-"
     }
     
-  private def suiteSummary(elementId: String, suiteName: String, suiteFileName: String, duration: Option[Long], succeededCount: Int, 
-                            failedCount: Int, ignoredCount: Int, pendingCount: Int, canceledCount: Int) = 
+  private def suiteSummary(elementId: String, suiteFileName: String, suiteResult: SuiteResult) = {
+    import suiteResult._
     <tr id={ elementId }>
-      <td class={ suiteNameStyle(succeededCount, failedCount, ignoredCount, pendingCount, canceledCount) }><a href={ "javascript: showDetails('" + suiteFileName + "')" }>{ suiteName }</a></td>
-      <td class={ durationStyle(succeededCount, failedCount, ignoredCount, pendingCount, canceledCount) }>{ durationDisplay(duration) }</td>
-      <td class={ countStyle("succeeded", succeededCount) }>{ succeededCount }</td>
-      <td class={ countStyle("failed", failedCount) }>{ failedCount }</td>
-      <td class={ countStyle("ignored", ignoredCount) }>{ ignoredCount }</td>
-      <td class={ countStyle("pending", pendingCount) }>{ pendingCount }</td>
-      <td class={ countStyle("canceled", canceledCount) }>{ canceledCount }</td>
-      <td class={ totalStyle(succeededCount, failedCount, ignoredCount, pendingCount, canceledCount) }>{ succeededCount + failedCount + ignoredCount + pendingCount + canceledCount }</td>
+      <td class={ appendCombinedStatus("suite_name", suiteResult) }><a href={ "javascript: showDetails('" + suiteFileName + "')" }>{ suiteName }</a></td>
+      <td class={ appendCombinedStatus("duration", suiteResult) }>{ durationDisplay(duration) }</td>
+      <td class={ countStyle("succeeded", testsSucceededCount) }>{ testsSucceededCount }</td>
+      <td class={ countStyle("failed", testsFailedCount) }>{ testsFailedCount }</td>
+      <td class={ countStyle("ignored", testsIgnoredCount) }>{ testsIgnoredCount }</td>
+      <td class={ countStyle("pending", testsPendingCount) }>{ testsPendingCount }</td>
+      <td class={ countStyle("canceled", testsCanceledCount) }>{ testsCanceledCount }</td>
+      <td class={ appendCombinedStatus("total", suiteResult) }>{ testsSucceededCount + testsFailedCount + testsIgnoredCount + testsPendingCount + testsCanceledCount }</td>
     </tr>
+  }
         
   private def suite(elementId: String, suiteName: String, indentLevel: Int) = 
     <div id={ elementId } class="suite" style={ "margin-left: " + (20 * indentLevel) + "px;" }>
