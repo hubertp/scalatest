@@ -62,7 +62,6 @@ body {
   padding-right: 15px;
   position: fixed;
   float: right;
-  width: 100%;
   height: 500px;
   font-family: "Lucida Grande", Helvetica, sans-serif;
 }
@@ -395,4 +394,8 @@ table.sortable tr td.total_with_failed {
 .label { 
   color: #444444; 
   font-weight: bold; 
+}
+
+iframe {
+  border: none;
 }

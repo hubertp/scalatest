@@ -447,10 +447,20 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
             function showDetails(suiteName) {
               document.getElementById('details_view').innerHTML = "<iframe src='" + suiteName + ".html' width='100%' height='100%'></iframe>";
             }
+              
+            function resizeDetailsView() {
+              var headerView = document.getElementById('scalatest-header');
+              var detailsView = document.getElementById('details_view');
+              var summaryView = document.getElementById('summary_view');
+              var left = summaryView.offsetWidth + 30;
+              detailsView.style.left = left + "px";
+              detailsView.style.width = (window.innerWidth - left - 30) + "px";
+              detailsView.style.height = (window.innerHeight - headerView.offsetHeight - 20) + "px";
+            }
           """) }
         </script>
       </head>
-      <body>
+      <body onresize="resizeDetailsView()">
         <div class="scalatest-report"> 
           { header(resourceName, duration, summary) }
           <table id="summary_view">
@@ -504,7 +514,7 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
         </script>
         <script type="text/javascript">
           { PCDATA("""
-              document.getElementById('details_view').style.left = (document.getElementById('summary_view').offsetWidth + 30) + "px";
+              resizeDetailsView();
             """)
           }
         </script>
