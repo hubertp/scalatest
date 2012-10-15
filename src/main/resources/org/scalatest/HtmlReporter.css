@@ -429,3 +429,156 @@ table.sortable tr td.total_with_failed {
 iframe {
   border: none;
 }
+
+#suite_header_id_label_passed {
+  padding-left: 5px;
+  padding-right: 5px;
+  background-color: #65c400;
+  color: #fff;
+  font-weight: bold;
+  font: normal 11px "Lucida Grande", Helvetica, sans-serif;
+}
+
+#suite_header_id_label_passed_all {
+  padding-left: 5px;
+  padding-right: 5px;
+  background-color: #65c400;
+  color: #fff;
+  font-weight: bold;
+  font: normal 11px "Lucida Grande", Helvetica, sans-serif;
+}
+
+#suite_header_id_label_with_failed {
+  padding-left: 5px;
+  padding-right: 5px;
+  background-color: #C20000;
+  color: #fff;
+  font-weight: bold;
+  font: normal 11px "Lucida Grande", Helvetica, sans-serif;
+}
+
+#suite_header_id_value_passed {
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #65c400;
+  font-weight: bold;
+  font: normal 11px "Lucida Grande", Helvetica, sans-serif;
+}
+
+#suite_header_id_value_passed_all {
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #65c400;
+  font-weight: bold;
+  font: normal 11px "Lucida Grande", Helvetica, sans-serif;
+}
+
+#suite_header_id_value_with_failed {
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #C20000;
+  font-weight: bold;
+  font: normal 11px "Lucida Grande", Helvetica, sans-serif;
+}
+
+#suite_header_name_label_passed {
+  padding-left: 5px;
+  padding-right: 5px;
+  background-color: #65c400;
+  color: #fff;
+  font-weight: bold;
+  font: normal 11px "Lucida Grande", Helvetica, sans-serif;
+}
+
+#suite_header_name_label_passed_all {
+  padding-left: 5px;
+  padding-right: 5px;
+  background-color: #65c400;
+  color: #fff;
+  font-weight: bold;
+  font: normal 11px "Lucida Grande", Helvetica, sans-serif;
+}
+
+#suite_header_name_label_with_failed {
+  padding-left: 5px;
+  padding-right: 5px;
+  background-color: #C20000;
+  color: #fff;
+  font-weight: bold;
+  font: normal 11px "Lucida Grande", Helvetica, sans-serif;
+}
+
+#suite_header_name_value_passed {
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #65c400;
+  font-weight: bold;
+  font: normal 11px "Lucida Grande", Helvetica, sans-serif;
+}
+
+#suite_header_name_value_passed_all {
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #65c400;
+  font-weight: bold;
+  font: normal 11px "Lucida Grande", Helvetica, sans-serif;
+}
+
+#suite_header_name_value_with_failed {
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #C20000;
+  font-weight: bold;
+  font: normal 11px "Lucida Grande", Helvetica, sans-serif;
+}
+
+#suite_header_class_label_passed {
+  padding-left: 5px;
+  padding-right: 5px;
+  background-color: #65c400;
+  color: #fff;
+  font-weight: bold;
+  font: normal 11px "Lucida Grande", Helvetica, sans-serif;
+}
+
+#suite_header_class_label_passed_all {
+  padding-left: 5px;
+  padding-right: 5px;
+  background-color: #65c400;
+  color: #fff;
+  font-weight: bold;
+  font: normal 11px "Lucida Grande", Helvetica, sans-serif;
+}
+
+#suite_header_class_label_with_failed {
+  padding-left: 5px;
+  padding-right: 5px;
+  background-color: #C20000;
+  color: #fff;
+  font-weight: bold;
+  font: normal 11px "Lucida Grande", Helvetica, sans-serif;
+}
+
+#suite_header_class_value_passed {
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #65c400;
+  font-weight: bold;
+  font: normal 11px "Lucida Grande", Helvetica, sans-serif;
+}
+
+#suite_header_class_value_passed_all {
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #65c400;
+  font-weight: bold;
+  font: normal 11px "Lucida Grande", Helvetica, sans-serif;
+}
+
+#suite_header_class_value_with_failed {
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #C20000;
+  font-weight: bold;
+  font: normal 11px "Lucida Grande", Helvetica, sans-serif;
+}

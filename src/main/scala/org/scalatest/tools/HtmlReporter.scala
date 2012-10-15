@@ -167,6 +167,14 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
     }
   }
   
+  private def appendCombinedStatus(name: String, r: SuiteResult) = 
+    if (r.testsFailedCount > 0)
+      name + "_with_failed"
+    else if (r.testsIgnoredCount > 0 || r.testsPendingCount > 0 || r.testsCanceledCount > 0)
+      name + "_passed"
+    else
+      name + "_passed_all"
+  
   private def getSuiteHtml(name: String, suiteResult: SuiteResult) = 
     <html>
       <head>
@@ -194,6 +202,20 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
         </script>
       </head>
       <body>
+        <table id="suite_header">
+          <tr id="suite_header_id">
+            <td id={ appendCombinedStatus("suite_header_id_label", suiteResult) }>Suite ID</td>
+            <td id={ appendCombinedStatus("suite_header_id_value", suiteResult) } colspan="3">{ suiteResult.suiteId }</td>
+          </tr>
+          <tr id="suite_header_name">
+            <td id={ appendCombinedStatus("suite_header_name_label", suiteResult) }>Suite Name</td>
+            <td id={ appendCombinedStatus("suite_header_name_value", suiteResult) } colspan="3">{ suiteResult.suiteName }</td>
+          </tr>
+          <tr id="suite_header_class">
+            <td id={ appendCombinedStatus("suite_header_class_label", suiteResult) }>Class Name</td>
+            <td id={ appendCombinedStatus("suite_header_class_value", suiteResult) } colspan="3">{ suiteResult.suiteClassName.getOrElse("-") }</td>
+          </tr>
+        </table>
         {
           val scopeStack = new collection.mutable.Stack[String]()
           suiteResult.eventList.map { e => 
