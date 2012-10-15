@@ -240,23 +240,24 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
             
                 val stringToPrint = stringToPrintWhenNoError("testSucceeded", formatter, suiteName, Some(testName), duration)
 
-                stringToPrint match {
-                  case Some(string) => 
-                    val elementId = generateElementId
-                    test(elementId, List(string), getIndentLevel(formatter) + 1, "test_passed")
-                  case None =>
-                    NodeSeq.Empty
-                }
+                val nodeSeq = 
+                  stringToPrint match {
+                    case Some(string) => 
+                      val elementId = generateElementId
+                      test(elementId, List(string), getIndentLevel(formatter) + 1, "test_passed")
+                    case None =>
+                      NodeSeq.Empty
+                  }
             
-                // TODO: Print recorded events, when merge into trunk.
+                nodeSeq :: recordedEvents.map(processInfoMarkupProvided(_)).toList
             
               case TestFailed(ordinal, message, suiteName, suiteID, suiteClassName, testName, testText, recordedEvents, throwable, duration, formatter, location, rerunnable, payload, threadName, timeStamp) => 
 
                 val stringToPrint = stringsToPrintOnError("failedNote", "testFailed", message, throwable, formatter, Some(suiteName), Some(testName), duration)
                 val elementId = generateElementId
-                testWithDetails(elementId, List(stringToPrint), message, throwable, getIndentLevel(formatter) + 1, "test_failed")            
+                val nodeSeq = testWithDetails(elementId, List(stringToPrint), message, throwable, getIndentLevel(formatter) + 1, "test_failed")            
             
-                // TODO: Print recorded events, when merge into trunk.
+                nodeSeq :: recordedEvents.map(processInfoMarkupProvided(_)).toList
             
               case TestIgnored(ordinal, suiteName, suiteID, suiteClassName, testName, testText, formatter, location, payload, threadName, timeStamp) => 
 
@@ -284,46 +285,30 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
                     case _ => Some(Resources("testPending", suiteName + ": " + testName))
                   }
 
-                stringToPrint match {
-                  case Some(string) => 
-                    val elementId = generateElementId
-                    test(elementId, List(string), getIndentLevel(formatter) + 1, "test_pending")
-                  case None =>
-                    NodeSeq.Empty
-                }
+                val nodeSeq = 
+                  stringToPrint match {
+                    case Some(string) => 
+                      val elementId = generateElementId
+                      test(elementId, List(string), getIndentLevel(formatter) + 1, "test_pending")
+                    case None =>
+                      NodeSeq.Empty
+                  }
             
-                // TODO: Print recorded events, when merge into trunk.
+                nodeSeq :: recordedEvents.map(processInfoMarkupProvided(_)).toList
             
               case TestCanceled(ordinal, message, suiteName, suiteID, suiteClassName, testName, testText, recordedEvents, throwable, duration, formatter, location, payload, threadName, timeStamp) =>
 
                 val stringToPrint = stringsToPrintOnError("canceledNote", "testCanceled", message, throwable, formatter, Some(suiteName), Some(testName), duration)
                 val elementId = generateElementId
-                testWithDetails(elementId, List(stringToPrint), message, throwable, getIndentLevel(formatter) + 1, "test_canceled")
+                val nodeSeq = testWithDetails(elementId, List(stringToPrint), message, throwable, getIndentLevel(formatter) + 1, "test_canceled")
             
-                // TODO: Print recorded events, when merge into trunk.
+                nodeSeq :: recordedEvents.map(processInfoMarkupProvided(_)).toList
             
-              case InfoProvided(ordinal, message, nameInfo, throwable, formatter, location, payload, threadName, timeStamp) =>
-
-                val (suiteName, testName) =
-                  nameInfo match {
-                    case Some(NameInfo(suiteName, _, _, testName)) => (Some(suiteName), testName)
-                    case None => (None, None)
-                  }
-                val infoContent = stringsToPrintOnError("infoProvidedNote", "infoProvided", message, throwable, formatter, suiteName, testName, None)
-            
-                val elementId = generateElementId
-                test(elementId, List(infoContent), getIndentLevel(formatter) + 1, "info")
+              case infoProvided: InfoProvided =>
+                processInfoMarkupProvided(infoProvided)
         
-              case MarkupProvided(ordinal, text, nameInfo, formatter, location, payload, threadName, timeStamp) => 
-
-                val (suiteName, testName) =
-                  nameInfo match {
-                    case Some(NameInfo(suiteName, _, _, testName)) => (Some(suiteName), testName)
-                    case None => (None, None)
-                  }
-        
-                val elementId = generateElementId
-                markup(elementId, text, getIndentLevel(formatter) + 1, "markup")
+              case markupProvided: MarkupProvided => 
+                processInfoMarkupProvided(markupProvided)
                 // TO CONTINUE: XML element must be last
             
               case _ => NodeSeq.Empty
@@ -332,6 +317,33 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
         }
       </body>
     </html>
+        
+  private def processInfoMarkupProvided(event: Event) = {
+    event match {
+      case InfoProvided(ordinal, message, nameInfo, throwable, formatter, location, payload, threadName, timeStamp) =>
+        val (suiteName, testName) =
+          nameInfo match {
+            case Some(NameInfo(suiteName, _, _, testName)) => (Some(suiteName), testName)
+            case None => (None, None)
+          }
+        val infoContent = stringsToPrintOnError("infoProvidedNote", "infoProvided", message, throwable, formatter, suiteName, testName, None)
+            
+        val elementId = generateElementId
+        test(elementId, List(infoContent), getIndentLevel(formatter) + 1, "info")
+        
+      case MarkupProvided(ordinal, text, nameInfo, formatter, location, payload, threadName, timeStamp) => 
+        val (suiteName, testName) =
+          nameInfo match {
+            case Some(NameInfo(suiteName, _, _, testName)) => (Some(suiteName), testName)
+            case None => (None, None)
+          }
+        
+        val elementId = generateElementId
+        markup(elementId, text, getIndentLevel(formatter) + 1, "markup")
+        
+      case _ => NodeSeq.Empty
+    }
+  }
   
   private def makeIndexFile(resourceName: String, duration: Option[Long]) {
     val pw = new PrintWriter(new BufferedOutputStream(new FileOutputStream(new File(directory, "index.html")), BufferSize))
