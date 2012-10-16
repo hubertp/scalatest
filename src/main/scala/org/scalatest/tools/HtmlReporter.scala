@@ -46,7 +46,7 @@ import java.text.DecimalFormat
  * A <code>Reporter</code> that prints test status information in HTML format to a file.
  */
 private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations: Boolean,
-        presentInColor: Boolean, presentStackTraces: Boolean, presentFullStackTraces: Boolean, cssUrl: URL) extends ResourcefulReporter {
+        presentInColor: Boolean, presentStackTraces: Boolean, presentFullStackTraces: Boolean, cssUrl: Option[URL]) extends ResourcefulReporter {
 
   private val directory = new File(directoryPath)
   if (!directory.exists)
@@ -61,7 +61,11 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
     outputStream.close()
   }
   
-  copyResource(cssUrl, "styles.css")
+  cssUrl match {
+    case Some(cssUrl) => copyResource(cssUrl, "custom.css")
+    case None => // Do nothing.
+  }
+  copyResource(classOf[Suite].getClassLoader.getResource("org/scalatest/HtmlReporter.css"), "styles.css")
   copyResource(classOf[Suite].getClassLoader.getResource("org/scalatest/sorttable.js"), "sorttable.js")
   copyResource(classOf[Suite].getClassLoader.getResource("org/scalatest/d3.v2.min.js"), "d3.v2.min.js")
   
@@ -183,6 +187,13 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
         <meta http-equiv="Expires" content="-1" />
         <meta http-equiv="Pragma" content="no-cache" />
         <link href="styles.css" rel="stylesheet" />
+        { 
+          cssUrl match {
+            case Some(cssUrl) => 
+              <link href="custom.css" rel="stylesheet" />
+            case None => NodeSeq.Empty
+          }
+        }
         <script type="text/javascript">
           { PCDATA("""
             function toggleDetails(contentId, linkId) {
@@ -441,6 +452,13 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
         <meta http-equiv="Expires" content="-1" />
         <meta http-equiv="Pragma" content="no-cache" />
         <link href="styles.css" rel="stylesheet" />
+        { 
+          cssUrl match {
+            case Some(cssUrl) => 
+              <link href="custom.css" rel="stylesheet" />
+            case None => NodeSeq.Empty
+          }
+        }
         <script type="text/javascript" src="d3.v2.min.js"></script>
         <script type="text/javascript" src="sorttable.js"></script>
         <script type="text/javascript">

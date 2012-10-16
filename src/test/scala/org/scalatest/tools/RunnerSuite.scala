@@ -981,10 +981,10 @@ class RunnerSuite() extends Suite with PrivateMethodTester {
     expectResult(new ReporterConfigurations(None, Nil, Nil, Nil, Nil, None, None, Nil, Nil, List(new SocketReporterConfiguration("localhost", 8888), new SocketReporterConfiguration("another host", 1234)))) {
       Runner.parseReporterArgsIntoConfigurations(List("-k", "localhost", "8888", "-k", "another host", "1234"))
     }
-    expectResult(new ReporterConfigurations(None, Nil, Nil, Nil, Nil, None, None, List(new HtmlReporterConfiguration(Set(), "html", new File("target/jar_contents/org/scalatest/HtmlReporter.css").toURI.toURL)), Nil, Nil)) {
+    expectResult(new ReporterConfigurations(None, Nil, Nil, Nil, Nil, None, None, List(new HtmlReporterConfiguration(Set(), "html", None)), Nil, Nil)) {
       Runner.parseReporterArgsIntoConfigurations(List("-h", "html"))
     }
-    expectResult(new ReporterConfigurations(None, Nil, Nil, Nil, Nil, None, None, List(new HtmlReporterConfiguration(Set(), "html", new File("MyStyle.css").toURI.toURL)), Nil, Nil)) {
+    expectResult(new ReporterConfigurations(None, Nil, Nil, Nil, Nil, None, None, List(new HtmlReporterConfiguration(Set(), "html", Some(new File("MyStyle.css").toURI.toURL))), Nil, Nil)) {
       Runner.parseReporterArgsIntoConfigurations(List("-h", "html", "-Y", "MyStyle.css"))
     }
   }

@@ -1499,12 +1499,12 @@ object Runner {
             val cssFile = 
               if (it.hasNext && it.next == "-Y") {
                 if (it.hasNext)
-                  new File(it.next).toURI.toURL
+                  Some(new File(it.next).toURI.toURL)
                 else
                   throw new IllegalArgumentException("-Y cannot be last, expected CSS file name to follow.")
               }
               else
-                classOf[Suite].getClassLoader.getResource("org/scalatest/HtmlReporter.css")
+                None
             lb += new HtmlReporterConfiguration(configSet, directory, cssFile)
           }
           else

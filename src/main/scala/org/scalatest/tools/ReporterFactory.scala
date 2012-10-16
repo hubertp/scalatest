@@ -120,7 +120,7 @@ private[scalatest] class ReporterFactory {
     new XmlReporter(directory)
   }
   
-  protected def createHtmlReporter(configSet: Set[ReporterConfigParam], directory: String, cssUrl: URL) = {
+  protected def createHtmlReporter(configSet: Set[ReporterConfigParam], directory: String, cssUrl: Option[URL]) = {
     if (configSetMinusNonFilterParams(configSet).isEmpty)
       new HtmlReporter(
         directory,
@@ -175,7 +175,7 @@ private[scalatest] class ReporterFactory {
         case JunitXmlReporterConfiguration(configSet, directory) => createJunitXmlReporter(configSet, directory)
         case DashboardReporterConfiguration(configSet, directory, numFilesToArchive) => createDashboardReporter(configSet, directory, numFilesToArchive)
         case XmlReporterConfiguration(configSet, directory) => createXmlReporter(configSet, directory)
-        case HtmlReporterConfiguration(configSet, directory, cssFileName) => createHtmlReporter(configSet, directory, cssFileName)
+        case HtmlReporterConfiguration(configSet, directory, cssFile) => createHtmlReporter(configSet, directory, cssFile)
         case CustomReporterConfiguration(configSet, reporterClassName) => createCustomReporter(configSet, reporterClassName, loader) 
         case GraphicReporterConfiguration(configSet) => throw new RuntimeException("Should never happen.")
         case SocketReporterConfiguration(host, port) => createSocketReporter(host, port)
