@@ -156,30 +156,31 @@ class ScalaTestFramework extends Framework {
         (reporter, filter, configMap)
       }
     
-    def cleanup() {
-      reporter match {
-        case resourcefulRep: ResourcefulReporter => 
-          resourcefulRep.dispose()
-        case _ =>
+    private val atomicLatch = new AtomicReference(new CountDownLatch(0))
+  
+    def increaseLatch() {
+      synchronized {
+        val current = atomicLatch.get()
+        atomicLatch.set(new CountDownLatch((current.getCount() + 1).toInt))
       }
     }
-  }
   
-  private val atomicLatch = new AtomicReference(new CountDownLatch(0))
-  
-  private def increaseLatch() {
-    synchronized {
-      val current = atomicLatch.get()
-      atomicLatch.set(new CountDownLatch((current.getCount() + 1).toInt))
-    }
-  }
-  
-  private def decreaseLatch() {
-    synchronized {
-      val latch = atomicLatch.get
-      latch.countDown()
-      if (latch.getCount() == 0) 
-        RunConfig.cleanup()
+    def decreaseLatch() {
+      synchronized {
+        val latch = atomicLatch.get
+        latch.countDown()
+        if (latch.getCount() == 0) {
+          reporter match {
+            case resourcefulRep: ResourcefulReporter => 
+              resourcefulRep.dispose()
+            case _ =>
+          }
+          reporter = null
+          reporterConfigs = null
+          filter = null
+          configMap = null
+        }
+      }
     }
   }
 
@@ -258,7 +259,7 @@ Tags to include and exclude: -n "CheckinTests FunctionalTests" -l "SlowTests Net
 
         val formatter = formatterForSuiteStarting(suite)
 
-        increaseLatch()
+        RunConfig.increaseLatch()
         report(SuiteStarting(tracker.nextOrdinal(), suite.suiteName, suite.suiteId, Some(suiteClass.getName), formatter, Some(TopOfClass(suiteClass.getName))))
 
         try {  // TODO: I had to pass Set.empty for chosen styles now. Fix this later.
@@ -286,7 +287,7 @@ Tags to include and exclude: -n "CheckinTests FunctionalTests" -l "SlowTests Net
           }
         }
         finally {
-          decreaseLatch()
+          RunConfig.decreaseLatch()
         }
       }
       else throw new IllegalArgumentException("Class is not an accessible org.scalatest.Suite: " + testClassName)
