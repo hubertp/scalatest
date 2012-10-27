@@ -559,9 +559,9 @@ class ShouldLengthSpec extends Spec with ShouldMatchers with Checkers with Retur
       }
       val obj = new Lengthy(2)
   
-      implicit def wrapLengthy(o: Lengthy) =
-        new LengthWrapper {
-          def extent: Long = o.length()
+      implicit val lengthOfLengthy =
+        new Length[Lengthy] {
+          def extentOf(o: Lengthy): Long = o.length()
         }
 
       def `should do nothing if object length matches specified length` {
@@ -693,9 +693,9 @@ class ShouldLengthSpec extends Spec with ShouldMatchers with Checkers with Retur
       }
       val obj = new Lengthy(2)
 
-      implicit def wrapLengthy(o: Lengthy) =
-        new LengthWrapper {
-          def extent: Long = o.length
+      implicit val lengthOfLengthy =
+        new Length[Lengthy] {
+          def extentOf(o: Lengthy): Long = o.length
         }
 
       def `should do nothing if object length matches specified length` {
@@ -827,9 +827,9 @@ class ShouldLengthSpec extends Spec with ShouldMatchers with Checkers with Retur
       }
       val obj = new Lengthy(2)
 
-      implicit def wrapLengthy(o: Lengthy) =
-        new LengthWrapper {
-          def extent: Long = o.length
+      implicit val lengthOfLengthy =
+        new Length[Lengthy] {
+          def extentOf(o: Lengthy): Long = o.length
         }
 
       def `should do nothing if object length matches specified length` {
@@ -961,9 +961,9 @@ class ShouldLengthSpec extends Spec with ShouldMatchers with Checkers with Retur
       }
       val obj = new Lengthy(2)
 
-      implicit def wrapLengthy(o: Lengthy) =
-        new LengthWrapper {
-          def extent: Long = o.getLength()
+      implicit val lengthOfLengthy =
+        new Length[Lengthy] {
+          def extentOf(o: Lengthy): Long = o.getLength()
         }
 
       def `should do nothing if object length matches specified length` {
@@ -1095,9 +1095,9 @@ class ShouldLengthSpec extends Spec with ShouldMatchers with Checkers with Retur
       }
       val obj = new Lengthy(2)
 
-      implicit def wrapLengthy(o: Lengthy) =
-        new LengthWrapper {
-          def extent: Long = o.getLength
+      implicit val lengthOfLengthy =
+        new Length[Lengthy] {
+          def extentOf(o: Lengthy): Long = o.getLength
         }
 
       def `should do nothing if object length matches specified length` {
@@ -1229,9 +1229,9 @@ class ShouldLengthSpec extends Spec with ShouldMatchers with Checkers with Retur
       }
       val obj = new Lengthy(2)
 
-      implicit def wrapLengthy(o: Lengthy) =
-        new LengthWrapper {
-          def extent: Long = o.getLength
+      implicit val lengthOfLengthy =
+        new Length[Lengthy] {
+          def extentOf(o: Lengthy): Long = o.getLength
         }
 
       def `should do nothing if object length matches specified length` {
@@ -1363,9 +1363,9 @@ class ShouldLengthSpec extends Spec with ShouldMatchers with Checkers with Retur
       }
       val obj = new Lengthy(2)
 
-      implicit def wrapLengthy(o: Lengthy) =
-        new LengthWrapper {
-          def extent: Long = o.length()
+      implicit val lengthOfLengthy =
+        new Length[Lengthy] {
+          def extentOf(o: Lengthy): Long = o.length()
         }
 
       def `should do nothing if object length matches specified length` {
@@ -1503,9 +1503,9 @@ class ShouldLengthSpec extends Spec with ShouldMatchers with Checkers with Retur
       }
       val obj = new Lengthy(2)
 
-      implicit def wrapLengthy(o: Lengthy) =
-        new LengthWrapper {
-          def extent: Long = o.length
+      implicit val lengthOfLengthy =
+        new Length[Lengthy] {
+          def extentOf(o: Lengthy): Long = o.length
         }
 
       def `should do nothing if object length matches specified length` {
@@ -1643,9 +1643,9 @@ class ShouldLengthSpec extends Spec with ShouldMatchers with Checkers with Retur
       }
       val obj = new Lengthy(2)
 
-      implicit def wrapLengthy(o: Lengthy) =
-        new LengthWrapper {
-          def extent: Long = o.length
+      implicit val lengthOfLengthy =
+        new Length[Lengthy] {
+          def extentOf(o: Lengthy): Long = o.length
         }
 
       def `should do nothing if object length matches specified length` {
@@ -1779,9 +1779,9 @@ class ShouldLengthSpec extends Spec with ShouldMatchers with Checkers with Retur
       }
       val obj = new Lengthy(2)
 
-      implicit def wrapLengthy(o: Lengthy) =
-        new LengthWrapper {
-          def extent: Long = o.getLength()
+      implicit val lengthOfLengthy =
+        new Length[Lengthy] {
+          def extentOf(o: Lengthy): Long = o.getLength()
         }
 
       def `should do nothing if object length matches specified length` {
@@ -1919,9 +1919,9 @@ class ShouldLengthSpec extends Spec with ShouldMatchers with Checkers with Retur
       }
       val obj = new Lengthy(2)
 
-      implicit def wrapLengthy(o: Lengthy) =
-        new LengthWrapper {
-          def extent: Long = o.getLength
+      implicit val lengthOfLengthy =
+        new Length[Lengthy] {
+          def extentOf(o: Lengthy): Long = o.getLength
         }
 
       def `should do nothing if object length matches specified length` {
@@ -2059,9 +2059,9 @@ class ShouldLengthSpec extends Spec with ShouldMatchers with Checkers with Retur
       }
       val obj = new Lengthy(2)
 
-      implicit def wrapLengthy(o: Lengthy) =
-        new LengthWrapper {
-          def extent: Long = o.getLength
+      implicit val lengthOfLengthy =
+        new Length[Lengthy] {
+          def extentOf(o: Lengthy): Long = o.getLength
         }
 
       def `should do nothing if object length matches specified length` {

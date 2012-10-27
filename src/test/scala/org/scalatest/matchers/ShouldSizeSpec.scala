@@ -2103,9 +2103,9 @@ class ShouldSizeSpec extends Spec with ShouldMatchers with Checkers with Returns
       }
       val obj = new Sizey(2)
   
-      implicit def wrapSizey(o: Sizey) =
-        new SizeWrapper {
-          def extent: Long = o.size()
+      implicit val sizeOfSizey =
+        new Size[Sizey] {
+          def extentOf(o: Sizey): Long = o.size()
         }
 
       def `should do nothing if object size matches specified size` {
@@ -2239,9 +2239,9 @@ class ShouldSizeSpec extends Spec with ShouldMatchers with Checkers with Returns
       }
       val obj = new Sizey(2)
 
-      implicit def wrapSizey(o: Sizey) =
-        new SizeWrapper {
-          def extent: Long = o.size
+      implicit val sizeOfSizey =
+        new Size[Sizey] {
+          def extentOf(o: Sizey): Long = o.size
         }
 
       def `should do nothing if object size matches specified size` {
@@ -2375,9 +2375,9 @@ class ShouldSizeSpec extends Spec with ShouldMatchers with Checkers with Returns
       }
       val obj = new Sizey(2)
 
-      implicit def wrapSizey(o: Sizey) =
-        new SizeWrapper {
-          def extent: Long = o.size
+      implicit val sizeOfSizey =
+        new Size[Sizey] {
+          def extentOf(o: Sizey): Long = o.size
         }
 
       def `should do nothing if object size matches specified size` {
@@ -2511,9 +2511,9 @@ class ShouldSizeSpec extends Spec with ShouldMatchers with Checkers with Returns
       }
       val obj = new Sizey(2)
 
-      implicit def wrapSizey(o: Sizey) =
-        new SizeWrapper {
-          def extent: Long = o.getSize()
+      implicit val sizeOfSizey =
+        new Size[Sizey] {
+          def extentOf(o: Sizey): Long = o.getSize()
         }
 
       def `should do nothing if object size matches specified size` {
@@ -2647,9 +2647,9 @@ class ShouldSizeSpec extends Spec with ShouldMatchers with Checkers with Returns
       }
       val obj = new Sizey(2)
 
-      implicit def wrapSizey(o: Sizey) =
-        new SizeWrapper {
-          def extent: Long = o.getSize
+      implicit val sizeOfSizey =
+        new Size[Sizey] {
+          def extentOf(o: Sizey): Long = o.getSize
         }
 
       def `should do nothing if object size matches specified size` {
@@ -2783,9 +2783,9 @@ class ShouldSizeSpec extends Spec with ShouldMatchers with Checkers with Returns
       }
       val obj = new Sizey(2)
 
-      implicit def wrapSizey(o: Sizey) =
-        new SizeWrapper {
-          def extent: Long = o.getSize
+      implicit val sizeOfSizey =
+        new Size[Sizey] {
+          def extentOf(o: Sizey): Long = o.getSize
         }
 
       def `should do nothing if object size matches specified size` {
@@ -2919,9 +2919,9 @@ class ShouldSizeSpec extends Spec with ShouldMatchers with Checkers with Returns
       }
       val obj = new Sizey(2)
 
-      implicit def wrapSizey(o: Sizey) =
-        new SizeWrapper {
-          def extent: Long = o.size()
+      implicit val sizeOfSizey =
+        new Size[Sizey] {
+          def extentOf(o: Sizey): Long = o.size()
         }
 
       def `should do nothing if object size matches specified size` {
@@ -3061,9 +3061,9 @@ class ShouldSizeSpec extends Spec with ShouldMatchers with Checkers with Returns
       }
       val obj = new Sizey(2)
 
-      implicit def wrapSizey(o: Sizey) =
-        new SizeWrapper {
-          def extent: Long = o.size
+      implicit val sizeOfSizey =
+        new Size[Sizey] {
+          def extentOf(o: Sizey): Long = o.size
         }
 
       def `should do nothing if object size matches specified size` {
@@ -3201,9 +3201,9 @@ class ShouldSizeSpec extends Spec with ShouldMatchers with Checkers with Returns
       }
       val obj = new Sizey(2)
 
-      implicit def wrapSizey(o: Sizey) =
-        new SizeWrapper {
-          def extent: Long = o.size
+      implicit val sizeOfSizey =
+        new Size[Sizey] {
+          def extentOf(o: Sizey): Long = o.size
         }
 
       def `should do nothing if object size matches specified size` {
@@ -3339,9 +3339,9 @@ class ShouldSizeSpec extends Spec with ShouldMatchers with Checkers with Returns
       }
       val obj = new Sizey(2)
 
-      implicit def wrapSizey(o: Sizey) =
-        new SizeWrapper {
-          def extent: Long = o.getSize()
+      implicit val sizeOfSizey =
+        new Size[Sizey] {
+          def extentOf(o: Sizey): Long = o.getSize()
         }
 
       def `should do nothing if object size matches specified size` {
@@ -3479,9 +3479,9 @@ class ShouldSizeSpec extends Spec with ShouldMatchers with Checkers with Returns
       }
       val obj = new Sizey(2)
 
-      implicit def wrapSizey(o: Sizey) =
-        new SizeWrapper {
-          def extent: Long = o.getSize
+      implicit val sizeOfSizey =
+        new Size[Sizey] {
+          def extentOf(o: Sizey): Long = o.getSize
         }
 
       def `should do nothing if object size matches specified size` {
@@ -3619,9 +3619,9 @@ class ShouldSizeSpec extends Spec with ShouldMatchers with Checkers with Returns
       }
       val obj = new Sizey(2)
 
-      implicit def wrapSizey(o: Sizey) =
-        new SizeWrapper {
-          def extent: Long = o.getSize
+      implicit val sizeOfSizey =
+        new Size[Sizey] {
+          def extentOf(o: Sizey): Long = o.getSize
         }
 
       def `should do nothing if object size matches specified size` {
