@@ -273,7 +273,16 @@ trait Spec extends Suite  { thisSuite =>
           
         def isScopeMethod(o: AnyRef, m: Method): Boolean = {
           val scopeMethodName = getScopeClassName(o)+ m.getName + "$"
-          scopeMethodName == m.getReturnType.getName
+          
+          val returnTypeName = m.getReturnType.getName
+          if (returnTypeName.matches(".+\\$\\$\\$\\$.+\\$\\$\\$\\$.+")) {
+            val firstDolarIdx = returnTypeName.indexOf("$$$$")
+            val lastDolarIdx = returnTypeName.lastIndexOf("$$$$")
+            scopeMethodName.startsWith(returnTypeName.substring(0, firstDolarIdx)) && 
+            scopeMethodName.endsWith(returnTypeName.substring(lastDolarIdx + 4))
+          }
+          else
+            scopeMethodName == m.getReturnType.getName
         }
         
         def getScopeDesc(m: Method): String = {
@@ -580,9 +589,11 @@ private[scalatest] object Spec {
     val includesEncodedSpace = m.getName.indexOf("$u0020") >= 0
     
     val isOuterMethod = m.getName.endsWith("$$outer")
+    
+    val isNestedMethod = m.getName.matches(".+\\$\\$.+\\$[1-9]+")
 
     // def maybe(b: Boolean) = if (b) "" else "!"
     // println("m.getName: " + m.getName + ": " + maybe(isInstanceMethod) + "isInstanceMethod, " + maybe(hasNoParams) + "hasNoParams, " + maybe(includesEncodedSpace) + "includesEncodedSpace")
-    isInstanceMethod && hasNoParamOrFixtureParam && includesEncodedSpace && !isOuterMethod
+    isInstanceMethod && hasNoParamOrFixtureParam && includesEncodedSpace && !isOuterMethod && !isNestedMethod
   }
 }
