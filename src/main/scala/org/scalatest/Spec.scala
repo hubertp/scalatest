@@ -1255,7 +1255,7 @@ trait Spec extends Suite { thisSuite =>
         }
         
         def register(o: AnyRef) {
-          val testMethods = o.getClass.getMethods.filter(isTestMethod(_)).sorted(MethodNameEncodedOrdering)
+          val testMethods = o.getClass.getMethods.filter(isTestMethod(o, _)).sorted(MethodNameEncodedOrdering)
           
           testMethods.foreach { m =>
             val scope = isScopeMethod(o, m)
@@ -1455,7 +1455,7 @@ trait Spec extends Suite { thisSuite =>
 
 private[scalatest] object Spec {
 
-  def isTestMethod(m: Method): Boolean = {
+  def isTestMethod(o: AnyRef, m: Method): Boolean = {
 
     val isInstanceMethod = !Modifier.isStatic(m.getModifiers())
 
@@ -1465,11 +1465,13 @@ private[scalatest] object Spec {
     val includesEncodedSpace = m.getName.indexOf("$u0020") >= 0
     
     val isOuterMethod = m.getName.endsWith("$$outer")
+    
+    val isNestedMethod = m.getName.matches(".+\\$\\$.+\\$[1-9]+")
 
     //val isOuterMethod = m.getName.endsWith("$$$outer")
     // def maybe(b: Boolean) = if (b) "" else "!"
     // println("m.getName: " + m.getName + ": " + maybe(isInstanceMethod) + "isInstanceMethod, " + maybe(hasNoParams) + "hasNoParams, " + maybe(includesEncodedSpace) + "includesEncodedSpace")
-    isInstanceMethod && hasNoParams && includesEncodedSpace && !isOuterMethod
+    isInstanceMethod && hasNoParams && includesEncodedSpace && !isOuterMethod && !isNestedMethod
   }
 }
 
