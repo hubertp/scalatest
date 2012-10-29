@@ -1238,7 +1238,16 @@ trait Spec extends Suite { thisSuite =>
           
         def isScopeMethod(o: AnyRef, m: Method): Boolean = {
           val scopeMethodName = getScopeClassName(o)+ m.getName + "$"
-          scopeMethodName == m.getReturnType.getName
+
+          val returnTypeName = m.getReturnType.getName
+          if (returnTypeName.matches(".+\\$\\$\\$\\$.+\\$\\$\\$\\$.+")) {
+            val firstDolarIdx = returnTypeName.indexOf("$$$$")
+            val lastDolarIdx = returnTypeName.lastIndexOf("$$$$")
+            scopeMethodName.startsWith(returnTypeName.substring(0, firstDolarIdx)) && 
+            scopeMethodName.endsWith(returnTypeName.substring(lastDolarIdx + 4))
+          }
+          else
+            scopeMethodName == m.getReturnType.getName
         }
         
         def getScopeDesc(m: Method): String = {
@@ -1456,7 +1465,7 @@ trait Spec extends Suite { thisSuite =>
 private[scalatest] object Spec {
 
   def isTestMethod(o: AnyRef, m: Method): Boolean = {
-
+    
     val isInstanceMethod = !Modifier.isStatic(m.getModifiers())
 
     val hasNoParams = m.getParameterTypes.isEmpty
