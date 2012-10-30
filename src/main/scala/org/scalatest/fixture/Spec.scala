@@ -275,14 +275,8 @@ trait Spec extends Suite  { thisSuite =>
           val scopeMethodName = getScopeClassName(o)+ m.getName + "$"
           
           val returnTypeName = m.getReturnType.getName
-          if (returnTypeName.matches(".+\\$\\$\\$\\$.+\\$\\$\\$\\$.+")) {
-            val firstDolarIdx = returnTypeName.indexOf("$$$$")
-            val lastDolarIdx = returnTypeName.lastIndexOf("$$$$")
-            scopeMethodName.startsWith(returnTypeName.substring(0, firstDolarIdx)) && 
-            scopeMethodName.endsWith(returnTypeName.substring(lastDolarIdx + 4))
-          }
-          else
-            scopeMethodName == m.getReturnType.getName
+          
+          equalIfRequiredCompactify(scopeMethodName, returnTypeName)
         }
         
         def getScopeDesc(m: Method): String = {
@@ -595,5 +589,36 @@ private[scalatest] object Spec {
     // def maybe(b: Boolean) = if (b) "" else "!"
     // println("m.getName: " + m.getName + ": " + maybe(isInstanceMethod) + "isInstanceMethod, " + maybe(hasNoParams) + "hasNoParams, " + maybe(includesEncodedSpace) + "includesEncodedSpace")
     isInstanceMethod && hasNoParamOrFixtureParam && includesEncodedSpace && !isOuterMethod && !isNestedMethod
+  }
+  
+  import java.security.MessageDigest
+  import scala.io.Codec
+  
+  // The following compactify code is written based on scala compiler source code at:-
+  // https://github.com/scala/scala/blob/master/src/reflect/scala/reflect/internal/StdNames.scala#L47
+  
+  private val compactifiedMarker = "$$$$"
+  
+  def equalIfRequiredCompactify(value: String, compactified: String): Boolean = {
+    if (compactified.matches(".+\\$\\$\\$\\$.+\\$\\$\\$\\$.+")) {
+      val firstDolarIdx = compactified.indexOf("$$$$")
+      val lastDolarIdx = compactified.lastIndexOf("$$$$")
+      val prefix = compactified.substring(0, firstDolarIdx)
+      val suffix = compactified.substring(lastDolarIdx + 4)
+      val lastIndexOfDot = value.lastIndexOf(".")
+      val toHash = 
+        if (lastIndexOfDot >= 0) 
+          value.substring(0, value.length - 1).substring(value.lastIndexOf(".") + 1)
+        else
+          value
+          
+      val bytes = Codec.toUTF8(toHash.toArray)
+      val md5 = MessageDigest.getInstance("MD5")
+      md5.update(bytes)
+      val md5chars = (md5.digest() map (b => (b & 0xFF).toHexString)).mkString
+      (prefix + compactifiedMarker + md5chars + compactifiedMarker + suffix) == compactified
+    }
+    else
+      value == compactified
   }
 }
