@@ -1259,7 +1259,7 @@ trait Spec extends Suite { thisSuite =>
         }
         
         def register(o: AnyRef) {
-          val testMethods = o.getClass.getMethods.filter(isTestMethod(o, _)).sorted(MethodNameEncodedOrdering)
+          val testMethods = o.getClass.getMethods.filter(isTestMethod(_)).sorted(MethodNameEncodedOrdering)
           
           testMethods.foreach { m =>
             val scope = isScopeMethod(o, m)
@@ -1459,7 +1459,7 @@ trait Spec extends Suite { thisSuite =>
 
 private[scalatest] object Spec {
 
-  def isTestMethod(o: AnyRef, m: Method): Boolean = {
+  def isTestMethod(m: Method): Boolean = {
     
     val isInstanceMethod = !Modifier.isStatic(m.getModifiers())
 
