@@ -587,11 +587,11 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
           
   private def getStatistic(summary: Summary) = 
     <div id="display-filters">
-      <input id="succeeded_checkbox" name="succeeded_checkbox" type="checkbox" checked="checked" onchange="applyFilter()" /> <label id="succeeded_checkbox_label" for="passed_checkbox">Succeeded: { summary.testsSucceededCount }</label>
       <input id="failed_checkbox" name="failed_checkbox" type="checkbox" checked="checked" onchange="applyFilter()" /> <label id="failed_checkbox_label" for="failed_checkbox">Failed: { summary.testsFailedCount }</label>
+      <input id="canceled_checkbox" name="canceled_checkbox" type="checkbox" checked="checked" onchange="applyFilter()" /> <label id="canceled_checkbox_label" for="canceled_checkbox">Canceled: { summary.testsCanceledCount }</label>
       <input id="ignored_checkbox" name="ignored_checkbox" type="checkbox" checked="checked" onchange="applyFilter()" /> <label id="ignored_checkbox_label" for="ignored_checkbox">Ignored: { summary.testsIgnoredCount }</label>
       <input id="pending_checkbox" name="pending_checkbox" type="checkbox" checked="checked" onchange="applyFilter()" /> <label id="pending_checkbox_label" for="pending_checkbox">Pending: { summary.testsPendingCount }</label>
-      <input id="canceled_checkbox" name="canceled_checkbox" type="checkbox" checked="checked" onchange="applyFilter()" /> <label id="canceled_checkbox_label" for="canceled_checkbox">Canceled: { summary.testsCanceledCount }</label>
+      <input id="succeeded_checkbox" name="succeeded_checkbox" type="checkbox" checked="checked" onchange="applyFilter()" /> <label id="succeeded_checkbox_label" for="passed_checkbox">Succeeded: { summary.testsSucceededCount }</label>
     </div>
   
   private def header(resourceName: String, duration: Option[Long], summary: Summary) = 
@@ -623,11 +623,11 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
       <tr>
         <td>Suite</td>
         <td>Duration (ms.)</td>
-        <td>Succeeded</td>
         <td>Failed</td>
+        <td>Canceled</td>
         <td>Ignored</td>
         <td>Pending</td>
-        <td>Canceled</td>
+        <td>Succeeded</td>
         <td>Total</td>
       </tr>
     {
@@ -669,11 +669,11 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
     <tr id={ elementId }>
       <td class={ appendCombinedStatus("suite_name", suiteResult) }><a href={ "javascript: showDetails('" + suiteFileName + "')" }>{ suiteName }</a></td>
       <td class={ appendCombinedStatus("duration", suiteResult) }>{ durationDisplay(duration) }</td>
-      <td class={ countStyle("succeeded", testsSucceededCount) }>{ testsSucceededCount }</td>
       <td class={ countStyle("failed", testsFailedCount) }>{ testsFailedCount }</td>
+      <td class={ countStyle("canceled", testsCanceledCount) }>{ testsCanceledCount }</td>
       <td class={ countStyle("ignored", testsIgnoredCount) }>{ testsIgnoredCount }</td>
       <td class={ countStyle("pending", testsPendingCount) }>{ testsPendingCount }</td>
-      <td class={ countStyle("canceled", testsCanceledCount) }>{ testsCanceledCount }</td>
+      <td class={ countStyle("succeeded", testsSucceededCount) }>{ testsSucceededCount }</td>
       <td class={ appendCombinedStatus("total", suiteResult) }>{ testsSucceededCount + testsFailedCount + testsIgnoredCount + testsPendingCount + testsCanceledCount }</td>
     </tr>
   }
