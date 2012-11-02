@@ -674,8 +674,20 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
       </tr>
     {
       val sortedSuiteList = suiteList.sortWith { (a, b) => 
-        if (a.testsFailedCount == b.testsFailedCount) 
-          a.startEvent.suiteName < b.startEvent.suiteName
+        if (a.testsFailedCount == b.testsFailedCount) { 
+          if (a.testsCanceledCount == b.testsCanceledCount) {
+            if (a.testsIgnoredCount == b.testsIgnoredCount) {
+              if (a.testsPendingCount == b.testsPendingCount)
+                a.startEvent.suiteName < b.startEvent.suiteName
+              else
+                a.testsPendingCount > b.testsPendingCount
+            }
+            else
+              a.testsIgnoredCount > b.testsIgnoredCount
+          }
+          else
+            a.testsCanceledCount > b.testsCanceledCount
+        }
         else
           a.testsFailedCount > b.testsFailedCount
       }.toArray
