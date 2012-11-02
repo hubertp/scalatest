@@ -464,6 +464,10 @@ iframe {
   border: none;
 }
 
+#suite_header {
+  width: 100%
+}
+
 #suite_header_id_label_passed {
   padding-left: 5px;
   padding-right: 5px;
@@ -615,4 +619,328 @@ iframe {
   color: #C20000;
   font-weight: bold;
   font-size: 11px;
+}
+
+#suite_header_total_label_passed {
+  padding-left: 5px;
+  padding-right: 5px;
+  background-color: #65c400;
+  color: #fff;
+  font-weight: bold;
+  font-size: 11px;
+}
+
+#suite_header_total_label_passed_all {
+  padding-left: 5px;
+  padding-right: 5px;
+  background-color: #65c400;
+  color: #fff;
+  font-weight: bold;
+  font-size: 11px;
+}
+
+#suite_header_total_label_with_failed {
+  padding-left: 5px;
+  padding-right: 5px;
+  background-color: #C20000;
+  color: #fff;
+  font-weight: bold;
+  font-size: 11px;
+}
+
+#suite_header_total_value_passed {
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #65c400;
+  font-weight: bold;
+  font-size: 11px;
+  text-align: right;
+}
+
+#suite_header_total_value_passed_all {
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #65c400;
+  font-weight: bold;
+  font-size: 11px;
+  text-align: right;
+}
+
+#suite_header_total_value_with_failed {
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #C20000;
+  font-weight: bold;
+  font-size: 11px;
+  text-align: right;
+}
+
+#suite_header_failed_label_passed {
+  padding-left: 5px;
+  padding-right: 5px;
+  background-color: #65c400;
+  color: #fff;
+  font-weight: bold;
+  font-size: 11px;
+}
+
+#suite_header_failed_label_passed_all {
+  padding-left: 5px;
+  padding-right: 5px;
+  background-color: #65c400;
+  color: #fff;
+  font-weight: bold;
+  font-size: 11px;
+}
+
+#suite_header_failed_label_with_failed {
+  padding-left: 5px;
+  padding-right: 5px;
+  background-color: #C20000;
+  color: #fff;
+  font-weight: bold;
+  font-size: 11px;
+}
+
+#suite_header_failed_value_passed {
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #993333;
+  font-weight: bold;
+  font-size: 11px;
+  text-align: right;
+}
+
+#suite_header_failed_value_passed_all {
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #993333;
+  font-weight: bold;
+  font-size: 11px;
+  text-align: right;
+}
+
+#suite_header_failed_value_with_failed {
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #993333;
+  font-weight: bold;
+  font-size: 11px;
+  text-align: right;
+}
+
+#suite_header_canceled_label_passed {
+  padding-left: 5px;
+  padding-right: 5px;
+  background-color: #65c400;
+  color: #fff;
+  font-weight: bold;
+  font-size: 11px;
+}
+
+#suite_header_canceled_label_passed_all {
+  padding-left: 5px;
+  padding-right: 5px;
+  background-color: #65c400;
+  color: #fff;
+  font-weight: bold;
+  font-size: 11px;
+}
+
+#suite_header_canceled_label_with_failed {
+  padding-left: 5px;
+  padding-right: 5px;
+  background-color: #C20000;
+  color: #fff;
+  font-weight: bold;
+  font-size: 11px;
+}
+
+#suite_header_canceled_value_passed {
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #FFCC00;
+  font-weight: bold;
+  font-size: 11px;
+  text-align: right;
+}
+
+#suite_header_canceled_value_passed_all {
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #FFCC00;
+  font-weight: bold;
+  font-size: 11px;
+  text-align: right;
+}
+
+#suite_header_canceled_value_with_failed {
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #FFCC00;
+  font-weight: bold;
+  font-size: 11px;
+  text-align: right;
+}
+
+#suite_header_ignored_label_passed {
+  padding-left: 5px;
+  padding-right: 5px;
+  background-color: #65c400;
+  color: #fff;
+  font-weight: bold;
+  font-size: 11px;
+}
+
+#suite_header_ignored_label_passed_all {
+  padding-left: 5px;
+  padding-right: 5px;
+  background-color: #65c400;
+  color: #fff;
+  font-weight: bold;
+  font-size: 11px;
+}
+
+#suite_header_ignored_label_with_failed {
+  padding-left: 5px;
+  padding-right: 5px;
+  background-color: #C20000;
+  color: #fff;
+  font-weight: bold;
+  font-size: 11px;
+}
+
+#suite_header_ignored_value_passed {
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #FF6600;
+  font-weight: bold;
+  font-size: 11px;
+  text-align: right;
+}
+
+#suite_header_ignored_value_passed_all {
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #FF6600;
+  font-weight: bold;
+  font-size: 11px;
+  text-align: right;
+}
+
+#suite_header_ignored_value_with_failed {
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #FF6600;
+  font-weight: bold;
+  font-size: 11px;
+  text-align: right;
+}
+
+#suite_header_pending_label_passed {
+  padding-left: 5px;
+  padding-right: 5px;
+  background-color: #65c400;
+  color: #fff;
+  font-weight: bold;
+  font-size: 11px;
+}
+
+#suite_header_pending_label_passed_all {
+  padding-left: 5px;
+  padding-right: 5px;
+  background-color: #65c400;
+  color: #fff;
+  font-weight: bold;
+  font-size: 11px;
+}
+
+#suite_header_pending_label_with_failed {
+  padding-left: 5px;
+  padding-right: 5px;
+  background-color: #C20000;
+  color: #fff;
+  font-weight: bold;
+  font-size: 11px;
+}
+
+#suite_header_pending_value_passed {
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #33CCCC;
+  font-weight: bold;
+  font-size: 11px;
+  text-align: right;
+}
+
+#suite_header_pending_value_passed_all {
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #33CCCC;
+  font-weight: bold;
+  font-size: 11px;
+  text-align: right;
+}
+
+#suite_header_pending_value_with_failed {
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #33CCCC;
+  font-weight: bold;
+  font-size: 11px;
+  text-align: right;
+}
+
+#suite_header_succeeded_label_passed {
+  padding-left: 5px;
+  padding-right: 5px;
+  background-color: #65c400;
+  color: #fff;
+  font-weight: bold;
+  font-size: 11px;
+}
+
+#suite_header_succeeded_label_passed_all {
+  padding-left: 5px;
+  padding-right: 5px;
+  background-color: #65c400;
+  color: #fff;
+  font-weight: bold;
+  font-size: 11px;
+}
+
+#suite_header_succeeded_label_with_failed {
+  padding-left: 5px;
+  padding-right: 5px;
+  background-color: #C20000;
+  color: #fff;
+  font-weight: bold;
+  font-size: 11px;
+}
+
+#suite_header_succeeded_value_passed {
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #339933;
+  font-weight: bold;
+  font-size: 11px;
+  text-align: right;
+}
+
+#suite_header_succeeded_value_passed_all {
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #339933;
+  font-weight: bold;
+  font-size: 11px;
+  text-align: right;
+}
+
+#suite_header_succeeded_value_with_failed {
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #339933;
+  font-weight: bold;
+  font-size: 11px;
+  text-align: right;
 }

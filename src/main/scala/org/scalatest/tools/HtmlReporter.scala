@@ -241,15 +241,31 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
         <table id="suite_header">
           <tr id="suite_header_id">
             <td id={ appendCombinedStatus("suite_header_id_label", suiteResult) }>Suite ID</td>
-            <td id={ appendCombinedStatus("suite_header_id_value", suiteResult) } colspan="3">{ suiteResult.suiteId }</td>
+            <td id={ appendCombinedStatus("suite_header_id_value", suiteResult) } colspan="5">{ suiteResult.suiteId }</td>
           </tr>
           <tr id="suite_header_name">
             <td id={ appendCombinedStatus("suite_header_name_label", suiteResult) }>Suite Name</td>
-            <td id={ appendCombinedStatus("suite_header_name_value", suiteResult) } colspan="3">{ suiteResult.suiteName }</td>
+            <td id={ appendCombinedStatus("suite_header_name_value", suiteResult) } colspan="5">{ suiteResult.suiteName }</td>
           </tr>
           <tr id="suite_header_class">
             <td id={ appendCombinedStatus("suite_header_class_label", suiteResult) }>Class Name</td>
-            <td id={ appendCombinedStatus("suite_header_class_value", suiteResult) } colspan="3">{ suiteResult.suiteClassName.getOrElse("-") }</td>
+            <td id={ appendCombinedStatus("suite_header_class_value", suiteResult) } colspan="5">{ suiteResult.suiteClassName.getOrElse("-") }</td>
+          </tr>
+          <tr id="suite_header_statistic_1">
+            <td id={ appendCombinedStatus("suite_header_total_label", suiteResult) }>Total</td>
+            <td id={ appendCombinedStatus("suite_header_total_value", suiteResult) }>{ suiteResult.testsSucceededCount + suiteResult.testsFailedCount + suiteResult.testsCanceledCount + suiteResult.testsPendingCount + suiteResult.testsIgnoredCount }</td>
+            <td id={ appendCombinedStatus("suite_header_failed_label", suiteResult) }>Failed</td>
+            <td id={ appendCombinedStatus("suite_header_failed_value", suiteResult) }>{ suiteResult.testsFailedCount }</td>
+            <td id={ appendCombinedStatus("suite_header_canceled_label", suiteResult) }>Canceled</td>
+            <td id={ appendCombinedStatus("suite_header_canceled_value", suiteResult) }>{ suiteResult.testsCanceledCount }</td>
+          </tr>
+          <tr id="suite_header_statistic_2">
+            <td id={ appendCombinedStatus("suite_header_ignored_label", suiteResult) }>Ignored</td>
+            <td id={ appendCombinedStatus("suite_header_ignored_value", suiteResult) }>{ suiteResult.testsIgnoredCount }</td>
+            <td id={ appendCombinedStatus("suite_header_pending_label", suiteResult) }>Pending</td>
+            <td id={ appendCombinedStatus("suite_header_pending_value", suiteResult) }>{ suiteResult.testsPendingCount }</td>
+            <td id={ appendCombinedStatus("suite_header_succeeded_label", suiteResult) }>Succeeded</td>
+            <td id={ appendCombinedStatus("suite_header_succeeded_value", suiteResult) }>{ suiteResult.testsSucceededCount }</td>
           </tr>
         </table>
         {
