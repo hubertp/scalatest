@@ -245,7 +245,16 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
           </tr>
           <tr id="suite_header_name">
             <td id={ appendCombinedStatus("suite_header_name_label", suiteResult) }>Suite Name</td>
-            <td id={ appendCombinedStatus("suite_header_name_value", suiteResult) } colspan="5">{ suiteResult.suiteName }</td>
+            <td id={ appendCombinedStatus("suite_header_name_value", suiteResult) } colspan="2">{ suiteResult.suiteName }</td>
+            <td id={ appendCombinedStatus("suite_header_duration_label", suiteResult) }>Duration</td>
+            <td id={ appendCombinedStatus("suite_header_duration_value", suiteResult) } colspan="2">
+              { 
+                suiteResult.duration match {
+                  case Some(duration) => duration + " ms."
+                  case None => "-"
+                } 
+              }
+              </td>
           </tr>
           <tr id="suite_header_class">
             <td id={ appendCombinedStatus("suite_header_class_label", suiteResult) }>Class Name</td>
@@ -665,7 +674,7 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
       </tr>
     {
       val sortedSuiteList = suiteList.sortWith { (a, b) => 
-        if (a.testsFailedCount == b.testsFailedCount)
+        if (a.testsFailedCount == b.testsFailedCount) 
           a.startEvent.suiteName < b.startEvent.suiteName
         else
           a.testsFailedCount > b.testsFailedCount
