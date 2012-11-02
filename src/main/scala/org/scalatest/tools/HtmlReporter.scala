@@ -48,14 +48,19 @@ import java.text.DecimalFormat
 private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations: Boolean,
         presentInColor: Boolean, presentStackTraces: Boolean, presentFullStackTraces: Boolean, cssUrl: Option[URL]) extends ResourcefulReporter {
 
-  private val directory = new File(directoryPath)
-  if (!directory.exists)
-    directory.mkdirs()
+  private val targetDir = new File(directoryPath)
+  private val imagesDir = new File(targetDir, "images")
+  
+  if (!targetDir.exists)
+    targetDir.mkdirs()
     
-  private def copyResource(url: URL, targetFileName: String) {
+  if (!imagesDir.exists)
+    imagesDir.mkdirs()
+    
+  private def copyResource(url: URL, toDir: File, targetFileName: String) {
     val inputStream = url.openStream
     try {
-      val outputStream = new FileOutputStream(new File(directory, targetFileName))
+      val outputStream = new FileOutputStream(new File(toDir, targetFileName))
       try {
         outputStream getChannel() transferFrom(Channels.newChannel(inputStream), 0, Long.MaxValue)
       }
@@ -69,13 +74,25 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
     }
   }
   
+  private def getResource(resourceName: String): URL = 
+    classOf[Suite].getClassLoader.getResource(resourceName)
+  
   cssUrl match {
-    case Some(cssUrl) => copyResource(cssUrl, "custom.css")
+    case Some(cssUrl) => copyResource(cssUrl, targetDir, "custom.css")
     case None => // Do nothing.
   }
-  copyResource(classOf[Suite].getClassLoader.getResource("org/scalatest/HtmlReporter.css"), "styles.css")
-  copyResource(classOf[Suite].getClassLoader.getResource("org/scalatest/sorttable.js"), "sorttable.js")
-  copyResource(classOf[Suite].getClassLoader.getResource("org/scalatest/d3.v2.min.js"), "d3.v2.min.js")
+  copyResource(getResource("org/scalatest/HtmlReporter.css"), targetDir, "styles.css")
+  copyResource(getResource("org/scalatest/sorttable.js"), targetDir, "sorttable.js")
+  copyResource(getResource("org/scalatest/d3.v2.min.js"), targetDir, "d3.v2.min.js")
+  
+  copyResource(getResource("images/greendot.gif"), imagesDir, "testsucceeded.gif")
+  copyResource(getResource("images/reddot.gif"), imagesDir, "testfailed.gif")
+  copyResource(getResource("images/yellowdot.gif"), imagesDir, "testignored.gif")
+  copyResource(getResource("images/yellowdot.gif"), imagesDir, "testcanceled.gif")
+  copyResource(getResource("images/yellowdot.gif"), imagesDir, "testpending.gif")
+  copyResource(getResource("images/bluedot.gif"), imagesDir, "scope.gif")
+  copyResource(getResource("images/bluedot.gif"), imagesDir, "infoprovided.gif")
+  copyResource(getResource("images/bluedot.gif"), imagesDir, "markupprovided.gif")
   
   private val pegDown = new PegDownProcessor
 
@@ -95,8 +112,8 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
     formatter: Option[Formatter], suiteName: Option[String], testName: Option[String], duration: Option[Long]): String = {
 
     formatter match {
-      case Some(IndentedText(formattedText, _, _)) =>
-        Resources("specTextAndNote", formattedText, Resources(noteResourceName))
+      case Some(IndentedText(_, rawText, _)) =>
+        Resources("specTextAndNote", rawText, Resources(noteResourceName))
       case _ =>
         // Deny MotionToSuppress directives in error events, because error info needs to be seen by users
           suiteName match {
@@ -117,14 +134,14 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
   private def stringToPrintWhenNoError(resourceName: String, formatter: Option[Formatter], suiteName: String, testName: Option[String], duration: Option[Long]): Option[String] = {
 
     formatter match {
-      case Some(IndentedText(formattedText, _, _)) =>
+      case Some(IndentedText(_, rawText, _)) =>
         duration match {
           case Some(milliseconds) =>
             if (presentAllDurations)
-              Some(Resources("withDuration", formattedText, makeDurationString(milliseconds)))
+              Some(Resources("withDuration", rawText, makeDurationString(milliseconds)))
             else
-              Some(formattedText)
-          case None => Some(formattedText)
+              Some(rawText)
+          case None => Some(rawText)
         }
       case Some(MotionToSuppress) => None
       case _ =>
@@ -161,7 +178,7 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
   private def makeSuiteFile(suiteResult: SuiteResult) {
     val name = getSuiteFileName(suiteResult)
     
-    val pw = new PrintWriter(new BufferedOutputStream(new FileOutputStream(new File(directory, name + ".html")), BufferSize))
+    val pw = new PrintWriter(new BufferedOutputStream(new FileOutputStream(new File(targetDir, name + ".html")), BufferSize))
     try {
       pw.println {
         """
@@ -365,7 +382,7 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
   }
   
   private def makeIndexFile(resourceName: String, duration: Option[Long]) {
-    val pw = new PrintWriter(new BufferedOutputStream(new FileOutputStream(new File(directory, "index.html")), BufferSize))
+    val pw = new PrintWriter(new BufferedOutputStream(new FileOutputStream(new File(targetDir, "index.html")), BufferSize))
     try {
       pw.println {
         """
@@ -678,13 +695,6 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
     </tr>
   }
         
-  private def suite(elementId: String, suiteName: String, indentLevel: Int) = 
-    <div id={ elementId } class="suite" style={ "margin-left: " + (20 * indentLevel) + "px;" }>
-      <dl>
-        <dt>{ suiteName }</dt>
-      </dl>
-    </div>
-        
   private def scope(elementId: String, message: String, indentLevel: Int) = 
     <div id={ elementId } class="scope" style={ "margin-left: " + (20 * indentLevel) + "px;" }>
       { message }
@@ -692,6 +702,7 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
       
   private def test(elementId: String, lines: List[String], indentLevel: Int, styleName: String) = 
     <div id={ elementId } class={ styleName } style={ "margin-left: " + (20 * indentLevel) + "px;" }>
+      <span class="test_succeeded_icon" />
       <dl>
         {
           lines.map { line => 

@@ -340,73 +340,110 @@ table.sortable tr td.total_with_failed {
   font-weight: bold;
   font-size: 11px;
 }
-
-.suite {
-  margin: 0 10px 5px;
-  background-color: #65c400;
-  color: #fff;
-  font-weight: bold;
-  font-size: 11px;
-}
             
 .scope {
-  margin: 0 10px 5px;
-  background-color: #65c400;
-  color: #fff;
+  background-image: url("images/scope.gif");
+  background-repeat: no-repeat;
+  width: auto; 
+  height: auto; 
+  margin: 0;
+  padding-top: 0px;
+  padding-bottom: 0px;
+  padding-left: 18px;
+  padding-right: 0px;
+  color: #3D7700;
   font-weight: bold;
   font-size: 11px;
 }
 
 .test_passed {
-  margin: 0 10px 5px;
-  border-left: 5px solid #65C400;
-  border-bottom: 1px solid #65C400;
-  background-color: #DBFFB4; 
-  color: #3D7700;
+  background-image: url("images/testsucceeded.gif");
+  background-repeat: no-repeat;
+  width: auto; 
+  height: auto; 
+  margin: 0;
+  padding-top: 0px;
+  padding-bottom: 0px;
+  padding-left: 18px;
+  padding-right: 0px;
+  color: #339933;
 }
 
 .test_failed {
-  margin: 0 10px 5px;
-  border-left: 5px solid #C20000;
-  border-bottom: 1px solid #C20000;
-  color: #C20000; 
-  background-color: #FFFBD3;
+  background-image: url("images/testfailed.gif");
+  background-repeat: no-repeat;
+  width: auto; 
+  height: auto; 
+  margin: 0;
+  padding-top: 0px;
+  padding-bottom: 0px;
+  padding-left: 18px;
+  padding-right: 0px;
+  color: #993333;
 }
 
 .test_ignored {
-  margin: 0 10px 5px;
-  border-left: 5px solid #FAF834;
-  border-bottom: 1px solid #FAF834;
-  background-color: #FCFB98; color: #131313;
+  background-image: url("images/testignored.gif");
+  background-repeat: no-repeat;
+  width: auto; 
+  height: auto; 
+  margin: 0;
+  padding-top: 0px;
+  padding-bottom: 0px;
+  padding-left: 18px;
+  padding-right: 0px;
+  color: #FF6600;
 }
 
 .test_pending {
-  margin: 0 10px 5px;
-  border-left: 5px solid #FAF834;
-  border-bottom: 1px solid #FAF834;
-  background-color: #FCFB98; color: #131313;
+  background-image: url("images/testpending.gif");
+  background-repeat: no-repeat;
+  width: auto; 
+  height: auto; 
+  margin: 0;
+  padding-top: 0px;
+  padding-bottom: 0px;
+  padding-left: 18px;
+  padding-right: 0px;
+  color: #33CCCC;
 }
 
 .test_canceled {
-  margin: 0 10px 5px;
-  border-left: 5px solid #FAF834;
-  border-bottom: 1px solid #FAF834;
-  background-color: #FCFB98; color: #131313;
+  background-image: url("images/testcanceled.gif");
+  background-repeat: no-repeat;
+  width: auto; 
+  height: auto; 
+  margin: 0;
+  padding-top: 0px;
+  padding-bottom: 0px;
+  padding-left: 18px;
+  padding-right: 0px;
+  color: #FFCC00;
 }
 
 .markup {
-  margin: 0 10px 5px;
-  border-left: 5px solid #65C400;
-  border-bottom: 1px solid #65C400;
-  background-color: #DBFFB4; 
+  background-image: url("images/markupprovided.gif");
+  background-repeat: no-repeat;
+  width: auto; 
+  height: auto; 
+  margin: 0;
+  padding-top: 0px;
+  padding-bottom: 0px;
+  padding-left: 18px;
+  padding-right: 0px;
   color: #3D7700;
 }
 
 .info {
-  margin: 0 10px 5px;
-  border-left: 5px solid #65C400;
-  border-bottom: 1px solid #65C400;
-  background-color: #DBFFB4; 
+  background-image: url("images/infoprovided.gif");
+  background-repeat: no-repeat;
+  width: auto; 
+  height: auto; 
+  margin: 0;
+  padding-top: 0px;
+  padding-bottom: 0px;
+  padding-left: 18px;
+  padding-right: 0px;
   color: #3D7700;
 }
             
