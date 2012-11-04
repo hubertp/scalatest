@@ -342,7 +342,7 @@ table.sortable tr td.total_with_failed {
 }
             
 .scope {
-  background-image: url("images/scope.gif");
+  background-image: url("../images/scope.gif");
   background-repeat: no-repeat;
   width: auto; 
   height: auto; 
@@ -357,7 +357,7 @@ table.sortable tr td.total_with_failed {
 }
 
 .test_passed {
-  background-image: url("images/testsucceeded.gif");
+  background-image: url("../images/testsucceeded.gif");
   background-repeat: no-repeat;
   width: auto; 
   height: auto; 
@@ -370,7 +370,7 @@ table.sortable tr td.total_with_failed {
 }
 
 .test_failed {
-  background-image: url("images/testfailed.gif");
+  background-image: url("../images/testfailed.gif");
   background-repeat: no-repeat;
   width: auto; 
   height: auto; 
@@ -383,7 +383,7 @@ table.sortable tr td.total_with_failed {
 }
 
 .test_ignored {
-  background-image: url("images/testignored.gif");
+  background-image: url("../images/testignored.gif");
   background-repeat: no-repeat;
   width: auto; 
   height: auto; 
@@ -396,7 +396,7 @@ table.sortable tr td.total_with_failed {
 }
 
 .test_pending {
-  background-image: url("images/testpending.gif");
+  background-image: url("../images/testpending.gif");
   background-repeat: no-repeat;
   width: auto; 
   height: auto; 
@@ -409,7 +409,7 @@ table.sortable tr td.total_with_failed {
 }
 
 .test_canceled {
-  background-image: url("images/testcanceled.gif");
+  background-image: url("../images/testcanceled.gif");
   background-repeat: no-repeat;
   width: auto; 
   height: auto; 
@@ -422,7 +422,7 @@ table.sortable tr td.total_with_failed {
 }
 
 .markup {
-  background-image: url("images/markupprovided.gif");
+  background-image: url("../images/markupprovided.gif");
   background-repeat: no-repeat;
   width: auto; 
   height: auto; 
@@ -435,7 +435,7 @@ table.sortable tr td.total_with_failed {
 }
 
 .info {
-  background-image: url("images/infoprovided.gif");
+  background-image: url("../images/infoprovided.gif");
   background-repeat: no-repeat;
   width: auto; 
   height: auto; 

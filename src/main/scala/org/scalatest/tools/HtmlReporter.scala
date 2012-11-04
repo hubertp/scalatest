@@ -50,12 +50,20 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
 
   private val targetDir = new File(directoryPath)
   private val imagesDir = new File(targetDir, "images")
+  private val jsDir = new File(targetDir, "js")
+  private val cssDir = new File(targetDir, "css")
   
   if (!targetDir.exists)
     targetDir.mkdirs()
     
   if (!imagesDir.exists)
     imagesDir.mkdirs()
+    
+  if (!jsDir.exists)
+    jsDir.mkdirs()
+    
+  if (!cssDir.exists)
+    cssDir.mkdirs()
     
   private def copyResource(url: URL, toDir: File, targetFileName: String) {
     val inputStream = url.openStream
@@ -78,12 +86,12 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
     classOf[Suite].getClassLoader.getResource(resourceName)
   
   cssUrl match {
-    case Some(cssUrl) => copyResource(cssUrl, targetDir, "custom.css")
+    case Some(cssUrl) => copyResource(cssUrl, cssDir, "custom.css")
     case None => // Do nothing.
   }
-  copyResource(getResource("org/scalatest/HtmlReporter.css"), targetDir, "styles.css")
-  copyResource(getResource("org/scalatest/sorttable.js"), targetDir, "sorttable.js")
-  copyResource(getResource("org/scalatest/d3.v2.min.js"), targetDir, "d3.v2.min.js")
+  copyResource(getResource("org/scalatest/HtmlReporter.css"), cssDir, "styles.css")
+  copyResource(getResource("org/scalatest/sorttable.js"), jsDir, "sorttable.js")
+  copyResource(getResource("org/scalatest/d3.v2.min.js"), jsDir, "d3.v2.min.js")
   
   copyResource(getResource("images/greendot.gif"), imagesDir, "testsucceeded.gif")
   copyResource(getResource("images/reddot.gif"), imagesDir, "testfailed.gif")
@@ -211,11 +219,11 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
         <meta http-equiv="Expires" content="-1" />
         <meta http-equiv="Pragma" content="no-cache" />
-        <link href="styles.css" rel="stylesheet" />
+        <link href="css/styles.css" rel="stylesheet" />
         { 
           cssUrl match {
             case Some(cssUrl) => 
-              <link href="custom.css" rel="stylesheet" />
+              <link href="css/custom.css" rel="stylesheet" />
             case None => NodeSeq.Empty
           }
         }
@@ -501,16 +509,16 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
         <meta http-equiv="Expires" content="-1" />
         <meta http-equiv="Pragma" content="no-cache" />
-        <link href="styles.css" rel="stylesheet" />
+        <link href="css/styles.css" rel="stylesheet" />
         { 
           cssUrl match {
             case Some(cssUrl) => 
-              <link href="custom.css" rel="stylesheet" />
+              <link href="css/custom.css" rel="stylesheet" />
             case None => NodeSeq.Empty
           }
         }
-        <script type="text/javascript" src="d3.v2.min.js"></script>
-        <script type="text/javascript" src="sorttable.js"></script>
+        <script type="text/javascript" src="js/d3.v2.min.js"></script>
+        <script type="text/javascript" src="js/sorttable.js"></script>
         <script type="text/javascript">
           { PCDATA("""
             var tagMap = {};    
