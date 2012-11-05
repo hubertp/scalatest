@@ -98,7 +98,6 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
   copyResource(getResource("images/yellowdot.gif"), imagesDir, "testignored.gif")
   copyResource(getResource("images/yellowdot.gif"), imagesDir, "testcanceled.gif")
   copyResource(getResource("images/yellowdot.gif"), imagesDir, "testpending.gif")
-  copyResource(getResource("images/bluedot.gif"), imagesDir, "scope.gif")
   copyResource(getResource("images/bluedot.gif"), imagesDir, "infoprovided.gif")
   copyResource(getResource("images/bluedot.gif"), imagesDir, "markupprovided.gif")
   
@@ -243,45 +242,12 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
         </script>
       </head>
       <body>
-        <table id="suite_header">
-          <tr id="suite_header_id">
-            <td id={ appendCombinedStatus("suite_header_id_label", suiteResult) }>Suite ID</td>
-            <td id={ appendCombinedStatus("suite_header_id_value", suiteResult) } colspan="5">{ suiteResult.suiteId }</td>
-          </tr>
-          <tr id="suite_header_name">
-            <td id={ appendCombinedStatus("suite_header_name_label", suiteResult) }>Suite Name</td>
-            <td id={ appendCombinedStatus("suite_header_name_value", suiteResult) } colspan="2">{ suiteResult.suiteName }</td>
-            <td id={ appendCombinedStatus("suite_header_duration_label", suiteResult) }>Duration</td>
-            <td id={ appendCombinedStatus("suite_header_duration_value", suiteResult) } colspan="2">
-              { 
-                suiteResult.duration match {
-                  case Some(duration) => duration + " ms."
-                  case None => "-"
-                } 
-              }
-              </td>
-          </tr>
-          <tr id="suite_header_class">
-            <td id={ appendCombinedStatus("suite_header_class_label", suiteResult) }>Class Name</td>
-            <td id={ appendCombinedStatus("suite_header_class_value", suiteResult) } colspan="5">{ suiteResult.suiteClassName.getOrElse("-") }</td>
-          </tr>
-          <tr id="suite_header_statistic_1">
-            <td id={ appendCombinedStatus("suite_header_total_label", suiteResult) }>Total</td>
-            <td id={ appendCombinedStatus("suite_header_total_value", suiteResult) }>{ suiteResult.testsSucceededCount + suiteResult.testsFailedCount + suiteResult.testsCanceledCount + suiteResult.testsPendingCount + suiteResult.testsIgnoredCount }</td>
-            <td id={ appendCombinedStatus("suite_header_failed_label", suiteResult) }>Failed</td>
-            <td id={ appendCombinedStatus("suite_header_failed_value", suiteResult) }>{ suiteResult.testsFailedCount }</td>
-            <td id={ appendCombinedStatus("suite_header_canceled_label", suiteResult) }>Canceled</td>
-            <td id={ appendCombinedStatus("suite_header_canceled_value", suiteResult) }>{ suiteResult.testsCanceledCount }</td>
-          </tr>
-          <tr id="suite_header_statistic_2">
-            <td id={ appendCombinedStatus("suite_header_ignored_label", suiteResult) }>Ignored</td>
-            <td id={ appendCombinedStatus("suite_header_ignored_value", suiteResult) }>{ suiteResult.testsIgnoredCount }</td>
-            <td id={ appendCombinedStatus("suite_header_pending_label", suiteResult) }>Pending</td>
-            <td id={ appendCombinedStatus("suite_header_pending_value", suiteResult) }>{ suiteResult.testsPendingCount }</td>
-            <td id={ appendCombinedStatus("suite_header_succeeded_label", suiteResult) }>Succeeded</td>
-            <td id={ appendCombinedStatus("suite_header_succeeded_value", suiteResult) }>{ suiteResult.testsSucceededCount }</td>
-          </tr>
-        </table>
+        <div id="suite_header_name">{ suiteResult.suiteName }</div>
+        <div id="suite_header_statistic">
+          { (suiteResult.testsSucceededCount + suiteResult.testsFailedCount + suiteResult.testsCanceledCount + suiteResult.testsIgnoredCount + suiteResult.testsPendingCount) + " tests: " + 
+            suiteResult.testsSucceededCount + " succeeded, " + suiteResult.testsFailedCount + " failed, " + suiteResult.testsIgnoredCount + " ignored, " + suiteResult.testsCanceledCount + " canceled, " + 
+            suiteResult.testsPendingCount + " pending" }
+        </div>
         {
           val scopeStack = new collection.mutable.Stack[String]()
           suiteResult.eventList.map { e => 
@@ -329,7 +295,7 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
 
                 val stringToPrint =
                   formatter match {
-                    case Some(IndentedText(formattedText, _, _)) => Some(Resources("specTextAndNote", formattedText, Resources("ignoredNote")))
+                    case Some(IndentedText(_, rawText, _)) => Some(Resources("specTextAndNote", rawText, Resources("ignoredNote")))
                     case Some(MotionToSuppress) => None
                     case _ => Some(Resources("testIgnored", suiteName + ": " + testName))
                   }
@@ -346,7 +312,7 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
 
                 val stringToPrint =
                   formatter match {
-                    case Some(IndentedText(formattedText, _, _)) => Some(Resources("specTextAndNote", formattedText, Resources("pendingNote")))
+                    case Some(IndentedText(_, rawText, _)) => Some(Resources("specTextAndNote", rawText, Resources("pendingNote")))
                     case Some(MotionToSuppress) => None
                     case _ => Some(Resources("testPending", suiteName + ": " + testName))
                   }
@@ -381,6 +347,27 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
             }
           }
         }
+        <table id="suite_footer">
+          <tr id="suite_footer_id">
+            <td id="suite_footer_id_label">Suite ID</td>
+            <td id="suite_footer_id_value" colspan="5">{ suiteResult.suiteId }</td>
+          </tr>
+          <tr id="suite_footer_class">
+            <td id="suite_footer_class_label">Class Name</td>
+            <td id="suite_footer_class_value" colspan="5">{ suiteResult.suiteClassName.getOrElse("-") }</td>
+          </tr>
+          <tr id="suite_footer_duration">
+            <td id="suite_footer_duration_label">Total Duration</td>
+            <td id="suite_footer_duration_value" colspan="2">
+              { 
+                suiteResult.duration match {
+                  case Some(duration) => duration + " milliseconds"
+                  case None => "-"
+                } 
+              }
+              </td>
+          </tr>
+        </table>
       </body>
     </html>
         
