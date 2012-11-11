@@ -227,7 +227,7 @@
     	</java>
     </target>
 
-    <target name="compile" depends="compile-main, compile-tests, compile-examples"/>
+    <target name="compile" depends="compile-main, compile-tests"/>
 
     <!--<target name="compile-main" depends="init">-->
     <target name="compile-main" depends="init, gentables, genmatchers, gengen">
@@ -418,7 +418,7 @@
             <membersonly package="org.scalatest.suiteprop" />
             <membersonly package="org.scalatest.mock" />
         	<membersonly package="org.scalatest.path" />
-        	<membersonly package="org.scalatest.selenium" />
+        	<!--<membersonly package="org.scalatest.selenium" />-->
             <config name="dbname" value="testdb" />
         </scalatest>
     </target>

@@ -12,11 +12,11 @@ body {
 }
     
 .scalatest-header-passed {
-  background-color: #65c400; 
+  background-color: #478747; 
 }
 
 .scalatest-header-failed {
-  background-color: #c20000; 
+  background-color: #874747; 
 }
             
 #title {
@@ -182,7 +182,7 @@ table.sortable thead {
 table.sortable tr td.suite_name_passed_all {
   padding-left: 15px;
   padding-right: 15px;
-  background-color: #65c400;
+  background-color: #478747;
   color: #fff;
   font-weight: bold;
   font-size: 11px;
@@ -191,7 +191,7 @@ table.sortable tr td.suite_name_passed_all {
 table.sortable tr td.suite_name_passed {
   padding-left: 15px;
   padding-right: 15px;
-  background-color: #65c400;
+  background-color: #478747;
   color: #fff;
   font-weight: bold;
   font-size: 11px;
@@ -210,7 +210,7 @@ table.sortable tr td.duration_passed_all {
   text-align: right;
   padding-left: 5px;
   padding-right: 5px;
-  background-color: #65c400;
+  background-color: #478747;
   color: #fff;
   font-weight: bold;
   font-size: 11px;
@@ -220,7 +220,7 @@ table.sortable tr td.duration_passed {
   text-align: right;
   padding-left: 5px;
   padding-right: 5px;
-  background-color: #65c400;
+  background-color: #478747;
   color: #fff;
   font-weight: bold;
   font-size: 11px;
@@ -315,7 +315,7 @@ table.sortable tr td.total_passed {
   text-align: right;
   padding-left: 5px;
   padding-right: 5px;
-  background-color: #65c400;
+  background-color: #478747;
   color: #fff;
   font-weight: bold;
   font-size: 11px;
@@ -325,7 +325,7 @@ table.sortable tr td.total_passed_all {
   text-align: right;
   padding-left: 5px;
   padding-right: 5px;
-  background-color: #65c400;
+  background-color: #478747;
   color: #fff;
   font-weight: bold;
   font-size: 11px;
