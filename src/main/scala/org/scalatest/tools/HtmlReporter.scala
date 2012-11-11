@@ -244,9 +244,9 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
       <body>
         <div id="suite_header_name">{ suiteResult.suiteName }</div>
         <div id="suite_header_statistic">
-          { (suiteResult.testsSucceededCount + suiteResult.testsFailedCount + suiteResult.testsCanceledCount + suiteResult.testsIgnoredCount + suiteResult.testsPendingCount) + " tests: " + 
-            suiteResult.testsSucceededCount + " succeeded, " + suiteResult.testsFailedCount + " failed, " + suiteResult.testsIgnoredCount + " ignored, " + suiteResult.testsCanceledCount + " canceled, " + 
-            suiteResult.testsPendingCount + " pending" }
+          { "Tests: total " + (suiteResult.testsSucceededCount + suiteResult.testsFailedCount + suiteResult.testsCanceledCount + suiteResult.testsIgnoredCount + suiteResult.testsPendingCount) + ", succeeded " + 
+            suiteResult.testsSucceededCount + ", failed " + suiteResult.testsFailedCount + ", canceled " + suiteResult.testsCanceledCount + ", ignored " + suiteResult.testsIgnoredCount + ", pending " + 
+            suiteResult.testsPendingCount }
         </div>
         {
           val scopeStack = new collection.mutable.Stack[String]()
@@ -558,6 +558,11 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
                     <td id="summary_view_row_1_legend_failed_count">{ testsFailedCount }</td>
                     <td id="summary_view_row_1_legend_failed_percent">({ decimalFormat.format(testsFailedCount * 100.0 / totalTestsCount) }%)</td>
                   </tr>
+                  <tr id="summary_view_row_1_legend_table_row_canceled">
+                    <td id="summary_view_row_1_legend_canceled_label">Canceled</td>
+                    <td id="summary_view_row_1_legend_canceled_count">{ testsCanceledCount }</td>
+                    <td id="summary_view_row_1_legend_canceled_percent">({ decimalFormat.format(testsCanceledCount * 100.0 / totalTestsCount) }%)</td>
+                  </tr>
                   <tr id="summary_view_row_1_legend_table_row_ignored">
                     <td id="summary_view_row_1_legend_ignored_label">Ignored</td>
                     <td id="summary_view_row_1_legend_ignored_count">{ testsIgnoredCount }</td>
@@ -567,11 +572,6 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
                     <td id="summary_view_row_1_legend_pending_label">Pending</td>
                     <td id="summary_view_row_1_legend_pending_count">{ testsPendingCount }</td>
                     <td id="summary_view_row_1_legend_pending_percent">({ decimalFormat.format(testsPendingCount * 100.0 / totalTestsCount) }%)</td>
-                  </tr>
-                  <tr id="summary_view_row_1_legend_table_row_canceled">
-                    <td id="summary_view_row_1_legend_canceled_label">Canceled</td>
-                    <td id="summary_view_row_1_legend_canceled_count">{ testsCanceledCount }</td>
-                    <td id="summary_view_row_1_legend_canceled_percent">({ decimalFormat.format(testsCanceledCount * 100.0 / totalTestsCount) }%)</td>
                   </tr>
                 </table>
               </td>
@@ -600,13 +600,14 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
     </html>
   }      
           
+  // TODO: This needs to be internationalized
   private def getStatistic(summary: Summary) = 
     <div id="display-filters">
-      <input id="failed_checkbox" name="failed_checkbox" type="checkbox" checked="checked" onchange="applyFilter()" /> <label id="failed_checkbox_label" for="failed_checkbox">Failed: { summary.testsFailedCount }</label>
-      <input id="canceled_checkbox" name="canceled_checkbox" type="checkbox" checked="checked" onchange="applyFilter()" /> <label id="canceled_checkbox_label" for="canceled_checkbox">Canceled: { summary.testsCanceledCount }</label>
-      <input id="ignored_checkbox" name="ignored_checkbox" type="checkbox" checked="checked" onchange="applyFilter()" /> <label id="ignored_checkbox_label" for="ignored_checkbox">Ignored: { summary.testsIgnoredCount }</label>
-      <input id="pending_checkbox" name="pending_checkbox" type="checkbox" checked="checked" onchange="applyFilter()" /> <label id="pending_checkbox_label" for="pending_checkbox">Pending: { summary.testsPendingCount }</label>
-      <input id="succeeded_checkbox" name="succeeded_checkbox" type="checkbox" checked="checked" onchange="applyFilter()" /> <label id="succeeded_checkbox_label" for="passed_checkbox">Succeeded: { summary.testsSucceededCount }</label>
+      <input id="succeeded_checkbox" name="succeeded_checkbox" type="checkbox" checked="checked" onchange="applyFilter()" /> <label id="succeeded_checkbox_label" for="passed_checkbox">Succeeded</label>
+      <input id="failed_checkbox" name="failed_checkbox" type="checkbox" checked="checked" onchange="applyFilter()" /> <label id="failed_checkbox_label" for="failed_checkbox">Failed</label>
+      <input id="canceled_checkbox" name="canceled_checkbox" type="checkbox" checked="checked" onchange="applyFilter()" /> <label id="canceled_checkbox_label" for="canceled_checkbox">Canceled</label>
+      <input id="ignored_checkbox" name="ignored_checkbox" type="checkbox" checked="checked" onchange="applyFilter()" /> <label id="ignored_checkbox_label" for="ignored_checkbox">Ignored</label>
+      <input id="pending_checkbox" name="pending_checkbox" type="checkbox" checked="checked" onchange="applyFilter()" /> <label id="pending_checkbox_label" for="pending_checkbox">Pending</label>
     </div>
   
   private def header(resourceName: String, duration: Option[Long], summary: Summary) = 
@@ -619,6 +620,7 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
         <p id="duration">{ getDuration(resourceName, duration) }</p>    
         <p id="totalTests">{ getTotalTests(summary) }</p>
         <p id="suiteSummary">{ getSuiteSummary(summary) }</p>
+        <p id="testSummary">{ getTestSummary(summary) }</p>
       </div>
     </div>
         
@@ -638,11 +640,11 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
       <tr>
         <td>Suite</td>
         <td>Duration (ms.)</td>
+        <td>Succeeded</td>
         <td>Failed</td>
         <td>Canceled</td>
         <td>Ignored</td>
         <td>Pending</td>
-        <td>Succeeded</td>
         <td>Total</td>
       </tr>
     {
@@ -696,23 +698,34 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
     <tr id={ elementId }>
       <td class={ appendCombinedStatus("suite_name", suiteResult) }><a href={ "javascript: showDetails('" + suiteFileName + "')" }>{ suiteName }</a></td>
       <td class={ appendCombinedStatus("duration", suiteResult) }>{ durationDisplay(duration) }</td>
+      <td class={ countStyle("succeeded", testsSucceededCount) }>{ testsSucceededCount }</td>
       <td class={ countStyle("failed", testsFailedCount) }>{ testsFailedCount }</td>
       <td class={ countStyle("canceled", testsCanceledCount) }>{ testsCanceledCount }</td>
       <td class={ countStyle("ignored", testsIgnoredCount) }>{ testsIgnoredCount }</td>
       <td class={ countStyle("pending", testsPendingCount) }>{ testsPendingCount }</td>
-      <td class={ countStyle("succeeded", testsSucceededCount) }>{ testsSucceededCount }</td>
       <td class={ appendCombinedStatus("total", suiteResult) }>{ testsSucceededCount + testsFailedCount + testsIgnoredCount + testsPendingCount + testsCanceledCount }</td>
     </tr>
   }
         
+  private def twoLess(indentLevel: Int): Int =
+    indentLevel - 2 match {
+      case lev if lev < 0 => 0
+      case lev => lev
+    }
+
+  private def oneLess(indentLevel: Int): Int =
+    indentLevel - 1 match {
+      case lev if lev < 0 => 0
+      case lev => lev
+    }
+
   private def scope(elementId: String, message: String, indentLevel: Int) = 
-    <div id={ elementId } class="scope" style={ "margin-left: " + (20 * indentLevel) + "px;" }>
+    <div id={ elementId } class="scope" style={ "margin-left: " + (20 * oneLess(indentLevel)) + "px;" }>
       { message }
     </div>
       
   private def test(elementId: String, lines: List[String], indentLevel: Int, styleName: String) = 
-    <div id={ elementId } class={ styleName } style={ "margin-left: " + (20 * indentLevel) + "px;" }>
-      <span class="test_succeeded_icon" />
+    <div id={ elementId } class={ styleName } style={ "margin-left: " + (20 * twoLess(indentLevel)) + "px;" }>
       <dl>
         {
           lines.map { line => 
@@ -779,7 +792,7 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
     
     val linkId = UUID.randomUUID.toString
     val contentId = UUID.randomUUID.toString
-    <div id={ elementId } class={ styleName } style={ "margin-left: " + (20 * indentLevel) + "px;" }>
+    <div id={ elementId } class={ styleName } style={ "margin-left: " + (20 * oneLess(indentLevel)) + "px;" }>
       <dl>
         {
           lines.map { line => 
@@ -840,7 +853,7 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
   }
         
   private def markup(elementId: String, text: String, indentLevel: Int, styleName: String) = 
-    <div id={ elementId } class={ styleName } style={ "margin-left: " + (20 * indentLevel) + "px;" }>
+    <div id={ elementId } class={ styleName } style={ "margin-left: " + (20 * oneLess(indentLevel)) + "px;" }>
        { XML.loadString(pegDown.markdownToHtml(text)) }
     </div>
        
@@ -981,8 +994,14 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
   private def getTotalTests(summary: Summary) = 
     Resources("totalNumberOfTestsRun", summary.testsCompletedCount.toString)    
     
+  // Suites: completed {0}, aborted {1}
   private def getSuiteSummary(summary: Summary) = 
     Resources("suiteSummary", summary.suitesCompletedCount.toString, summary.suitesAbortedCount.toString)
+
+  // Tests: succeeded {0}, failed {1}, canceled {4}, ignored {2}, pending {3}
+  private def getTestSummary(summary: Summary) = 
+    Resources("testSummary", summary.testsSucceededCount.toString, summary.testsFailedCount.toString, summary.testsCanceledCount.toString, summary.testsIgnoredCount.toString,
+      summary.testsPendingCount.toString)
 
   // We subtract one from test reports because we add "- " in front, so if one is actually zero, it will come here as -1
   // private def indent(s: String, times: Int) = if (times <= 0) s else ("  " * times) + s
