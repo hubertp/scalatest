@@ -1,26 +1,40 @@
 body {
   margin: 0;
   padding: 0;
-  background-color: #fff;
+  background-color: #FFF;
   font-size: 80%;
   font-family: "Lucida Grande", Helvetica, sans-serif;
 }
 
+a:link {
+  color:#039;
+  text-decoration:none;
+}
+
+a:hover {
+  text-decoration:underline;
+}
+
 #scalatest-header {
-  color: #fff; 
-  height: 5.3em;
+  color: #FFF; 
+  height: 6.3em;
+  background-color: #4169E1;
 }
     
 .scalatest-header-passed {
+  color: #FFF; 
+  height: 6.3em;
   background-color: #478747; 
 }
 
 .scalatest-header-failed {
+  color: #FFF; 
+  height: 6.3em;
   background-color: #874747; 
 }
             
 #title {
-  font-size: 3.0em;
+  font-size: 3.5em;
   float: left;
   padding-top: 10px;
   padding-left: 10px;
@@ -28,13 +42,14 @@ body {
 
 #display-filters {            
   padding: 0px 0 0 0px;
+  text-align: center;
 }
 
 #summary {
   float:right;
-  padding-top: 10px;
+  padding-top: 7px;
   padding-right: 10px;
-  padding-bottom: 10px;
+  padding-bottom: 5px;
   text-align: right;
 }
 
@@ -49,13 +64,15 @@ body {
 
 #summary_view {
   float: left;
+  background-color: #FFF;
 }
 
 #details_view {
-  padding-right: 15px;
+  background-color: #FFF;
   position: fixed;
   float: right;
   height: 500px;
+  padding: 10px;
 }
 
 #summary_view_row_1_chart {
@@ -67,114 +84,117 @@ body {
 }
 
 #succeeded_checkbox_label {
-  color: #339933;
+  color: #666666;
 }
 
 #failed_checkbox_label {
-  color: #993333;
+  color: #666666;
 }
 
 #ignored_checkbox_label {
-  color: #FF6600;
+  color: #666666;
 }
 
 #pending_checkbox_label {
-  color: #33CCCC;
+  color: #666666;
 }
 
 #canceled_checkbox_label {
-  color: #FFCC00;
+  color: #666666;
 }
 
 #summary_view_row_1_legend_succeeded_label {
-  background-color: #339933;
-  color: #fff;
+  background-color: #478747;
+  color: #FFF;
 }
 
 #summary_view_row_1_legend_succeeded_count {
   padding-left: 5px;
   text-align: right;
-  color: #339933;
+  color: #478747;
 }
 
 #summary_view_row_1_legend_succeeded_percent {
   padding-left: 5px;
   text-align: right;
-  color: #339933;
+  color: #478747;
 }
 
 #summary_view_row_1_legend_failed_label {
-  background-color: #993333;
-  color: #fff;
+  background-color: #874747;
+  color: #FFF;
 }
 
 #summary_view_row_1_legend_failed_count {
   padding-left: 5px;
   text-align: right;
-  color: #993333;
+  color: #874747;
 }
 
 #summary_view_row_1_legend_failed_percent {
   padding-left: 5px;
   text-align: right;
-  color: #993333;
+  color: #874747;
 }
 
 #summary_view_row_1_legend_ignored_label {
-  background-color: #FF6600;
-  color: #fff;
+  background-color: #474787;
+  color: #FFF;
 }
 
 #summary_view_row_1_legend_ignored_count {
   padding-left: 5px;
   text-align: right;
-  color: #FF6600;
+  color: #474787;
 }
 
 #summary_view_row_1_legend_ignored_percent {
   padding-left: 5px;
   text-align: right;
-  color: #FF6600;
+  color: #474787;
 }
 
 #summary_view_row_1_legend_pending_label {
-  background-color: #33CCCC;
-  color: #fff;
+  background-color: #478787;
+  color: #FFF;
 }
 
 #summary_view_row_1_legend_pending_count {
   padding-left: 5px;
   text-align: right;
-  color: #33CCCC;
+  color: #478787;
 }
 
 #summary_view_row_1_legend_pending_percent {
   padding-left: 5px;
   text-align: right;
-  color: #33CCCC;
+  color: #478787;
 }
 
 #summary_view_row_1_legend_canceled_label {
-  background-color: #FFCC00;
-  color: #fff;
+  background-color: #878747;
+  color: #FFF;
 }
 
 #summary_view_row_1_legend_canceled_count {
   padding-left: 5px;
   text-align: right;
-  color: #FFCC00;
+  color: #878747;
 }
 
 #summary_view_row_1_legend_canceled_percent {
   padding-left: 5px;
   text-align: right;
-  color: #FFCC00;
+  color: #878747;
 }
 
 /* Sortable tables */
+table.sortable {
+  background-color: #CCCCCC;
+}
+
 table.sortable thead {
-  background-color: #eee;
-  color: #666666;
+  color: #000;
   font-weight: bold;
   cursor: default;
 }
@@ -182,17 +202,18 @@ table.sortable thead {
 table.sortable tr td.suite_name_passed_all {
   padding-left: 15px;
   padding-right: 15px;
-  background-color: #478747;
-  color: #fff;
+  background-color: #E8E8E8;
+  color: #FFF;
   font-weight: bold;
   font-size: 11px;
+  border-color: #FF0000;
 }
 
 table.sortable tr td.suite_name_passed {
   padding-left: 15px;
   padding-right: 15px;
-  background-color: #478747;
-  color: #fff;
+  background-color: #E8E8E8;
+  color: #FFF;
   font-weight: bold;
   font-size: 11px;
 }
@@ -200,18 +221,27 @@ table.sortable tr td.suite_name_passed {
 table.sortable tr td.suite_name_with_failed {
   padding-left: 15px;
   padding-right: 15px;
-  background-color: #C20000;
-  color: #fff;
+  background-color: #E8E8E8;
+  color: #000;
   font-weight: bold;
   font-size: 11px;
+}
+
+table.sortable td.suite_name_with_failed a:link {
+    color:#874747;
+    text-decoration:none;
+}
+
+table.sortable td.suite_name_with_failed a:hover {
+  text-decoration:underline;
 }
 
 table.sortable tr td.duration_passed_all {
   text-align: right;
   padding-left: 5px;
   padding-right: 5px;
-  background-color: #478747;
-  color: #fff;
+  background-color: #E8E8E8;
+  color: #000;
   font-weight: bold;
   font-size: 11px;
 }
@@ -220,8 +250,8 @@ table.sortable tr td.duration_passed {
   text-align: right;
   padding-left: 5px;
   padding-right: 5px;
-  background-color: #478747;
-  color: #fff;
+  background-color: #E8E8E8;
+  color: #000;
   font-weight: bold;
   font-size: 11px;
 }
@@ -230,8 +260,8 @@ table.sortable tr td.duration_with_failed {
   text-align: right;
   padding-left: 5px;
   padding-right: 5px;
-  background-color: #C20000;
-  color: #fff;
+  background-color: #E8E8E8;
+  color: #000;
   font-weight: bold;
   font-size: 11px;
 }
@@ -240,83 +270,88 @@ table.sortable tr td.succeeded_zero {
   text-align: right;
   padding-left: 5px;
   padding-right: 5px;
-  color: #339933;
+  background-color: #E8E8E8;
+  color: #000;
 }
 
 table.sortable tr td.succeeded {
   text-align: right;
   padding-left: 5px;
   padding-right: 5px;
-  background-color: #339933;
-  color: #fff;
+  background-color: #478747;
+  color: #FFF;
 }
 
 table.sortable tr td.failed_zero {
   text-align: right;
   padding-left: 5px;
   padding-right: 5px;
-  color: #993333;
+  background-color: #E8E8E8;
+  color: #000;
 }
 
 table.sortable tr td.failed {
   text-align: right;
   padding-left: 5px;
   padding-right: 5px;
-  background-color: #993333;
-  color: #fff;
+  background-color: #874747;
+  color: #FFF;
 }
 
 table.sortable tr td.ignored_zero {
   text-align: right;
   padding-left: 5px;
   padding-right: 5px;
-  color: #FF6600;
+  background-color: #E8E8E8;
+  color: #000;
 }
 
 table.sortable tr td.ignored {
   text-align: right;
   padding-left: 5px;
   padding-right: 5px;
-  background-color: #FF6600;
-  color: #fff;
+  background-color: #474787;
+  color: #FFF;
 }
 
 table.sortable tr td.pending_zero {
   text-align: right;
   padding-left: 5px;
   padding-right: 5px;
-  color: #33CCCC;
+  background-color: #E8E8E8;
+  color: #000;
 }
 
 table.sortable tr td.pending {
   text-align: right;
   padding-left: 5px;
   padding-right: 5px;
-  background-color: #33CCCC;
-  color: #fff;
+  background-color: #478787;
+  color: #FFF;
 }
 
 table.sortable tr td.canceled_zero {
   text-align: right;
   padding-left: 5px;
   padding-right: 5px;
-  color: #FFCC00;
+  background-color: #E8E8E8;
+  color: #000;
 }
 
 table.sortable tr td.canceled {
   text-align: right;
   padding-left: 5px;
   padding-right: 5px;
-  background-color: #FFCC00;
-  color: #fff;
+  background-color: #878747;
+  color: #FFF;
 }
 
 table.sortable tr td.total_passed {
   text-align: right;
   padding-left: 5px;
   padding-right: 5px;
-  background-color: #478747;
-  color: #fff;
+  background-color: #E8E8E8;
+  color: #000;
   font-weight: bold;
   font-size: 11px;
 }
@@ -325,8 +360,8 @@ table.sortable tr td.total_passed_all {
   text-align: right;
   padding-left: 5px;
   padding-right: 5px;
-  background-color: #478747;
-  color: #fff;
+  background-color: #E8E8E8;
+  color: #000;
   font-weight: bold;
   font-size: 11px;
 }
@@ -335,13 +370,20 @@ table.sortable tr td.total_with_failed {
   text-align: right;
   padding-left: 5px;
   padding-right: 5px;
-  background-color: #C20000;
-  color: #fff;
+  background-color: #E8E8E8;
+  color: #000;
   font-weight: bold;
   font-size: 11px;
 }
             
+.specification {
+  background-color: #FFF;
+  margin: 0;
+  padding: 0;
+}
+
 .scope {
+  background-color: #FFF;
   width: auto; 
   height: auto; 
   margin: 0;
@@ -349,11 +391,11 @@ table.sortable tr td.total_with_failed {
   padding-bottom: 0px;
   padding-left: 0px;
   padding-right: 0px;
-  font-weight: bold;
-  font-size: 11px;
+  font-size: 1.25em;
 }
 
 .test_passed {
+  background-color: #FFF;
   background-image: url("../images/testsucceeded.gif");
   background-repeat: no-repeat;
   width: auto; 
@@ -366,6 +408,7 @@ table.sortable tr td.total_with_failed {
 }
 
 .test_failed {
+  background-color: #FFF;
   background-image: url("../images/testfailed.gif");
   background-repeat: no-repeat;
   width: auto; 
@@ -375,10 +418,11 @@ table.sortable tr td.total_with_failed {
   padding-bottom: 0px;
   padding-left: 18px;
   padding-right: 0px;
-  color: #993333;
+  color: #874747;
 }
 
 .test_ignored {
+  background-color: #FFF;
   background-image: url("../images/testignored.gif");
   background-repeat: no-repeat;
   width: auto; 
@@ -388,10 +432,11 @@ table.sortable tr td.total_with_failed {
   padding-bottom: 0px;
   padding-left: 18px;
   padding-right: 0px;
-  color: #FFCC00;
+  color: #878747;
 }
 
 .test_pending {
+  background-color: #FFF;
   background-image: url("../images/testpending.gif");
   background-repeat: no-repeat;
   width: auto; 
@@ -401,10 +446,11 @@ table.sortable tr td.total_with_failed {
   padding-bottom: 0px;
   padding-left: 18px;
   padding-right: 0px;
-  color: #FFCC00;
+  color: #878747;
 }
 
 .test_canceled {
+  background-color: #FFF;
   background-image: url("../images/testcanceled.gif");
   background-repeat: no-repeat;
   width: auto; 
@@ -414,10 +460,11 @@ table.sortable tr td.total_with_failed {
   padding-bottom: 0px;
   padding-left: 18px;
   padding-right: 0px;
-  color: #FFCC00;
+  color: #878747;
 }
 
 .markup {
+  background-color: #FFF;
   background-image: url("../images/markupprovided.gif");
   background-repeat: no-repeat;
   width: auto; 
@@ -431,6 +478,7 @@ table.sortable tr td.total_with_failed {
 }
 
 .info {
+  background-color: #FFF;
   background-image: url("../images/infoprovided.gif");
   background-repeat: no-repeat;
   width: auto; 
@@ -458,29 +506,36 @@ table.sortable tr td.total_with_failed {
 
 iframe {
   border: none;
+  background-color: #FFF;
 }
 
 #suite_header_name {
   font-weight: bold;
-  font-size: 2em;
+  font-size: 2.5em;
+  background-color: #FFF;
   padding-top: 10px;
-  padding-bottom: 10px;
+  padding-bottom: 3px;
 }
 
 #suite_header_statistic {
-  background-color: grey;
-  padding-left: 10px;
+  background-color: #478747;
+  color: #FFF;
+  padding-top: 3px;
+  padding-bottom: 3px;
+  padding-left: 5px;
   margin-bottom: 10px;
 }
 
 #suite_footer {
-  margin-top: 10px;
+  margin-top: 20px;
+  border: solid;
+  border-color: #CCCCCC;
 }
 
 #suite_footer_id_label {
   padding-left: 5px;
   padding-right: 5px;
-  background-color: grey;
+  background-color: #CCCCCC;
   font-weight: bold;
 }
 
@@ -492,7 +547,7 @@ iframe {
 #suite_footer_class_label {
   padding-left: 5px;
   padding-right: 5px;
-  background-color: grey;
+  background-color: #CCCCCC;
   font-weight: bold;
 }
 
@@ -504,7 +559,7 @@ iframe {
 #suite_footer_duration_label {
   padding-left: 5px;
   padding-right: 5px;
-  background-color: grey;
+  background-color: #CCCCCC;
   font-weight: bold;
 }
 
