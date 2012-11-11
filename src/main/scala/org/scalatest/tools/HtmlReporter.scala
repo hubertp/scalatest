@@ -234,11 +234,11 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
             "  var text = document.getElementById(linkId);" + "\n" + 
             "  if(ele.style.display == \"block\") {" + "\n" + 
             "    ele.style.display = \"none\";" + "\n" + 
-            "    text.innerHTML = \"Show Details\";" + "\n" + 
+            "    text.innerHTML = \"(Show Details)\";" + "\n" + 
             "  }" + "\n" + 
             "  else {" + "\n" + 
             "    ele.style.display = \"block\";" + "\n" + 
-            "    text.innerHTML = \"Hide Details\";" + "\n" + 
+            "    text.innerHTML = \"(Hide Details)\";" + "\n" + 
             "  }" + "\n" + 
             "}" + "\n")
           }
@@ -740,7 +740,7 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
   
   private def testWithDetails(elementId: String, lines: List[String], message: String, throwable: Option[Throwable], indentLevel: Int, styleName: String) = {
     def getHTMLForStackTrace(stackTraceList: List[StackTraceElement]) =
-              stackTraceList.map((ste: StackTraceElement) => <span>{ ste.toString }</span><br />)
+              stackTraceList.map((ste: StackTraceElement) => <div>{ ste.toString }</div>)
     
     def getHTMLForCause(throwable: Throwable): scala.xml.NodeBuffer = {
       val cause = throwable.getCause
@@ -803,13 +803,15 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
           }
         }
       </dl>
-      <a id={ linkId } href={ "javascript:toggleDetails('" + contentId + "', '" + linkId + "');" }>Show Details</a>
+      <div class="detailstoggle">
+      <a id={ linkId } href={ "javascript:toggleDetails('" + contentId + "', '" + linkId + "');" }>(Show Details)</a>
+      </div>
       <div id={ contentId } style="display: none">
         <table>
           {
             //if (mainMessage.isDefined) {
               <tr valign="top"><td align="left"><span class="label">{ Resources("DetailsMessage") + ":" }</span></td><td align="left">
-                <span class="dark">
+                <span>
                 { 
                   // Put <br>'s in for line returns at least, so property check failure messages look better
                   val messageLines = message.split("\n")
@@ -826,7 +828,7 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
           {
             fileAndLineOption match {
               case Some(fileAndLine) =>
-                <tr valign="top"><td align="left"><span class="label">{ Resources("LineNumber") + ":" }</span></td><td align="left"><span class="dark">{ "(" + fileAndLine + ")" }</span></td></tr>
+                <tr valign="top"><td align="left"><span class="label">{ Resources("LineNumber") + ":" }</span></td><td align="left"><span>{ "(" + fileAndLine + ")" }</span></td></tr>
               case None =>
             }
           }
@@ -840,8 +842,8 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
         </table>
         <table>
           <tr valign="top"><td align="left" colspan="2">
-            { grayStackTraceElements.map((ste: StackTraceElement) => <span class="gray">{ ste.toString }</span><br />) }
-            { blackStackTraceElements.map((ste: StackTraceElement) => <span class="dark">{ ste.toString }</span><br />) }
+            { grayStackTraceElements.map((ste: StackTraceElement) => <div class="gray">{ ste.toString }</div>) }
+            { blackStackTraceElements.map((ste: StackTraceElement) => <div>{ ste.toString }</div>) }
             </td>
           </tr>
         </table>

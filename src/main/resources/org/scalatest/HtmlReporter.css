@@ -524,13 +524,24 @@ dl {
 }
             
 .gray { 
-  color: grey; 
+  color: #CCCCCC; 
 }
           
+.detailstoggle {
+  font-size: 0.9em;
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+
 .dark { 
   font-weight: bold; 
 }
-            
+
+.stackelement {
+  margin: 0;
+  padding: 0;
+}
+
 .label { 
   color: #444444; 
   font-weight: bold; 
