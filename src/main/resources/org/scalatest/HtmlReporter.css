@@ -171,20 +171,20 @@ a:hover {
 }
 
 #summary_view_row_1_legend_canceled_label {
-  background-color: #878747;
+  background-color: #874787;
   color: #FFF;
 }
 
 #summary_view_row_1_legend_canceled_count {
   padding-left: 5px;
   text-align: right;
-  color: #878747;
+  color: #874787;
 }
 
 #summary_view_row_1_legend_canceled_percent {
   padding-left: 5px;
   text-align: right;
-  color: #878747;
+  color: #874787;
 }
 
 /* Sortable tables */
@@ -271,6 +271,7 @@ table.sortable tr td.succeeded_zero {
   padding-right: 5px;
   background-color: #E8E8E8;
   color: #000;
+  font-size: 11px;
 }
 
 table.sortable tr td.succeeded {
@@ -279,6 +280,7 @@ table.sortable tr td.succeeded {
   padding-right: 5px;
   background-color: #478747;
   color: #FFF;
+  font-size: 11px;
 }
 
 table.sortable tr td.failed_zero {
@@ -287,6 +289,7 @@ table.sortable tr td.failed_zero {
   padding-right: 5px;
   background-color: #E8E8E8;
   color: #000;
+  font-size: 11px;
 }
 
 table.sortable tr td.failed {
@@ -295,6 +298,7 @@ table.sortable tr td.failed {
   padding-right: 5px;
   background-color: #874747;
   color: #FFF;
+  font-size: 11px;
 }
 
 table.sortable tr td.ignored_zero {
@@ -303,6 +307,7 @@ table.sortable tr td.ignored_zero {
   padding-right: 5px;
   background-color: #E8E8E8;
   color: #000;
+  font-size: 11px;
 }
 
 table.sortable tr td.ignored {
@@ -311,6 +316,7 @@ table.sortable tr td.ignored {
   padding-right: 5px;
   background-color: #474787;
   color: #FFF;
+  font-size: 11px;
 }
 
 table.sortable tr td.pending_zero {
@@ -319,6 +325,7 @@ table.sortable tr td.pending_zero {
   padding-right: 5px;
   background-color: #E8E8E8;
   color: #000;
+  font-size: 11px;
 }
 
 table.sortable tr td.pending {
@@ -327,6 +334,7 @@ table.sortable tr td.pending {
   padding-right: 5px;
   background-color: #478787;
   color: #FFF;
+  font-size: 11px;
 }
 
 table.sortable tr td.canceled_zero {
@@ -335,14 +343,16 @@ table.sortable tr td.canceled_zero {
   padding-right: 5px;
   background-color: #E8E8E8;
   color: #000;
+  font-size: 11px;
 }
 
 table.sortable tr td.canceled {
   text-align: right;
   padding-left: 5px;
   padding-right: 5px;
-  background-color: #878747;
+  background-color: #874787;
   color: #FFF;
+  font-size: 11px;
 }
 
 table.sortable tr td.total_passed {
@@ -378,7 +388,10 @@ table.sortable tr td.total_with_failed {
 .specification {
   background-color: #FFF;
   margin: 0;
-  padding: 0;
+  padding: 15px;
+  border: solid;
+  border-width: 2px;
+  border-color: #CCCCCC;
 }
 
 .scope {
@@ -403,12 +416,13 @@ dl {
   background-color: #FFF;
   background-image: url("../images/testsucceeded.gif");
   background-repeat: no-repeat;
+  background-position:0% 32%;
   width: auto; 
   height: auto; 
   margin: 0;
   padding-top: 0px;
   padding-bottom: 0px;
-  padding-left: 18px;
+  padding-left: 12px;
   padding-right: 0px;
   font-size: 1.1em;
   color: #111111;
@@ -418,12 +432,13 @@ dl {
   background-color: #FFF;
   background-image: url("../images/testfailed.gif");
   background-repeat: no-repeat;
+  background-position:0% 32%;
   width: auto; 
   height: auto; 
   margin: 0;
   padding-top: 0px;
   padding-bottom: 0px;
-  padding-left: 18px;
+  padding-left: 12px;
   padding-right: 0px;
   color: #874747;
   font-size: 1.1em;
@@ -433,12 +448,13 @@ dl {
   background-color: #FFF;
   background-image: url("../images/testignored.gif");
   background-repeat: no-repeat;
+  background-position:0% 32%;
   width: auto; 
   height: auto; 
   margin: 0;
   padding-top: 0px;
   padding-bottom: 0px;
-  padding-left: 18px;
+  padding-left: 12px;
   padding-right: 0px;
   color: #878747;
   font-size: 1.1em;
@@ -448,12 +464,13 @@ dl {
   background-color: #FFF;
   background-image: url("../images/testpending.gif");
   background-repeat: no-repeat;
+  background-position:0% 32%;
   width: auto; 
   height: auto; 
   margin: 0;
   padding-top: 0px;
   padding-bottom: 0px;
-  padding-left: 18px;
+  padding-left: 12px;
   padding-right: 0px;
   color: #878747;
   font-size: 1.1em;
@@ -463,12 +480,13 @@ dl {
   background-color: #FFF;
   background-image: url("../images/testcanceled.gif");
   background-repeat: no-repeat;
+  background-position:0% 32%;
   width: auto; 
   height: auto; 
   margin: 0;
   padding-top: 0px;
   padding-bottom: 0px;
-  padding-left: 18px;
+  padding-left: 12px;
   padding-right: 0px;
   color: #878747;
   font-size: 1.1em;
@@ -483,7 +501,7 @@ dl {
   margin: 0;
   padding-top: 0px;
   padding-bottom: 0px;
-  padding-left: 18px;
+  padding-left: 12px;
   padding-right: 0px;
   color: #3D7700;
   font-size: 1.1em;
@@ -493,12 +511,13 @@ dl {
   background-color: #FFF;
   background-image: url("../images/infoprovided.gif");
   background-repeat: no-repeat;
+  background-position:0% 32%;
   width: auto; 
   height: auto; 
   margin: 0;
   padding-top: 0px;
   padding-bottom: 0px;
-  padding-left: 18px;
+  padding-left: 12px;
   padding-right: 0px;
   color: #3D7700;
   font-size: 1.1em;
@@ -526,11 +545,11 @@ iframe {
   font-weight: bold;
   font-size: 2.5em;
   background-color: #FFF;
-  padding-top: 10px;
+  padding-top: 0px;
   padding-bottom: 0.15em;
 }
 
-#suite_header_statistic {
+#suite_header_statistic_passed {
   background-color: #478747;
   color: #FFF;
   padding-top: 3px;
@@ -539,44 +558,82 @@ iframe {
   margin-bottom: 10px;
 }
 
-#suite_footer {
-  margin-top: 20px;
-  border: solid;
-  border-color: #CCCCCC;
+#suite_header_statistic_failed {
+  background-color: #874747;
+  color: #FFF;
+  padding-top: 3px;
+  padding-bottom: 3px;
+  padding-left: 5px;
+  margin-bottom: 10px;
 }
 
-#suite_footer_id_label {
+#suite_footer {
+  margin-top: 0.5em;
+  background-color: #CCCCCC;
+}
+
+#suite_footer_id_label_passed {
   padding-left: 5px;
   padding-right: 5px;
-  background-color: #CCCCCC;
-  font-weight: bold;
+  background-color: #478747;
+  text-align:left;
+  color: #FFF;
+}
+
+#suite_footer_id_label_failed {
+  padding-left: 5px;
+  padding-right: 5px;
+  background-color: #874747;
+  text-align:left;
+  color: #FFF;
 }
 
 #suite_footer_id_value {
   padding-left: 5px;
   padding-right: 5px;
+  background-color: #E8E8E8;
 }
 
-#suite_footer_class_label {
+#suite_footer_class_label_passed {
   padding-left: 5px;
   padding-right: 5px;
-  background-color: #CCCCCC;
-  font-weight: bold;
+  background-color: #478747;
+  text-align:left;
+  color: #FFF;
+}
+
+#suite_footer_class_label_failed {
+  padding-left: 5px;
+  padding-right: 5px;
+  background-color: #874747;
+  text-align:left;
+  color: #FFF;
 }
 
 #suite_footer_class_value {
   padding-left: 5px;
   padding-right: 5px;
+  background-color: #E8E8E8;
 }
 
-#suite_footer_duration_label {
+#suite_footer_duration_label_passed {
   padding-left: 5px;
   padding-right: 5px;
-  background-color: #CCCCCC;
-  font-weight: bold;
+  background-color: #478747;
+  text-align:left;
+  color: #FFF;
+}
+
+#suite_footer_duration_label_failed {
+  padding-left: 5px;
+  padding-right: 5px;
+  background-color: #874747;
+  text-align:left;
+  color: #FFF;
 }
 
 #suite_footer_duration_value {
   padding-left: 5px;
   padding-right: 5px;
+  background-color: #E8E8E8;
 }

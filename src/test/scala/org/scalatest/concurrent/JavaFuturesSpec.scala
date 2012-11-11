@@ -211,6 +211,7 @@ class JavaFuturesSpec extends FunSpec with ShouldMatchers with OptionValues with
       }
 
       it("should by default query a never-ready future for at least 1 second") {
+        fail("temporarily failing for testing html reporter")
         var startTime = System.currentTimeMillis
         val execSvc: ExecutorService = Executors.newFixedThreadPool(1)
         try {

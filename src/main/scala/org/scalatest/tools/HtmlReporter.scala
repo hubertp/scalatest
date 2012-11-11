@@ -93,13 +93,12 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
   copyResource(getResource("org/scalatest/sorttable.js"), jsDir, "sorttable.js")
   copyResource(getResource("org/scalatest/d3.v2.min.js"), jsDir, "d3.v2.min.js")
   
-  copyResource(getResource("images/greendot.gif"), imagesDir, "testsucceeded.gif")
-  copyResource(getResource("images/reddot.gif"), imagesDir, "testfailed.gif")
-  copyResource(getResource("images/yellowdot.gif"), imagesDir, "testignored.gif")
-  copyResource(getResource("images/yellowdot.gif"), imagesDir, "testcanceled.gif")
-  copyResource(getResource("images/yellowdot.gif"), imagesDir, "testpending.gif")
-  copyResource(getResource("images/bluedot.gif"), imagesDir, "infoprovided.gif")
-  copyResource(getResource("images/bluedot.gif"), imagesDir, "markupprovided.gif")
+  copyResource(getResource("images/greenbullet.gif"), imagesDir, "testsucceeded.gif")
+  copyResource(getResource("images/redbullet.gif"), imagesDir, "testfailed.gif")
+  copyResource(getResource("images/yellowbullet.gif"), imagesDir, "testignored.gif")
+  copyResource(getResource("images/yellowbullet.gif"), imagesDir, "testcanceled.gif")
+  copyResource(getResource("images/yellowbullet.gif"), imagesDir, "testpending.gif")
+  copyResource(getResource("images/graybullet.gif"), imagesDir, "infoprovided.gif")
   
   private val pegDown = new PegDownProcessor
 
@@ -209,6 +208,9 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
     else
       name + "_passed_all"
   
+  private def transformStringForResult(s: String, suiteResult: SuiteResult): String =
+    s + (if (suiteResult.testsFailedCount > 0) "_failed" else "_passed")
+
   private def getSuiteHtml(name: String, suiteResult: SuiteResult) = 
     <html>
       <head>
@@ -241,9 +243,9 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
           }
         </script>
       </head>
-      <body>
+      <body class="specification">
         <div id="suite_header_name">{ suiteResult.suiteName }</div>
-        <div id="suite_header_statistic">
+        <div id={ transformStringForResult("suite_header_statistic", suiteResult) }>
           { "Tests: total " + (suiteResult.testsSucceededCount + suiteResult.testsFailedCount + suiteResult.testsCanceledCount + suiteResult.testsIgnoredCount + suiteResult.testsPendingCount) + ", succeeded " + 
             suiteResult.testsSucceededCount + ", failed " + suiteResult.testsFailedCount + ", canceled " + suiteResult.testsCanceledCount + ", ignored " + suiteResult.testsIgnoredCount + ", pending " + 
             suiteResult.testsPendingCount }
@@ -349,15 +351,15 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
         }
         <table id="suite_footer">
           <tr id="suite_footer_id">
-            <td id="suite_footer_id_label">Suite ID</td>
+            <td id={ transformStringForResult("suite_footer_id_label", suiteResult) }>Suite ID</td>
             <td id="suite_footer_id_value" colspan="5">{ suiteResult.suiteId }</td>
           </tr>
           <tr id="suite_footer_class">
-            <td id="suite_footer_class_label">Class Name</td>
+            <td id={ transformStringForResult("suite_footer_class_label", suiteResult) }>Class Name</td>
             <td id="suite_footer_class_value" colspan="5">{ suiteResult.suiteClassName.getOrElse("-") }</td>
           </tr>
           <tr id="suite_footer_duration">
-            <td id="suite_footer_duration_label">Total Duration</td>
+            <td id={ transformStringForResult("suite_footer_duration_label", suiteResult) }>Total Duration</td>
             <td id="suite_footer_duration_value" colspan="2">
               { 
                 suiteResult.duration match {
