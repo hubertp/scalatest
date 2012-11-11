@@ -48,6 +48,7 @@ import java.text.DecimalFormat
 private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations: Boolean,
         presentInColor: Boolean, presentStackTraces: Boolean, presentFullStackTraces: Boolean, cssUrl: Option[URL]) extends ResourcefulReporter {
 
+  private val specIndent = 15
   private val targetDir = new File(directoryPath)
   private val imagesDir = new File(targetDir, "images")
   private val jsDir = new File(targetDir, "js")
@@ -355,11 +356,11 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
             <td id="suite_footer_id_value" colspan="5">{ suiteResult.suiteId }</td>
           </tr>
           <tr id="suite_footer_class">
-            <td id={ transformStringForResult("suite_footer_class_label", suiteResult) }>Class Name</td>
+            <td id={ transformStringForResult("suite_footer_class_label", suiteResult) }>Class name</td>
             <td id="suite_footer_class_value" colspan="5">{ suiteResult.suiteClassName.getOrElse("-") }</td>
           </tr>
           <tr id="suite_footer_duration">
-            <td id={ transformStringForResult("suite_footer_duration_label", suiteResult) }>Total Duration</td>
+            <td id={ transformStringForResult("suite_footer_duration_label", suiteResult) }>Total duration</td>
             <td id="suite_footer_duration_value" colspan="2">
               { 
                 suiteResult.duration match {
@@ -722,12 +723,12 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
     }
 
   private def scope(elementId: String, message: String, indentLevel: Int) = 
-    <div id={ elementId } class="scope" style={ "margin-left: " + (20 * oneLess(indentLevel)) + "px;" }>
+    <div id={ elementId } class="scope" style={ "margin-left: " + (specIndent * oneLess(indentLevel)) + "px;" }>
       { message }
     </div>
       
   private def test(elementId: String, lines: List[String], indentLevel: Int, styleName: String) = 
-    <div id={ elementId } class={ styleName } style={ "margin-left: " + (20 * twoLess(indentLevel)) + "px;" }>
+    <div id={ elementId } class={ styleName } style={ "margin-left: " + (specIndent * twoLess(indentLevel)) + "px;" }>
       <dl>
         {
           lines.map { line => 
@@ -794,7 +795,7 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
     
     val linkId = UUID.randomUUID.toString
     val contentId = UUID.randomUUID.toString
-    <div id={ elementId } class={ styleName } style={ "margin-left: " + (20 * oneLess(indentLevel)) + "px;" }>
+    <div id={ elementId } class={ styleName } style={ "margin-left: " + (specIndent * twoLess(indentLevel)) + "px;" }>
       <dl>
         {
           lines.map { line => 
@@ -855,7 +856,7 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
   }
         
   private def markup(elementId: String, text: String, indentLevel: Int, styleName: String) = 
-    <div id={ elementId } class={ styleName } style={ "margin-left: " + (20 * oneLess(indentLevel)) + "px;" }>
+    <div id={ elementId } class={ styleName } style={ "margin-left: " + (specIndent * oneLess(indentLevel)) + "px;" }>
        { XML.loadString(pegDown.markdownToHtml(text)) }
     </div>
        
