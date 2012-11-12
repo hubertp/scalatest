@@ -371,6 +371,7 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
               </td>
           </tr>
         </table>
+           <div class="printlink">(<a href={ getSuiteFileName(suiteResult) + ".html" } target="_blank">Open { suiteResult.suiteName } in new tab</a>)</div>
       </body>
     </html>
         

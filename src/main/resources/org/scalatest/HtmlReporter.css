@@ -648,3 +648,9 @@ iframe {
   padding-right: 5px;
   background-color: #E8E8E8;
 }
+
+.printlink {
+  font-size: 0.8em;
+  padding-top: 5px;
+}
+
