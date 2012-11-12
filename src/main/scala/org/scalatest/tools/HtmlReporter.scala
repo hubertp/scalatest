@@ -594,7 +594,8 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
             </tr>
           </table>
           <div id="details_view">
-            Click on suite name to view details.
+            <span id="click_suite_hint">Click on suite name to view details.</span> <br />
+            <span id="click_column_hint">Click on column name to sort.</span>
           </div>
         </div>
         <script type="text/javascript">
