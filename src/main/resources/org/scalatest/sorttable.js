@@ -125,11 +125,11 @@ sorttable = {
 	          //row_array[row_array.length] = [sorttable.getInnerText(rows[j].cells[col]), rows[j]];
 	          row_array[row_array.length] = {
 	            suiteName : sorttable.getInnerText(rows[j].cells[0]), 
-	            testFailedCount : sorttable.getInnerText(rows[j].cells[2]), 
-	            testCanceledCount : sorttable.getInnerText(rows[j].cells[3]), 
-	            testIgnoredCount : sorttable.getInnerText(rows[j].cells[4]), 
-	            testPendingCount : sorttable.getInnerText(rows[j].cells[5]), 
-	            testSucceededCount : sorttable.getInnerText(rows[j].cells[6]),
+	            testSucceededCount : sorttable.getInnerText(rows[j].cells[2]),
+	            testFailedCount : sorttable.getInnerText(rows[j].cells[3]), 
+	            testCanceledCount : sorttable.getInnerText(rows[j].cells[4]), 
+	            testIgnoredCount : sorttable.getInnerText(rows[j].cells[5]), 
+	            testPendingCount : sorttable.getInnerText(rows[j].cells[6]), 
 	            row : rows[j]
 	          };
 	        }
