@@ -240,6 +240,9 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
             "    ele.style.display = \"block\";" + "\n" + 
             "    text.innerHTML = \"(Hide Details)\";" + "\n" + 
             "  }" + "\n" + 
+            "}" + "\n" + 
+            "function hideOpenInNewTabIfRequired() {" + "\n" + 
+            "  if (top === self) { document.getElementById('printlink').style.display = 'none'; }" + "\n" + 
             "}" + "\n")
           }
         </script>
@@ -371,8 +374,11 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
               </td>
           </tr>
         </table>
-           <div class="printlink">(<a href={ getSuiteFileName(suiteResult) + ".html" } target="_blank">Open { suiteResult.suiteName } in new tab</a>)</div>
+           <div id="printlink">(<a href={ getSuiteFileName(suiteResult) + ".html" } target="_blank">Open { suiteResult.suiteName } in new tab</a>)</div>
       </body>
+      <script type="text/javascript">
+        { PCDATA("hideOpenInNewTabIfRequired();") }
+      </script>
     </html>
         
   private def processInfoMarkupProvided(event: Event) = {
