@@ -777,8 +777,8 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
         case Some(throwable) =>
           val stackTraceElements = throwable.getStackTrace.toList
           throwable match {
-            case tfe: TestFailedException =>
-              (stackTraceElements.take(tfe.failedCodeStackDepth), stackTraceElements.drop(tfe.failedCodeStackDepth))
+            case sde: exceptions.StackDepthException =>
+              (stackTraceElements.take(sde.failedCodeStackDepth), stackTraceElements.drop(sde.failedCodeStackDepth))
             case _ => (List(), stackTraceElements)
           } 
         case None => (List(), List())
