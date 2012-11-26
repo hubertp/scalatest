@@ -895,6 +895,8 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
         val (suiteEvents, otherEvents) = extractSuiteEvents(suiteId)
         eventList = otherEvents
         val sortedSuiteEvents = suiteEvents.sorted
+        if (sortedSuiteEvents.length == 0)
+          throw new IllegalStateException("Expected SuiteStarting in the head of suite events, but we got no suite event at all")
         sortedSuiteEvents.head match {
           case suiteStarting: SuiteStarting => 
             val suiteResult = sortedSuiteEvents.foldLeft(SuiteResult(suiteId, suiteName, suiteClassName, duration, suiteStarting, event, Vector.empty ++ sortedSuiteEvents.tail, 0, 0, 0, 0, 0, true)) { case (r, e) => 
@@ -917,6 +919,8 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
         val (suiteEvents, otherEvents) = extractSuiteEvents(suiteId)
         eventList = otherEvents
         val sortedSuiteEvents = suiteEvents.sorted
+        if (sortedSuiteEvents.length == 0)
+          throw new IllegalStateException("Expected SuiteStarting in the head of suite events, but we got no suite event at all")
         sortedSuiteEvents.head match {
           case suiteStarting: SuiteStarting => 
             val suiteResult = sortedSuiteEvents.foldLeft(SuiteResult(suiteId, suiteName, suiteClassName, duration, suiteStarting, event, Vector.empty ++ sortedSuiteEvents.tail, 0, 0, 0, 0, 0, false)) { case (r, e) => 
