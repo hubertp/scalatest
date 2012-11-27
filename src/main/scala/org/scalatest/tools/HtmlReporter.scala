@@ -896,7 +896,7 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
         eventList = otherEvents
         val sortedSuiteEvents = suiteEvents.sorted
         if (sortedSuiteEvents.length == 0)
-          throw new IllegalStateException("Expected SuiteStarting in the head of suite events, but we got no suite event at all")
+          throw new IllegalStateException("Expected SuiteStarting for completion event: " + event + " in the head of suite events, but we got no suite event at all")
         sortedSuiteEvents.head match {
           case suiteStarting: SuiteStarting => 
             val suiteResult = sortedSuiteEvents.foldLeft(SuiteResult(suiteId, suiteName, suiteClassName, duration, suiteStarting, event, Vector.empty ++ sortedSuiteEvents.tail, 0, 0, 0, 0, 0, true)) { case (r, e) => 
@@ -912,7 +912,7 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
             results += suiteResult
             makeSuiteFile(suiteResult)
           case other => 
-            throw new IllegalStateException("Expected SuiteStarting in the head of suite events, but we got: " + other.getClass.getName)
+            throw new IllegalStateException("Expected SuiteStarting for completion event: " + event +  " in the head of suite events, but we got: " + other)
         }
             
       case SuiteAborted(ordinal, message, suiteName, suiteId, suiteClassName, throwable, duration, formatter, location, rerunner, payload, threadName, timeStamp) =>
@@ -920,7 +920,7 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
         eventList = otherEvents
         val sortedSuiteEvents = suiteEvents.sorted
         if (sortedSuiteEvents.length == 0)
-          throw new IllegalStateException("Expected SuiteStarting in the head of suite events, but we got no suite event at all")
+          throw new IllegalStateException("Expected SuiteStarting for completion event: " + event + " in the head of suite events, but we got no suite event at all")
         sortedSuiteEvents.head match {
           case suiteStarting: SuiteStarting => 
             val suiteResult = sortedSuiteEvents.foldLeft(SuiteResult(suiteId, suiteName, suiteClassName, duration, suiteStarting, event, Vector.empty ++ sortedSuiteEvents.tail, 0, 0, 0, 0, 0, false)) { case (r, e) => 
@@ -936,7 +936,7 @@ private[scalatest] class HtmlReporter(directoryPath: String, presentAllDurations
             results += suiteResult
             makeSuiteFile(suiteResult)
           case other => 
-            throw new IllegalStateException("Expected SuiteStarting in the head of suite events, but we got: " + other.getClass.getName)
+            throw new IllegalStateException("Expected SuiteStarting for completion event: " + event + " in the head of suite events, but we got: " + other)
         }
       
       case _ => eventList += event
