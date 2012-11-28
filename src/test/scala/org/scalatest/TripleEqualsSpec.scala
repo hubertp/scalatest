@@ -115,8 +115,8 @@ class TripleEqualsSpec extends Spec with NonImplicitAssertions {
         // These should work with implicit conversions
         assert(1 === 1L)
         assert(1L === 1)
-        assert(1 !== 1L)
-        assert(1L !== 1)
+        assert(!(1 !== 1L))
+        assert(!(1L !== 1))
 
         // The rest should not compile
         // assert("1" === 1)
