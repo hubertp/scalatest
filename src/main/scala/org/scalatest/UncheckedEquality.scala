@@ -15,8 +15,15 @@
  */
 package org.scalatest
 
-trait UncheckedEquality {
-  implicit def equalityConstraint[A, B]: EqualityConstraint[A, B] = new EqualityConstraint[A, B]
+trait UncheckedEquality extends EqualityConstraints {
+
+  implicit override def unconstrainedEquality[A, B]: EqualityConstraint[A, B] = { println("UE!"); new EqualityConstraint[A, B] }
+
+  override def lowPriorityTypeCheckedEqualityConstraint[A, B](implicit ev: A <:< B): EqualityConstraint[A, B] = new EqualityConstraint[A, B]
+  override def typeCheckedEqualityConstraint[A, B](implicit ev: B <:< A): EqualityConstraint[A, B] = new EqualityConstraint[A, B]
+
+  override def lowPriorityConversionCheckedEqualityConstraint[A, B](implicit ev: A => B): EqualityConstraint[A, B] = new EqualityConstraint[A, B]
+  override def conversionCheckedEqualityConstraint[A, B](implicit ev: B => A): EqualityConstraint[A, B] = new EqualityConstraint[A, B]
 }
 
 object UncheckedEquality extends UncheckedEquality

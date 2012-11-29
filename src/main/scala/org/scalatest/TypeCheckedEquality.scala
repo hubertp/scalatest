@@ -15,12 +15,18 @@
  */
 package org.scalatest
 
-trait LowPriorityTypeCheckedEquality {
-  implicit def lowPriorityEqualityConstraint[A, B](implicit ev: A <:< B): EqualityConstraint[A, B] = new EqualityConstraint[A, B]
+trait LowPriorityTypeCheckedEquality extends EqualityConstraints {
+  implicit override def lowPriorityTypeCheckedEqualityConstraint[A, B](implicit ev: A <:< B): EqualityConstraint[A, B] = new EqualityConstraint[A, B]
 }
 
 trait TypeCheckedEquality extends LowPriorityTypeCheckedEquality {
-  implicit def equalityConstraint[A, B](implicit ev: B <:< A): EqualityConstraint[A, B] = new EqualityConstraint[A, B]
+
+  override def unconstrainedEquality[A, B]: EqualityConstraint[A, B] = { println("TCE!"); new EqualityConstraint[A, B] }
+
+  implicit override def typeCheckedEqualityConstraint[A, B](implicit ev: B <:< A): EqualityConstraint[A, B] = new EqualityConstraint[A, B]
+
+  override def lowPriorityConversionCheckedEqualityConstraint[A, B](implicit ev: A => B): EqualityConstraint[A, B] = new EqualityConstraint[A, B]
+  override def conversionCheckedEqualityConstraint[A, B](implicit ev: B => A): EqualityConstraint[A, B] = new EqualityConstraint[A, B]
 }
 
 object TypeCheckedEquality extends TypeCheckedEquality

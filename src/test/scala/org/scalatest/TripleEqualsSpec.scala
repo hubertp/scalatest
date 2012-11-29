@@ -48,6 +48,83 @@ class TripleEqualsSpec extends Spec with NonImplicitAssertions {
         assert(1 !== "1")
         assert(!(1 === "1"))
       }
+
+      def `should be overridable with TypeCheckedEquality locally when UncheckedEquality imported` {
+
+        object O extends TripleEquals with UncheckedEquality
+        import O._
+
+        new TypeCheckedEquality {
+
+        class Fruit { override def equals(o: Any) = o.isInstanceOf[Fruit] }
+        trait Crunchy
+        class Apple extends Fruit with Crunchy
+
+        val fr: Fruit = new Apple
+        val cr: Crunchy = new Apple
+        val ap: Apple = new Apple
+
+        assert(1 === 1)
+        assert(!(1 !== 1))
+
+        assert(ap === fr)
+        assert(fr === ap)
+        assert(ap === cr)
+        assert(cr === ap)
+
+        // The rest should not compile
+        // assert(1 === 1L)
+        // assert(1L === 1)
+        // assert(1 !== 1L)
+        // assert(1L !== 1)
+
+        // assert("1" === 1)
+        // assert(1 === "1")
+        // assert("1" !== 1)
+        // assert(1 !== "1")
+
+        // assert(fr === cr)
+        // assert(cr === fr)
+}
+      }
+
+      def `should be overridable with TypeCheckedEquality locally when UncheckedEquality mixed in` {
+
+        class O extends TripleEquals with UncheckedEquality {
+
+          import TypeCheckedEquality._
+  
+          class Fruit { override def equals(o: Any) = o.isInstanceOf[Fruit] }
+          trait Crunchy
+          class Apple extends Fruit with Crunchy
+  
+          val fr: Fruit = new Apple
+          val cr: Crunchy = new Apple
+          val ap: Apple = new Apple
+  
+          assert(1 === 1)
+          assert(!(1 !== 1))
+  
+          assert(ap === fr)
+          assert(fr === ap)
+          assert(ap === cr)
+          assert(cr === ap)
+  
+          // The rest should not compile
+          // assert(1 === 1L)
+          // assert(1L === 1)
+          // assert(1 !== 1L)
+          // assert(1L !== 1)
+  
+          // assert("1" === 1)
+          // assert(1 === "1")
+          // assert("1" !== 1)
+          // assert(1 !== "1")
+  
+          // assert(fr === cr)
+          // assert(cr === fr)
+        }
+      }
     }
 
     object `with TypeCheckedEquality` {
