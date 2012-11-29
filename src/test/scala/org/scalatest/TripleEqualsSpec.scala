@@ -126,6 +126,85 @@ class TripleEqualsSpec extends Spec with NonImplicitAssertions {
           }
         }
       }
+
+      def `should be overridable with ConversionCheckedEquality locally when UncheckedEquality imported` {
+
+        object O extends TripleEquals with UncheckedEquality
+        import O._
+
+        new ConversionCheckedEquality {
+
+            class Fruit { override def equals(o: Any) = o.isInstanceOf[Fruit] }
+            trait Crunchy
+            class Apple extends Fruit with Crunchy
+
+            val fr: Fruit = new Apple
+            val cr: Crunchy = new Apple
+            val ap: Apple = new Apple
+
+            assert(1 === 1)
+            assert(!(1 !== 1))
+
+            assert(ap === fr)
+            assert(fr === ap)
+            assert(ap === cr)
+            assert(cr === ap)
+
+            // These should work with implicit conversions
+            assert(1 === 1L)
+            assert(1L === 1)
+            assert(!(1 !== 1L))
+            assert(!(1L !== 1))
+
+            // The rest should not compile
+            // assert("1" === 1)
+            // assert(1 === "1")
+            // assert("1" !== 1)
+            // assert(1 !== "1")
+
+            // assert(fr === cr)
+            // assert(cr === fr)
+        }
+      }
+
+      def `should be overridable with ConversionCheckedEquality locally when UncheckedEquality mixed in` {
+        object O extends TripleEquals with UncheckedEquality {
+
+          new ConversionCheckedEquality {
+
+            class Fruit { override def equals(o: Any) = o.isInstanceOf[Fruit] }
+            trait Crunchy
+            class Apple extends Fruit with Crunchy
+
+            val fr: Fruit = new Apple
+            val cr: Crunchy = new Apple
+            val ap: Apple = new Apple
+
+            assert(1 === 1)
+            assert(!(1 !== 1))
+
+            assert(ap === fr)
+            assert(fr === ap)
+            assert(ap === cr)
+            assert(cr === ap)
+
+            // These should work with implicit conversions
+            assert(1 === 1L)
+            assert(1L === 1)
+            assert(!(1 !== 1L))
+            assert(!(1L !== 1))
+
+            // The rest should not compile
+            // assert("1" === 1)
+            // assert(1 === "1")
+            // assert("1" !== 1)
+            // assert(1 !== "1")
+
+            // assert(fr === cr)
+            // assert(cr === fr)
+          }
+        }
+      }
     }
 
     object `with TypeCheckedEquality` {
@@ -164,6 +243,134 @@ class TripleEqualsSpec extends Spec with NonImplicitAssertions {
 
         // assert(fr === cr)
         // assert(cr === fr)
+      }
+
+      def `should be overridable with UncheckedEquality locally when TypeCheckedEquality imported` {
+
+        object O extends TripleEquals with TypeCheckedEquality
+        import O._
+
+        new UncheckedEquality {
+
+          assert(1 === 1)
+          assert(!(1 !== 1))
+
+          assert(1 === 1L)
+          assert(!(1 !== 1L))
+
+          assert(1L === 1)
+          assert(!(1L !== 1))
+
+          assert("1" !== 1)
+          assert(!("1" === 1))
+
+          assert(1 !== "1")
+          assert(!(1 === "1"))
+        }
+      }
+
+      def `should be overridable with UncheckedEquality locally when TypeCheckedEquality mixed in` {
+
+        object O extends TripleEquals with TypeCheckedEquality {
+
+          new UncheckedEquality {
+
+            assert(1 === 1)
+            assert(!(1 !== 1))
+
+            assert(1 === 1L)
+            assert(!(1 !== 1L))
+
+            assert(1L === 1)
+            assert(!(1L !== 1))
+
+            assert("1" !== 1)
+            assert(!("1" === 1))
+
+            assert(1 !== "1")
+            assert(!(1 === "1"))
+          }
+        }
+      }
+
+      def `should be overridable with ConversionCheckedEquality locally when TypeCheckedEquality imported` {
+
+        object O extends TripleEquals with TypeCheckedEquality
+        import O._
+
+        new ConversionCheckedEquality {
+
+          class Fruit { override def equals(o: Any) = o.isInstanceOf[Fruit] }
+          trait Crunchy
+          class Apple extends Fruit with Crunchy
+
+          val fr: Fruit = new Apple
+          val cr: Crunchy = new Apple
+          val ap: Apple = new Apple
+
+          assert(1 === 1)
+          assert(!(1 !== 1))
+
+          assert(ap === fr)
+          assert(fr === ap)
+          assert(ap === cr)
+          assert(cr === ap)
+
+          // These should work with implicit conversions
+          assert(1 === 1L)
+          assert(1L === 1)
+          assert(!(1 !== 1L))
+          assert(!(1L !== 1))
+
+          // The rest should not compile
+          // assert("1" === 1)
+          // assert(1 === "1")
+          // assert("1" !== 1)
+          // assert(1 !== "1")
+
+          // assert(fr === cr)
+          // assert(cr === fr)
+        }
+      }
+
+      def `should be overridable with ConversionCheckedEquality locally when TypeCheckedEquality mixed in` {
+
+        object O extends TripleEquals with TypeCheckedEquality {
+
+          new ConversionCheckedEquality {
+
+            class Fruit { override def equals(o: Any) = o.isInstanceOf[Fruit] }
+            trait Crunchy
+            class Apple extends Fruit with Crunchy
+
+            val fr: Fruit = new Apple
+            val cr: Crunchy = new Apple
+            val ap: Apple = new Apple
+
+            assert(1 === 1)
+            assert(!(1 !== 1))
+
+            assert(ap === fr)
+            assert(fr === ap)
+            assert(ap === cr)
+            assert(cr === ap)
+
+            // These should work with implicit conversions
+            assert(1 === 1L)
+            assert(1L === 1)
+            assert(!(1 !== 1L))
+            assert(!(1L !== 1))
+
+            // The rest should not compile
+            // assert("1" === 1)
+            // assert(1 === "1")
+            // assert("1" !== 1)
+            // assert(1 !== "1")
+
+            // assert(fr === cr)
+            // assert(cr === fr)
+          }
+        }
       }
     }
 
@@ -204,6 +411,131 @@ class TripleEqualsSpec extends Spec with NonImplicitAssertions {
 
         // assert(fr === cr)
         // assert(cr === fr)
+      }
+      def `should be overridable with UncheckedEquality locally when ConversionCheckedEquality imported` {
+
+        object O extends TripleEquals with ConversionCheckedEquality
+        import O._
+
+        new UncheckedEquality {
+
+          assert(1 === 1)
+          assert(!(1 !== 1))
+
+          assert(1 === 1L)
+          assert(!(1 !== 1L))
+
+          assert(1L === 1)
+          assert(!(1L !== 1))
+
+          assert("1" !== 1)
+          assert(!("1" === 1))
+
+          assert(1 !== "1")
+          assert(!(1 === "1"))
+        }
+      }
+
+      def `should be overridable with UncheckedEquality locally when ConversionCheckedEquality mixed in` {
+
+        object O extends TripleEquals with ConversionCheckedEquality {
+
+          new UncheckedEquality {
+
+            assert(1 === 1)
+            assert(!(1 !== 1))
+
+            assert(1 === 1L)
+            assert(!(1 !== 1L))
+
+            assert(1L === 1)
+            assert(!(1L !== 1))
+
+            assert("1" !== 1)
+            assert(!("1" === 1))
+
+            assert(1 !== "1")
+            assert(!(1 === "1"))
+          }
+        }
+      }
+
+      def `should be overridable with TypeCheckedEquality locally when ConversionCheckedEquality imported` {
+
+        object O extends TripleEquals with ConversionCheckedEquality
+        import O._
+
+        new TypeCheckedEquality {
+
+          class Fruit { override def equals(o: Any) = o.isInstanceOf[Fruit] }
+          trait Crunchy
+          class Apple extends Fruit with Crunchy
+
+          val fr: Fruit = new Apple
+          val cr: Crunchy = new Apple
+          val ap: Apple = new Apple
+
+          assert(1 === 1)
+          assert(!(1 !== 1))
+
+          assert(ap === fr)
+          assert(fr === ap)
+          assert(ap === cr)
+          assert(cr === ap)
+
+          // The rest should not compile
+          // assert(1 === 1L)
+          // assert(1L === 1)
+          // assert(1 !== 1L)
+          // assert(1L !== 1)
+
+          // assert("1" === 1)
+          // assert(1 === "1")
+          // assert("1" !== 1)
+          // assert(1 !== "1")
+
+          // assert(fr === cr)
+          // assert(cr === fr)
+        }
+      }
+
+      def `should be overridable with TypeCheckedEquality locally when ConversionCheckedEquality mixed in` {
+
+        object O extends TripleEquals with ConversionCheckedEquality {
+
+          new TypeCheckedEquality {
+
+            class Fruit { override def equals(o: Any) = o.isInstanceOf[Fruit] }
+            trait Crunchy
+            class Apple extends Fruit with Crunchy
+
+            val fr: Fruit = new Apple
+            val cr: Crunchy = new Apple
+            val ap: Apple = new Apple
+
+            assert(1 === 1)
+            assert(!(1 !== 1))
+
+            assert(ap === fr)
+            assert(fr === ap)
+            assert(ap === cr)
+            assert(cr === ap)
+
+            // The rest should not compile
+            // assert(1 === 1L)
+            // assert(1L === 1)
+            // assert(1 !== 1L)
+            // assert(1L !== 1)
+
+            // assert("1" === 1)
+            // assert(1 === "1")
+            // assert("1" !== 1)
+            // assert(1 !== "1")
+
+            // assert(fr === cr)
+            // assert(cr === fr)
+          }
+        }
       }
     }
   }
