@@ -47,7 +47,12 @@ class AnyEqualitySpec extends Spec with NonImplicitAssertions {
     }
 
     def `should call .deep first if left side, right side, or both are Arrays` {
-      pending
+      val a = Array(1, 2, 3)
+      val b = Array(1, 2, 3)
+      val v = Vector(1, 2, 3)
+      assert(AnyEquality.anyEquality[Array[Int]].areEqual(a, v))
+      assert(AnyEquality.anyEquality[Vector[Int]].areEqual(v, a))
+      assert(AnyEquality.anyEquality[Array[Int]].areEqual(a, b))
     }
 
     def `should handle tolerances specially` {

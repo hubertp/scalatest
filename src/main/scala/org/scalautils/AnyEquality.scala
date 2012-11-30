@@ -19,7 +19,21 @@ trait AnyEquality {
 
   implicit def anyEquality[A]: Equality[A] =
     new Equality[A] {
-      def areEqual(a: A, b: Any): Boolean = a == b
+      def areEqual(a: A, b: Any): Boolean = {
+        a match {
+          case arr: Array[_] =>
+            b match {
+              case brr: Array[_] => arr.deep == brr.deep
+              case _ => arr.deep == b
+            }
+          case _ => {
+            b match {
+              case brr: Array[_] => a == brr.deep
+              case _ => a == b
+            }
+          }
+        }
+      }
     }
 }
 
