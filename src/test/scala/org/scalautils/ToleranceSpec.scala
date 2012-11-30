@@ -296,6 +296,261 @@ class ToleranceSpec extends Spec with NonImplicitAssertions with TripleEquals wi
       assert(minusSevenByte === ((-5).toByte +- 2.toByte))
     }
 
+    def `should, for symmetry, do nothing if the number is within the specified range on the left hand side` {
+
+      // Double +- Double
+      assert((7.1 +- 0.2) === sevenDotOh)
+      assert((6.9 +- 0.2) === sevenDotOh)
+      assert((7.0 +- 0.2) === sevenDotOh)
+      assert((7.2 +- 0.2) === sevenDotOh)
+      assert((6.8 +- 0.2) === sevenDotOh)
+      assert((-7.1 +- 0.2) === minusSevenDotOh)
+      assert((-6.9 +- 0.2) === minusSevenDotOh)
+      assert((-7.0 +- 0.2) === minusSevenDotOh)
+      assert((-7.2 +- 0.2) === minusSevenDotOh)
+      assert((-6.8 +- 0.2) === minusSevenDotOh)
+
+      // Double +- Float
+      assert((7.1 +- 0.2f) === sevenDotOh)
+      assert((6.9 +- 0.2f) === sevenDotOh)
+      assert((7.0 +- 0.2f) === sevenDotOh)
+      assert((7.2 +- 0.2f) === sevenDotOh)
+      assert((6.8 +- 0.2f) === sevenDotOh)
+      assert((-7.1 +- 0.2f) === minusSevenDotOh)
+      assert((-6.9 +- 0.2f) === minusSevenDotOh)
+      assert((-7.0 +- 0.2f) === minusSevenDotOh)
+      assert((-7.2 +- 0.2f) === minusSevenDotOh)
+      assert((-6.8 +- 0.2f) === minusSevenDotOh)
+
+      // Double +- Long
+      assert((7.1 +- 2L) === sevenDotOh)
+      assert((6.9 +- 2L) === sevenDotOh)
+      assert((7.0 +- 2L) === sevenDotOh)
+      assert((7.2 +- 2L) === sevenDotOh)
+      assert((6.8 +- 2L) === sevenDotOh)
+      assert((-7.1 +- 2L) === minusSevenDotOh)
+      assert((-6.9 +- 2L) === minusSevenDotOh)
+      assert((-7.0 +- 2L) === minusSevenDotOh)
+      assert((-7.2 +- 2L) === minusSevenDotOh)
+      assert((-6.8 +- 2L) === minusSevenDotOh)
+
+      // Double +- Int
+      assert((7.1 +- 2) === sevenDotOh)
+      assert((6.9 +- 2) === sevenDotOh)
+      assert((7.0 +- 2) === sevenDotOh)
+      assert((7.2 +- 2) === sevenDotOh)
+      assert((6.8 +- 2) === sevenDotOh)
+      assert((-7.1 +- 2) === minusSevenDotOh)
+      assert((-6.9 +- 2) === minusSevenDotOh)
+      assert((-7.0 +- 2) === minusSevenDotOh)
+      assert((-7.2 +- 2) === minusSevenDotOh)
+      assert((-6.8 +- 2) === minusSevenDotOh)
+
+      // Double +- Short
+      assert((7.1 +- 2.toShort) === sevenDotOh)
+      assert((6.9 +- 2.toShort) === sevenDotOh)
+      assert((7.0 +- 2.toShort) === sevenDotOh)
+      assert((7.2 +- 2.toShort) === sevenDotOh)
+      assert((6.8 +- 2.toShort) === sevenDotOh)
+      assert((-7.1 +- 2.toShort) === minusSevenDotOh)
+      assert((-6.9 +- 2.toShort) === minusSevenDotOh)
+      assert((-7.0 +- 2.toShort) === minusSevenDotOh)
+      assert((-7.2 +- 2.toShort) === minusSevenDotOh)
+      assert((-6.8 +- 2.toShort) === minusSevenDotOh)
+
+      // Double +- Byte
+      assert((7.1 +- 2.toByte) === sevenDotOh)
+      assert((6.9 +- 2.toByte) === sevenDotOh)
+      assert((7.0 +- 2.toByte) === sevenDotOh)
+      assert((7.2 +- 2.toByte) === sevenDotOh)
+      assert((6.8 +- 2.toByte) === sevenDotOh)
+      assert((-7.1 +- 2.toByte) === minusSevenDotOh)
+      assert((-6.9 +- 2.toByte) === minusSevenDotOh)
+      assert((-7.0 +- 2.toByte) === minusSevenDotOh)
+      assert((-7.2 +- 2.toByte) === minusSevenDotOh)
+      assert((-6.8 +- 2.toByte) === minusSevenDotOh)
+
+      // Float +- Float
+      assert((7.1f +- 0.2f) === sevenDotOhFloat)
+      assert((6.9f +- 0.2f) === sevenDotOhFloat)
+      assert((7.0f +- 0.2f) === sevenDotOhFloat)
+      assert((7.2f +- 0.2f) === sevenDotOhFloat)
+      assert((6.8f +- 0.2f) === sevenDotOhFloat)
+      assert((-7.1f +- 0.2f) === minusSevenDotOhFloat)
+      assert((-6.9f +- 0.2f) === minusSevenDotOhFloat)
+      assert((-7.0f +- 0.2f) === minusSevenDotOhFloat)
+      assert((-7.2f +- 0.2f) === minusSevenDotOhFloat)
+      assert((-6.8f +- 0.2f) === minusSevenDotOhFloat)
+
+      // Float +- Long
+      assert((7.1f +- 2L) === sevenDotOhFloat)
+      assert((6.9f +- 2L) === sevenDotOhFloat)
+      assert((7.0f +- 2L) === sevenDotOhFloat)
+      assert((7.2f +- 2L) === sevenDotOhFloat)
+      assert((6.8f +- 2L) === sevenDotOhFloat)
+      assert((-7.1f +- 2L) === minusSevenDotOhFloat)
+      assert((-6.9f +- 2L) === minusSevenDotOhFloat)
+      assert((-7.0f +- 2L) === minusSevenDotOhFloat)
+      assert((-7.2f +- 2L) === minusSevenDotOhFloat)
+      assert((-6.8f +- 2L) === minusSevenDotOhFloat)
+
+      // Float +- Int
+      assert((7.1f +- 2) === sevenDotOhFloat)
+      assert((6.9f +- 2) === sevenDotOhFloat)
+      assert((7.0f +- 2) === sevenDotOhFloat)
+      assert((7.2f +- 2) === sevenDotOhFloat)
+      assert((6.8f +- 2) === sevenDotOhFloat)
+      assert((-7.1f +- 2) === minusSevenDotOhFloat)
+      assert((-6.9f +- 2) === minusSevenDotOhFloat)
+      assert((-7.0f +- 2) === minusSevenDotOhFloat)
+      assert((-7.2f +- 2) === minusSevenDotOhFloat)
+      assert((-6.8f +- 2) === minusSevenDotOhFloat)
+
+      // Float +- Short
+      assert((7.1f +- 2.toShort) === sevenDotOhFloat)
+      assert((6.9f +- 2.toShort) === sevenDotOhFloat)
+      assert((7.0f +- 2.toShort) === sevenDotOhFloat)
+      assert((7.2f +- 2.toShort) === sevenDotOhFloat)
+      assert((6.8f +- 2.toShort) === sevenDotOhFloat)
+      assert((-7.1f +- 2.toShort) === minusSevenDotOhFloat)
+      assert((-6.9f +- 2.toShort) === minusSevenDotOhFloat)
+      assert((-7.0f +- 2.toShort) === minusSevenDotOhFloat)
+      assert((-7.2f +- 2.toShort) === minusSevenDotOhFloat)
+      assert((-6.8f +- 2.toShort) === minusSevenDotOhFloat)
+
+      // Float +- Byte
+      assert((7.1f +- 2.toByte) === sevenDotOhFloat)
+      assert((6.9f +- 2.toByte) === sevenDotOhFloat)
+      assert((7.0f +- 2.toByte) === sevenDotOhFloat)
+      assert((7.2f +- 2.toByte) === sevenDotOhFloat)
+      assert((6.8f +- 2.toByte) === sevenDotOhFloat)
+      assert((-7.1f +- 2.toByte) === minusSevenDotOhFloat)
+      assert((-6.9f +- 2.toByte) === minusSevenDotOhFloat)
+      assert((-7.0f +- 2.toByte) === minusSevenDotOhFloat)
+      assert((-7.2f +- 2.toByte) === minusSevenDotOhFloat)
+      assert((-6.8f +- 2.toByte) === minusSevenDotOhFloat)
+
+      // Long +- Long
+      assert((9L +- 2L) === sevenLong)
+      assert((8L +- 2L) === sevenLong)
+      assert((7L +- 2L) === sevenLong)
+      assert((6L +- 2L) === sevenLong)
+      assert((5L +- 2L) === sevenLong)
+      assert((-9L +- 2L) === minusSevenLong)
+      assert((-8L +- 2L) === minusSevenLong)
+      assert((-7L +- 2L) === minusSevenLong)
+      assert((-6L +- 2L) === minusSevenLong)
+      assert((-5L +- 2L) === minusSevenLong)
+
+      // Long +- Int
+      assert((9L +- 2) === sevenLong)
+      assert((8L +- 2) === sevenLong)
+      assert((7L +- 2) === sevenLong)
+      assert((6L +- 2) === sevenLong)
+      assert((5L +- 2) === sevenLong)
+      assert((-9L +- 2) === minusSevenLong)
+      assert((-8L +- 2) === minusSevenLong)
+      assert((-7L +- 2) === minusSevenLong)
+      assert((-6L +- 2) === minusSevenLong)
+      assert((-5L +- 2) === minusSevenLong)
+
+      // Long +- Short
+      assert((9L +- 2.toShort) === sevenLong)
+      assert((8L +- 2.toShort) === sevenLong)
+      assert((7L +- 2.toShort) === sevenLong)
+      assert((6L +- 2.toShort) === sevenLong)
+      assert((5L +- 2.toShort) === sevenLong)
+      assert((-9L +- 2.toShort) === minusSevenLong)
+      assert((-8L +- 2.toShort) === minusSevenLong)
+      assert((-7L +- 2.toShort) === minusSevenLong)
+      assert((-6L +- 2.toShort) === minusSevenLong)
+      assert((-5L +- 2.toShort) === minusSevenLong)
+
+      // Long +- Byte
+      assert((9L +- 2.toByte) === sevenLong)
+      assert((8L +- 2.toByte) === sevenLong)
+      assert((7L +- 2.toByte) === sevenLong)
+      assert((6L +- 2.toByte) === sevenLong)
+      assert((5L +- 2.toByte) === sevenLong)
+      assert((-9L +- 2.toByte) === minusSevenLong)
+      assert((-8L +- 2.toByte) === minusSevenLong)
+      assert((-7L +- 2.toByte) === minusSevenLong)
+      assert((-6L +- 2.toByte) === minusSevenLong)
+      assert((-5L +- 2.toByte) === minusSevenLong)
+
+      // Int +- Int
+      assert((9 +- 2) === sevenInt)
+      assert((8 +- 2) === sevenInt)
+      assert((7 +- 2) === sevenInt)
+      assert((6 +- 2) === sevenInt)
+      assert((5 +- 2) === sevenInt)
+      assert((-9 +- 2) === minusSevenInt)
+      assert((-8 +- 2) === minusSevenInt)
+      assert((-7 +- 2) === minusSevenInt)
+      assert((-6 +- 2) === minusSevenInt)
+      assert((-5 +- 2) === minusSevenInt)
+
+      // Int +- Short
+      assert((9 +- 2.toShort) === sevenInt)
+      assert((8 +- 2.toShort) === sevenInt)
+      assert((7 +- 2.toShort) === sevenInt)
+      assert((6 +- 2.toShort) === sevenInt)
+      assert((5 +- 2.toShort) === sevenInt)
+      assert((-9 +- 2.toShort) === minusSevenInt)
+      assert((-8 +- 2.toShort) === minusSevenInt)
+      assert((-7 +- 2.toShort) === minusSevenInt)
+      assert((-6 +- 2.toShort) === minusSevenInt)
+      assert((-5 +- 2.toShort) === minusSevenInt)
+
+      // Int +- Byte
+      assert((9 +- 2.toByte) === sevenInt)
+      assert((8 +- 2.toByte) === sevenInt)
+      assert((7 +- 2.toByte) === sevenInt)
+      assert((6 +- 2.toByte) === sevenInt)
+      assert((5 +- 2.toByte) === sevenInt)
+      assert((-9 +- 2.toByte) === minusSevenInt)
+      assert((-8 +- 2.toByte) === minusSevenInt)
+      assert((-7 +- 2.toByte) === minusSevenInt)
+      assert((-6 +- 2.toByte) === minusSevenInt)
+      assert((-5 +- 2.toByte) === minusSevenInt)
+
+      // Short +- Short
+      assert((9.toShort +- 2.toShort) === sevenShort)
+      assert((8.toShort +- 2.toShort) === sevenShort)
+      assert((7.toShort +- 2.toShort) === sevenShort)
+      assert((6.toShort +- 2.toShort) === sevenShort)
+      assert((5.toShort +- 2.toShort) === sevenShort)
+      assert(((-9).toShort +- 2.toShort) === minusSevenShort)
+      assert(((-8).toShort +- 2.toShort) === minusSevenShort)
+      assert(((-7).toShort +- 2.toShort) === minusSevenShort)
+      assert(((-6).toShort +- 2.toShort) === minusSevenShort)
+      assert(((-5).toShort +- 2.toShort) === minusSevenShort)
+
+      // Short +- Byte
+      assert((9.toShort +- 2.toByte) === sevenShort)
+      assert((8.toShort +- 2.toByte) === sevenShort)
+      assert((7.toShort +- 2.toByte) === sevenShort)
+      assert((6.toShort +- 2.toByte) === sevenShort)
+      assert((5.toShort +- 2.toByte) === sevenShort)
+      assert(((-9).toShort +- 2.toByte) === minusSevenShort)
+      assert(((-8).toShort +- 2.toByte) === minusSevenShort)
+      assert(((-7).toShort +- 2.toByte) === minusSevenShort)
+      assert(((-6).toShort +- 2.toByte) === minusSevenShort)
+      assert(((-5).toShort +- 2.toByte) === minusSevenShort)
+
+      // Byte +- Byte
+      assert((9.toByte +- 2.toByte) === sevenByte)
+      assert((8.toByte +- 2.toByte) === sevenByte)
+      assert((7.toByte +- 2.toByte) === sevenByte)
+      assert((6.toByte +- 2.toByte) === sevenByte)
+      assert((5.toByte +- 2.toByte) === sevenByte)
+      assert(((-9).toByte +- 2.toByte) === minusSevenByte)
+      assert(((-8).toByte +- 2.toByte) === minusSevenByte)
+      assert(((-7).toByte +- 2.toByte) === minusSevenByte)
+      assert(((-6).toByte +- 2.toByte) === minusSevenByte)
+      assert(((-5).toByte +- 2.toByte) === minusSevenByte)
+    }
+
     def `should do nothing if the number is within the specified range, when used with !==` {
 
       // Double +- Double
@@ -423,6 +678,135 @@ class ToleranceSpec extends Spec with NonImplicitAssertions with TripleEquals wi
       assert(sevenByte !== (10.toByte +- 2.toByte))
       assert(minusSevenByte !== ((-4).toByte +- 2.toByte))
       assert(minusSevenByte !== ((-10).toByte +- 2.toByte))
+    }
+
+    def `should, for symmetry, do nothing if the number is within the specified range, when used with !== on the left hand side` {
+
+      // Double +- Double
+      assert((7.5 +- 0.2) !== sevenDotOh)
+      assert((6.5 +- 0.2) !== sevenDotOh)
+      assert((-7.5 +- 0.2) !== minusSevenDotOh)
+      assert((-6.5 +- 0.2) !== minusSevenDotOh)
+
+      // Double +- Float
+      assert((7.5 +- 0.2f) !== sevenDotOh)
+      assert((6.5 +- 0.2f) !== sevenDotOh)
+      assert((-7.5 +- 0.2f) !== minusSevenDotOh)
+      assert((-6.5 +- 0.2f) !== minusSevenDotOh)
+
+      // Double +- Long
+      assert((4.0 +- 2L) !== sevenDotOh)
+      assert((9.1 +- 2L) !== sevenDotOh)
+      assert((-4.0 +- 2L) !== minusSevenDotOh)
+      assert((-9.1 +- 2L) !== minusSevenDotOh)
+
+      // Double +- Int
+      assert((4.0 +- 2) !== sevenDotOh)
+      assert((9.1 +- 2) !== sevenDotOh)
+      assert((-4.0 +- 2) !== minusSevenDotOh)
+      assert((-9.1 +- 2) !== minusSevenDotOh)
+
+      // Double +- Short
+      assert((4.0 +- 2.toShort) !== sevenDotOh)
+      assert((9.1 +- 2.toShort) !== sevenDotOh)
+      assert((-4.0 +- 2.toShort) !== minusSevenDotOh)
+      assert((-9.1 +- 2.toShort) !== minusSevenDotOh)
+
+      // Double +- Byte
+      assert((4.0 +- 2.toByte) !== sevenDotOh)
+      assert((9.1 +- 2.toByte) !== sevenDotOh)
+      assert((-4.0 +- 2.toByte) !== minusSevenDotOh)
+      assert((-9.1 +- 2.toByte) !== minusSevenDotOh)
+
+      // Float +- Float
+      assert((7.5f +- 0.2f) !== sevenDotOhFloat)
+      assert((6.5f +- 0.2f) !== sevenDotOhFloat)
+      assert((-7.5f +- 0.2f) !== minusSevenDotOhFloat)
+      assert((-6.5f +- 0.2f) !== minusSevenDotOhFloat)
+
+      // Float +- Long
+      assert((4.0f +- 2L) !== sevenDotOhFloat)
+      assert((9.1f +- 2L) !== sevenDotOhFloat)
+      assert((-4.0f +- 2L) !== minusSevenDotOhFloat)
+      assert((-9.1f +- 2L) !== minusSevenDotOhFloat)
+
+      // Float +- Int
+      assert((4.0f +- 2) !== sevenDotOhFloat)
+      assert((9.1f +- 2) !== sevenDotOhFloat)
+      assert((-4.0f +- 2) !== minusSevenDotOhFloat)
+      assert((-9.1f +- 2) !== minusSevenDotOhFloat)
+
+      // Float +- Short
+      assert((4.0f +- 2.toShort) !== sevenDotOhFloat)
+      assert((9.1f +- 2.toShort) !== sevenDotOhFloat)
+      assert((-4.0f +- 2.toShort) !== minusSevenDotOhFloat)
+      assert((-9.1f +- 2.toShort) !== minusSevenDotOhFloat)
+
+      // Float +- Byte
+      assert((4.0f +- 2.toByte) !== sevenDotOhFloat)
+      assert((9.1f +- 2.toByte) !== sevenDotOhFloat)
+      assert((-4.0f +- 2.toByte) !== minusSevenDotOhFloat)
+      assert((-9.1f +- 2.toByte) !== minusSevenDotOhFloat)
+
+      // Long +- Long
+      assert((4L +- 2L) !== sevenLong)
+      assert((10L +- 2L) !== sevenLong)
+      assert((-4L +- 2L) !== minusSevenLong)
+      assert((-10L +- 2L) !== minusSevenLong)
+
+      // Long +- Int
+      assert((4L +- 2) !== sevenLong)
+      assert((10L +- 2) !== sevenLong)
+      assert((-4L +- 2) !== minusSevenLong)
+      assert((-10L +- 2) !== minusSevenLong)
+
+      // Long +- Short
+      assert((4L +- 2.toShort) !== sevenLong)
+      assert((10L +- 2.toShort) !== sevenLong)
+      assert((-4L +- 2.toShort) !== minusSevenLong)
+      assert((-10L +- 2.toShort) !== minusSevenLong)
+
+      // Long +- Byte
+      assert((4L +- 2.toByte) !== sevenLong)
+      assert((10L +- 2.toByte) !== sevenLong)
+      assert((-4L +- 2.toByte) !== minusSevenLong)
+      assert((-10L +- 2.toByte) !== minusSevenLong)
+
+      // Int +- Int
+      assert((4 +- 2) !== sevenInt)
+      assert((10 +- 2) !== sevenInt)
+      assert((-4 +- 2) !== minusSevenInt)
+      assert((-10 +- 2) !== minusSevenInt)
+
+      // Int +- Short
+      assert((4 +- 2.toShort) !== sevenInt)
+      assert((10 +- 2.toShort) !== sevenInt)
+      assert((-4 +- 2.toShort) !== minusSevenInt)
+      assert((-10 +- 2.toShort) !== minusSevenInt)
+
+      // Int +- Byte
+      assert((4 +- 2.toByte) !== sevenInt)
+      assert((10 +- 2.toByte) !== sevenInt)
+      assert((-4 +- 2.toByte) !== minusSevenInt)
+      assert((-10 +- 2.toByte) !== minusSevenInt)
+
+      // Short +- Short
+      assert((4.toShort +- 2.toShort) !== sevenShort)
+      assert((10.toShort +- 2.toShort) !== sevenShort)
+      assert(((-4).toShort +- 2.toShort) !== minusSevenShort)
+      assert(((-10).toShort +- 2.toShort) !== minusSevenShort)
+
+      // Short +- Byte
+      assert((4.toShort +- 2.toByte) !== sevenShort)
+      assert((10.toShort +- 2.toByte) !== sevenShort)
+      assert(((-4).toShort +- 2.toByte) !== minusSevenShort)
+      assert(((-10).toShort +- 2.toByte) !== minusSevenShort)
+
+      // Byte +- Byte
+      assert((4.toByte +- 2.toByte) !== sevenByte)
+      assert((10.toByte +- 2.toByte) !== sevenByte)
+      assert(((-4).toByte +- 2.toByte) !== minusSevenByte)
+      assert(((-10).toByte +- 2.toByte) !== minusSevenByte)
     }
 
     def `should throw TestFailedException if the number is not within the specified range` {
