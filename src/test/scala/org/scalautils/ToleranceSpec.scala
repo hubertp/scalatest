@@ -296,7 +296,7 @@ class ToleranceSpec extends Spec with NonImplicitAssertions with TripleEquals wi
       assert(minusSevenByte === ((-5).toByte +- 2.toByte))
     }
 
-    def `should do nothing if the number is within the specified range, when used with !==` { pending
+    def `should do nothing if the number is within the specified range, when used with !==` {
 
       // Double +- Double
       assert(sevenDotOh !== (7.5 +- 0.2))
