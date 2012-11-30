@@ -29,8 +29,8 @@ final case class Interval[T : Numeric](right: T, tolerance: T) {
   def isWithin(n: T): Boolean = {
     numeric.gteq(n, min) && numeric.lteq(n, max)
   }
-  def ===(fartherRight: T): Boolean = { println("&^&^&^&^&^ got " + fartherRight); isWithin(fartherRight) }
-  def !==(fartherRight: T): Boolean = { println("&^&^&^&^&^ got " + fartherRight); !isWithin(fartherRight) }
+  def ===(fartherRight: T): Boolean = isWithin(fartherRight)
+  def !==(fartherRight: T): Boolean = !isWithin(fartherRight)
 }
 
 trait Tolerance {
