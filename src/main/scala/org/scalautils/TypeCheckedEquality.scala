@@ -21,7 +21,7 @@ trait LowPriorityTypeCheckedEquality extends EqualityConstraints {
 
 trait TypeCheckedEquality extends LowPriorityTypeCheckedEquality {
 
-  override def unconstrainedEquality[A, B]: EqualityConstraint[A, B] = { println("TCE!"); new EqualityConstraint[A, B] }
+  override def unconstrainedEquality[A, B]: EqualityConstraint[A, B] = new EqualityConstraint[A, B]
 
   implicit override def typeCheckedEqualityConstraint[A, B](implicit ev: B <:< A): EqualityConstraint[A, B] = new EqualityConstraint[A, B]
 
