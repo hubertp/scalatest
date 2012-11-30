@@ -20,9 +20,11 @@ trait TripleEquals extends AnyEquality {
   class AnyEqualizer[L](left: L) {
     def ===[R](right: R)(implicit equality: Equality[L], constraint: EqualityConstraint[L, R]): Boolean = equality.areEqual(left, right)
     def !==[R](right: R)(implicit equality: Equality[L], constraint: EqualityConstraint[L, R]): Boolean = !equality.areEqual(left, right)
+    def ===(interval: Interval[L]): Boolean = interval.isWithin(left)
+    def !==(interval: Interval[L]): Boolean = !interval.isWithin(left)
   }
 
-  implicit def convertToAnyEqualizer[T](o: T) = new AnyEqualizer(o)
+  implicit def convertToAnyEqualizer[T](o: T): AnyEqualizer[T] = new AnyEqualizer(o)
 }
 
 object TripleEquals extends TripleEquals
