@@ -425,7 +425,7 @@ class ToleranceSpec extends Spec with NonImplicitAssertions with TripleEquals wi
       assert(minusSevenByte !== ((-10).toByte +- 2.toByte))
     }
 
-    def `should throw TestFailedException if the number is not within the specified range` { pending
+    def `should throw TestFailedException if the number is not within the specified range` {
 
       // Double +- Double
       val caught1 = intercept[TestFailedException] {
@@ -533,133 +533,133 @@ class ToleranceSpec extends Spec with NonImplicitAssertions with TripleEquals wi
       }
     }
 
-    def `should throw TestFailedException if the number passed as the range is 0 or negative` { pending
+    def `should throw IllegalArgumentException if the number passed as the range is 0 or negative` {
 
       // Double +- Double
-      val caught1 = intercept[TestFailedException] {
+      val caught1 = intercept[IllegalArgumentException] {
         assert(sevenDotOh === (7.1 +- -0.2))
       }
-      assert(caught1.getMessage === "Range (-0.2) passed to +- was zero or negative. Must be a positive non-zero number.")
+      assert(caught1.getMessage === "-0.2 passed to +- was zero or negative. Must be a positive non-zero number.", caught1.getMessage)
 
       // Double +- Float
-      val caught2 = intercept[TestFailedException] {
+      val caught2 = intercept[IllegalArgumentException] {
         assert(sevenDotOh === (7.1 +- -0.2f))
       }
-      assert(caught2.getMessage === "Range (-0.20000000298023224) passed to +- was zero or negative. Must be a positive non-zero number.")
+      assert(caught2.getMessage === "-0.20000000298023224 passed to +- was zero or negative. Must be a positive non-zero number.")
 
       // Double +- Long
-      val caught3 = intercept[TestFailedException] {
+      val caught3 = intercept[IllegalArgumentException] {
         assert(sevenDotOh === (7.1 +- -2L))
       }
-      assert(caught3.getMessage === "Range (-2.0) passed to +- was zero or negative. Must be a positive non-zero number.")
+      assert(caught3.getMessage === "-2.0 passed to +- was zero or negative. Must be a positive non-zero number.")
 
       // Double +- Int
-      val caught4 = intercept[TestFailedException] {
+      val caught4 = intercept[IllegalArgumentException] {
         assert(sevenDotOh === (7.1 +- -2))
       }
-      assert(caught4.getMessage === "Range (-2.0) passed to +- was zero or negative. Must be a positive non-zero number.")
+      assert(caught4.getMessage === "-2.0 passed to +- was zero or negative. Must be a positive non-zero number.")
 
       // Double +- Short
-      val caught5 = intercept[TestFailedException] {
+      val caught5 = intercept[IllegalArgumentException] {
         assert(sevenDotOh === (7.1 +- (-2).toShort))
       }
-      assert(caught5.getMessage === "Range (-2.0) passed to +- was zero or negative. Must be a positive non-zero number.")
+      assert(caught5.getMessage === "-2.0 passed to +- was zero or negative. Must be a positive non-zero number.")
 
       // Double +- Byte
-      val caught6 = intercept[TestFailedException] {
+      val caught6 = intercept[IllegalArgumentException] {
         assert(sevenDotOh === (7.1 +- (-2).toByte))
       }
-      assert(caught6.getMessage === "Range (-2.0) passed to +- was zero or negative. Must be a positive non-zero number.")
+      assert(caught6.getMessage === "-2.0 passed to +- was zero or negative. Must be a positive non-zero number.")
 
       // Float +- Float
-      val caught7 = intercept[TestFailedException] {
+      val caught7 = intercept[IllegalArgumentException] {
         assert(sevenDotOhFloat === (7.1f +- -0.2f))
       }
-      assert(caught7.getMessage === "Range (-0.2) passed to +- was zero or negative. Must be a positive non-zero number.")
+      assert(caught7.getMessage === "-0.2 passed to +- was zero or negative. Must be a positive non-zero number.")
 
       // Float +- Long
-      val caught8 = intercept[TestFailedException] {
+      val caught8 = intercept[IllegalArgumentException] {
         assert(sevenDotOhFloat === (7.1f +- -2L))
       }
-      assert(caught8.getMessage === "Range (-2.0) passed to +- was zero or negative. Must be a positive non-zero number.")
+      assert(caught8.getMessage === "-2.0 passed to +- was zero or negative. Must be a positive non-zero number.")
 
       // Float +- Int
-      val caught9 = intercept[TestFailedException] {
+      val caught9 = intercept[IllegalArgumentException] {
         assert(sevenDotOhFloat === (7.1f +- -2))
       }
-      assert(caught9.getMessage === "Range (-2.0) passed to +- was zero or negative. Must be a positive non-zero number.")
+      assert(caught9.getMessage === "-2.0 passed to +- was zero or negative. Must be a positive non-zero number.")
 
       // Float +- Short
-      val caught10 = intercept[TestFailedException] {
+      val caught10 = intercept[IllegalArgumentException] {
         assert(sevenDotOhFloat === (7.1f +- (-2).toShort))
       }
-      assert(caught10.getMessage === "Range (-2.0) passed to +- was zero or negative. Must be a positive non-zero number.")
+      assert(caught10.getMessage === "-2.0 passed to +- was zero or negative. Must be a positive non-zero number.")
 
       // Float +- Byte
-      val caught11 = intercept[TestFailedException] {
+      val caught11 = intercept[IllegalArgumentException] {
         assert(sevenDotOhFloat === (7.1f +- (-2).toByte))
       }
-      assert(caught11.getMessage === "Range (-2.0) passed to +- was zero or negative. Must be a positive non-zero number.")
+      assert(caught11.getMessage === "-2.0 passed to +- was zero or negative. Must be a positive non-zero number.")
 
       // Long +- Long
-      val caught12 = intercept[TestFailedException] {
+      val caught12 = intercept[IllegalArgumentException] {
         assert(sevenLong === (9L +- -2L))
       }
-      assert(caught12.getMessage === "Range (-2) passed to +- was zero or negative. Must be a positive non-zero number.")
+      assert(caught12.getMessage === "-2 passed to +- was zero or negative. Must be a positive non-zero number.")
 
       // Long +- Int
-      val caught13 = intercept[TestFailedException] {
+      val caught13 = intercept[IllegalArgumentException] {
         assert(sevenLong === (9L +- -2))
       }
-      assert(caught13.getMessage === "Range (-2) passed to +- was zero or negative. Must be a positive non-zero number.")
+      assert(caught13.getMessage === "-2 passed to +- was zero or negative. Must be a positive non-zero number.")
 
       // Long +- Short
-      val caught14 = intercept[TestFailedException] {
+      val caught14 = intercept[IllegalArgumentException] {
         assert(sevenLong === (9L +- (-2).toShort))
       }
-      assert(caught14.getMessage === "Range (-2) passed to +- was zero or negative. Must be a positive non-zero number.")
+      assert(caught14.getMessage === "-2 passed to +- was zero or negative. Must be a positive non-zero number.")
 
       // Long +- Byte
-      val caught15 = intercept[TestFailedException] {
+      val caught15 = intercept[IllegalArgumentException] {
         assert(sevenLong === (9L +- (-2).toByte))
       }
-      assert(caught15.getMessage === "Range (-2) passed to +- was zero or negative. Must be a positive non-zero number.")
+      assert(caught15.getMessage === "-2 passed to +- was zero or negative. Must be a positive non-zero number.")
 
       // Int +- Int
-      val caught16 = intercept[TestFailedException] {
+      val caught16 = intercept[IllegalArgumentException] {
         assert(sevenInt === (9 +- -2))
       }
-      assert(caught16.getMessage === "Range (-2) passed to +- was zero or negative. Must be a positive non-zero number.")
+      assert(caught16.getMessage === "-2 passed to +- was zero or negative. Must be a positive non-zero number.")
 
       // Int +- Short
-      val caught17 = intercept[TestFailedException] {
+      val caught17 = intercept[IllegalArgumentException] {
         assert(sevenInt === (9 +- (-2).toShort))
       }
-      assert(caught17.getMessage === "Range (-2) passed to +- was zero or negative. Must be a positive non-zero number.")
+      assert(caught17.getMessage === "-2 passed to +- was zero or negative. Must be a positive non-zero number.")
 
       // Int +- Byte
-      val caught18 = intercept[TestFailedException] {
+      val caught18 = intercept[IllegalArgumentException] {
         assert(sevenInt === (9 +- (-2).toByte))
       }
-      assert(caught18.getMessage === "Range (-2) passed to +- was zero or negative. Must be a positive non-zero number.")
+      assert(caught18.getMessage === "-2 passed to +- was zero or negative. Must be a positive non-zero number.")
 
       // Short +- Short
-      val caught19 = intercept[TestFailedException] {
+      val caught19 = intercept[IllegalArgumentException] {
         assert(sevenShort === (9.toShort +- (-2).toShort))
       }
-      assert(caught19.getMessage === "Range (-2) passed to +- was zero or negative. Must be a positive non-zero number.")
+      assert(caught19.getMessage === "-2 passed to +- was zero or negative. Must be a positive non-zero number.")
 
       // Short +- Byte
-      val caught20 = intercept[TestFailedException] {
+      val caught20 = intercept[IllegalArgumentException] {
         assert(sevenShort === (9.toShort +- (-2).toByte))
       }
-      assert(caught20.getMessage === "Range (-2) passed to +- was zero or negative. Must be a positive non-zero number.")
+      assert(caught20.getMessage === "-2 passed to +- was zero or negative. Must be a positive non-zero number.")
 
       // Byte +- Byte
-      val caught21 = intercept[TestFailedException] {
+      val caught21 = intercept[IllegalArgumentException] {
         assert(sevenByte === (9.toByte +- (-2).toByte))
       }
-      assert(caught21.getMessage === "Range (-2) passed to +- was zero or negative. Must be a positive non-zero number.")
+      assert(caught21.getMessage === "-2 passed to +- was zero or negative. Must be a positive non-zero number.")
     }
   }
 }
