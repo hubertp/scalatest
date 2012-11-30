@@ -54,10 +54,6 @@ class AnyEqualitySpec extends Spec with NonImplicitAssertions {
       assert(AnyEquality.anyEquality[Vector[Int]].areEqual(v, a))
       assert(AnyEquality.anyEquality[Array[Int]].areEqual(a, b))
     }
-
-    def `should handle tolerances specially` {
-      pending
-    }
   }
 }
 
