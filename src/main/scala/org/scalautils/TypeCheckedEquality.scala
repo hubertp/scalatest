@@ -13,18 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.scalatest
+package org.scalautils
 
-trait UncheckedEquality extends EqualityConstraints {
+trait LowPriorityTypeCheckedEquality extends EqualityConstraints {
+  implicit override def lowPriorityTypeCheckedEqualityConstraint[A, B](implicit ev: A <:< B): EqualityConstraint[A, B] = new EqualityConstraint[A, B]
+}
 
-  implicit override def unconstrainedEquality[A, B]: EqualityConstraint[A, B] = { println("UE!"); new EqualityConstraint[A, B] }
+trait TypeCheckedEquality extends LowPriorityTypeCheckedEquality {
 
-  override def lowPriorityTypeCheckedEqualityConstraint[A, B](implicit ev: A <:< B): EqualityConstraint[A, B] = new EqualityConstraint[A, B]
-  override def typeCheckedEqualityConstraint[A, B](implicit ev: B <:< A): EqualityConstraint[A, B] = new EqualityConstraint[A, B]
+  override def unconstrainedEquality[A, B]: EqualityConstraint[A, B] = { println("TCE!"); new EqualityConstraint[A, B] }
+
+  implicit override def typeCheckedEqualityConstraint[A, B](implicit ev: B <:< A): EqualityConstraint[A, B] = new EqualityConstraint[A, B]
 
   override def lowPriorityConversionCheckedEqualityConstraint[A, B](implicit ev: A => B): EqualityConstraint[A, B] = new EqualityConstraint[A, B]
   override def conversionCheckedEqualityConstraint[A, B](implicit ev: B => A): EqualityConstraint[A, B] = new EqualityConstraint[A, B]
 }
 
-object UncheckedEquality extends UncheckedEquality
+object TypeCheckedEquality extends TypeCheckedEquality
 

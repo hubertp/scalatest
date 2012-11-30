@@ -407,6 +407,7 @@
             <reporter type="stdout" config="D"/>
         	<reporter type="html" directory="target/html" config="D" />
             <membersonly package="org.scalatest" />
+            <membersonly package="org.scalautils" />
             <membersonly package="org.scalatest.fixture" />
             <membersonly package="org.scalatest.concurrent" />
             <membersonly package="org.scalatest.testng" />
