@@ -22,3 +22,7 @@ class EqualityConstraint[A, B] {
 class BToAEqualityConstraint[A, B](cnv: B => A) extends EqualityConstraint[A, B] {
   override def areEqual(equality: Equality[A], left: A, right: B): Boolean = equality.areEqual(left, cnv(right))
 }
+
+class AToBEqualityConstraint[A, B](equalityOfB: Equality[B], cnv: A => B) extends EqualityConstraint[A, B] {
+  override def areEqual(equality: Equality[A], left: A, right: B): Boolean = equalityOfB.areEqual(cnv(left), right)
+}

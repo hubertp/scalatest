@@ -16,7 +16,7 @@
 package org.scalautils
 
 trait LowPriorityConversionCheckedEquality extends EqualityConstraints {
-  implicit override def lowPriorityConversionCheckedEqualityConstraint[A, B](implicit cnv: A => B): EqualityConstraint[A, B] = new EqualityConstraint[A, B]
+  implicit override def lowPriorityConversionCheckedEqualityConstraint[A, B](implicit equalityOfB: Equality[B], cnv: A => B): EqualityConstraint[A, B] = new AToBEqualityConstraint[A, B](equalityOfB, cnv)
 }
 
 trait ConversionCheckedEquality extends LowPriorityConversionCheckedEquality {

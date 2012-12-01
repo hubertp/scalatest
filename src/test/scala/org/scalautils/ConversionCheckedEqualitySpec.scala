@@ -29,7 +29,7 @@ class ConversionCheckedEqualitySpec extends Spec with NonImplicitAssertions with
 
     case class Box[T](value: T)
 
-    def `should automatically unbox an object on the left` { pending
+    def `should automatically unbox an object on the left` {
 
       implicit def unbox[T](box: Box[T]): T = box.value
 
@@ -45,7 +45,7 @@ class ConversionCheckedEqualitySpec extends Spec with NonImplicitAssertions with
       assert("s" === Box("s"))
     }
 
-    def `should automatically box an object on the left` { pending
+    def `should automatically box an object on the left` {
 
       implicit def box[T](obj: T): Box[T] = Box(obj)
 
