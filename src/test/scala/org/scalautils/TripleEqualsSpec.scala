@@ -39,7 +39,7 @@ class TripleEqualsSpec extends Spec with NonImplicitAssertions {
 
       def `should compare anything with anything` {
 
-        object O extends TripleEquals with UncheckedEquality
+        object O extends TripleEquals
         import O._
 
         assert(1 === 1)
@@ -67,10 +67,10 @@ class TripleEqualsSpec extends Spec with NonImplicitAssertions {
 
       def `should be overridable with TypeCheckedEquality locally when UncheckedEquality imported` {
 
-        object O extends TripleEquals with UncheckedEquality
+        object O extends TripleEquals
         import O._
 
-        new TypeCheckedEquality {
+        new TypeCheckedTripleEquals {
 
           class Fruit { override def equals(o: Any) = o.isInstanceOf[Fruit] }
           trait Crunchy
@@ -113,9 +113,9 @@ class TripleEqualsSpec extends Spec with NonImplicitAssertions {
 
       def `should be overridable with TypeCheckedEquality locally when UncheckedEquality mixed in` {
 
-        object O extends TripleEquals with UncheckedEquality {
+        object O extends TripleEquals {
 
-          new TypeCheckedEquality {
+          new TypeCheckedTripleEquals {
 
             class Fruit { override def equals(o: Any) = o.isInstanceOf[Fruit] }
             trait Crunchy
@@ -159,10 +159,10 @@ class TripleEqualsSpec extends Spec with NonImplicitAssertions {
 
       def `should be overridable with ConversionCheckedEquality locally when UncheckedEquality imported` {
 
-        object O extends TripleEquals with UncheckedEquality
+        object O extends TripleEquals
         import O._
 
-        new ConversionCheckedEquality {
+        new ConversionCheckedTripleEquals {
 
             class Fruit { override def equals(o: Any) = o.isInstanceOf[Fruit] }
             trait Crunchy
@@ -205,9 +205,9 @@ class TripleEqualsSpec extends Spec with NonImplicitAssertions {
       }
 
       def `should be overridable with ConversionCheckedEquality locally when UncheckedEquality mixed in` {
-        object O extends TripleEquals with UncheckedEquality {
+        object O extends TripleEquals {
 
-          new ConversionCheckedEquality {
+          new ConversionCheckedTripleEquals {
 
             class Fruit { override def equals(o: Any) = o.isInstanceOf[Fruit] }
             trait Crunchy
@@ -255,7 +255,7 @@ class TripleEqualsSpec extends Spec with NonImplicitAssertions {
 
       def `should compare supertypes with subtypes on either side` {
 
-        object O extends TripleEquals with TypeCheckedEquality
+        object O extends TypeCheckedTripleEquals
         import O._
 
         class Fruit { override def equals(o: Any) = o.isInstanceOf[Fruit] }
@@ -298,10 +298,10 @@ class TripleEqualsSpec extends Spec with NonImplicitAssertions {
 
       def `should be overridable with UncheckedEquality locally when TypeCheckedEquality imported` {
 
-        object O extends TripleEquals with TypeCheckedEquality
+        object O extends TypeCheckedTripleEquals
         import O._
 
-        new UncheckedEquality {
+        new TripleEquals {
 
           assert(1 === 1)
           assert(!(1 !== 1))
@@ -329,9 +329,9 @@ class TripleEqualsSpec extends Spec with NonImplicitAssertions {
 
       def `should be overridable with UncheckedEquality locally when TypeCheckedEquality mixed in` {
 
-        object O extends TripleEquals with TypeCheckedEquality {
+        object O extends TypeCheckedTripleEquals {
 
-          new UncheckedEquality {
+          new TripleEquals {
 
             assert(1 === 1)
             assert(!(1 !== 1))
@@ -360,10 +360,10 @@ class TripleEqualsSpec extends Spec with NonImplicitAssertions {
 
       def `should be overridable with ConversionCheckedEquality locally when TypeCheckedEquality imported` {
 
-        object O extends TripleEquals with TypeCheckedEquality
+        object O extends TypeCheckedTripleEquals
         import O._
 
-        new ConversionCheckedEquality {
+        new ConversionCheckedTripleEquals {
 
           class Fruit { override def equals(o: Any) = o.isInstanceOf[Fruit] }
           trait Crunchy
@@ -407,9 +407,9 @@ class TripleEqualsSpec extends Spec with NonImplicitAssertions {
 
       def `should be overridable with ConversionCheckedEquality locally when TypeCheckedEquality mixed in` {
 
-        object O extends TripleEquals with TypeCheckedEquality {
+        object O extends TypeCheckedTripleEquals {
 
-          new ConversionCheckedEquality {
+          new ConversionCheckedTripleEquals {
 
             class Fruit { override def equals(o: Any) = o.isInstanceOf[Fruit] }
             trait Crunchy
@@ -457,7 +457,7 @@ class TripleEqualsSpec extends Spec with NonImplicitAssertions {
 
       def `should compare supertypes with subtypes on either side as well as types with implicit conversions in either direction` {
 
-        object O extends TripleEquals with ConversionCheckedEquality
+        object O extends ConversionCheckedTripleEquals
         import O._
 
         class Fruit { override def equals(o: Any) = o.isInstanceOf[Fruit] }
@@ -501,10 +501,10 @@ class TripleEqualsSpec extends Spec with NonImplicitAssertions {
 
       def `should be overridable with UncheckedEquality locally when ConversionCheckedEquality imported` {
 
-        object O extends TripleEquals with ConversionCheckedEquality
+        object O extends ConversionCheckedTripleEquals
         import O._
 
-        new UncheckedEquality {
+        new TripleEquals {
 
           assert(1 === 1)
           assert(!(1 !== 1))
@@ -532,9 +532,9 @@ class TripleEqualsSpec extends Spec with NonImplicitAssertions {
 
       def `should be overridable with UncheckedEquality locally when ConversionCheckedEquality mixed in` {
 
-        object O extends TripleEquals with ConversionCheckedEquality {
+        object O extends ConversionCheckedTripleEquals {
 
-          new UncheckedEquality {
+          new TripleEquals {
 
             assert(1 === 1)
             assert(!(1 !== 1))
@@ -563,10 +563,10 @@ class TripleEqualsSpec extends Spec with NonImplicitAssertions {
 
       def `should be overridable with TypeCheckedEquality locally when ConversionCheckedEquality imported` {
 
-        object O extends TripleEquals with ConversionCheckedEquality
+        object O extends ConversionCheckedTripleEquals
         import O._
 
-        new TypeCheckedEquality {
+        new TypeCheckedTripleEquals {
 
           class Fruit { override def equals(o: Any) = o.isInstanceOf[Fruit] }
           trait Crunchy
@@ -609,9 +609,9 @@ class TripleEqualsSpec extends Spec with NonImplicitAssertions {
 
       def `should be overridable with TypeCheckedEquality locally when ConversionCheckedEquality mixed in` {
 
-        object O extends TripleEquals with ConversionCheckedEquality {
+        object O extends ConversionCheckedTripleEquals {
 
-          new TypeCheckedEquality {
+          new TypeCheckedTripleEquals {
 
             class Fruit { override def equals(o: Any) = o.isInstanceOf[Fruit] }
             trait Crunchy

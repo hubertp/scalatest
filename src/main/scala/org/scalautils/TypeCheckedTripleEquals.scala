@@ -15,11 +15,11 @@
  */
 package org.scalautils
 
-trait LowPriorityTypeCheckedEquality extends EqualityConstraints {
+trait LowPriorityTypeCheckedConstraint extends EqualityConstraints {
   implicit override def lowPriorityTypeCheckedEqualityConstraint[A, B](implicit equalityOfA: Equality[A], ev: A <:< B): EqualityConstraint[A, B] = new BasicEqualityConstraint[A, B](equalityOfA)
 }
 
-trait TypeCheckedEquality extends LowPriorityTypeCheckedEquality {
+trait TypeCheckedTripleEquals extends TripleEquals with LowPriorityTypeCheckedConstraint {
 
   override def unconstrainedEquality[A, B](implicit equalityOfA: Equality[A]): EqualityConstraint[A, B] = new BasicEqualityConstraint[A, B](equalityOfA)
 
@@ -29,5 +29,5 @@ trait TypeCheckedEquality extends LowPriorityTypeCheckedEquality {
   override def conversionCheckedEqualityConstraint[A, B](implicit equalityOfA: Equality[A], cnv: B => A): EqualityConstraint[A, B] = new BToAEqualityConstraint[A, B](equalityOfA, cnv)
 }
 
-object TypeCheckedEquality extends TypeCheckedEquality
+object TypeCheckedTripleEquals extends TypeCheckedTripleEquals
 

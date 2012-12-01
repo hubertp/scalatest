@@ -23,9 +23,9 @@ import scala.collection.GenIterable
 import scala.collection.GenTraversable
 import scala.collection.GenTraversableOnce
 
-class ConversionCheckedEqualitySpec extends Spec with NonImplicitAssertions with TripleEquals with ConversionCheckedEquality {
+class ConversionCheckedTripleEqualsSpec extends Spec with NonImplicitAssertions with ConversionCheckedTripleEquals {
 
-  object `the ConversionCheckedEquality trait` {
+  object `the ConversionCheckedTripleEquals trait` {
 
     case class Box[T](value: T)
 
