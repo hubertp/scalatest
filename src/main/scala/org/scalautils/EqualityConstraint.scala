@@ -15,5 +15,7 @@
  */
 package org.scalautils
 
-class EqualityConstraint[A, B]
+class EqualityConstraint[A, B] {
+  def areEqual(equality: Equality[A], left: A, right: B): Boolean = equality.areEqual(left, right)
+}
 
