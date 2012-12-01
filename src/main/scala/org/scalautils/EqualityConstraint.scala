@@ -15,14 +15,18 @@
  */
 package org.scalautils
 
-class EqualityConstraint[A, B] {
-  def areEqual(equality: Equality[A], left: A, right: B): Boolean = equality.areEqual(left, right)
+abstract class EqualityConstraint[A, B] {
+  def areEqual(left: A, right: B): Boolean
 }
 
-class BToAEqualityConstraint[A, B](cnv: B => A) extends EqualityConstraint[A, B] {
-  override def areEqual(equality: Equality[A], left: A, right: B): Boolean = equality.areEqual(left, cnv(right))
+class BasicEqualityConstraint[A, B](equalityOfA: Equality[A]) extends EqualityConstraint[A, B] {
+  def areEqual(left: A, right: B): Boolean = equalityOfA.areEqual(left, right)
+}
+
+class BToAEqualityConstraint[A, B](equalityOfA: Equality[A], cnv: B => A) extends EqualityConstraint[A, B] {
+  override def areEqual(left: A, right: B): Boolean = equalityOfA.areEqual(left, cnv(right))
 }
 
 class AToBEqualityConstraint[A, B](equalityOfB: Equality[B], cnv: A => B) extends EqualityConstraint[A, B] {
-  override def areEqual(equality: Equality[A], left: A, right: B): Boolean = equalityOfB.areEqual(cnv(left), right)
+  override def areEqual(left: A, right: B): Boolean = equalityOfB.areEqual(cnv(left), right)
 }

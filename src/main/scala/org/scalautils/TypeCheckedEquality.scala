@@ -16,17 +16,17 @@
 package org.scalautils
 
 trait LowPriorityTypeCheckedEquality extends EqualityConstraints {
-  implicit override def lowPriorityTypeCheckedEqualityConstraint[A, B](implicit ev: A <:< B): EqualityConstraint[A, B] = new EqualityConstraint[A, B]
+  implicit override def lowPriorityTypeCheckedEqualityConstraint[A, B](implicit equalityOfA: Equality[A], ev: A <:< B): EqualityConstraint[A, B] = new BasicEqualityConstraint[A, B](equalityOfA)
 }
 
 trait TypeCheckedEquality extends LowPriorityTypeCheckedEquality {
 
-  override def unconstrainedEquality[A, B]: EqualityConstraint[A, B] = new EqualityConstraint[A, B]
+  override def unconstrainedEquality[A, B](implicit equalityOfA: Equality[A]): EqualityConstraint[A, B] = new BasicEqualityConstraint[A, B](equalityOfA)
 
-  implicit override def typeCheckedEqualityConstraint[A, B](implicit ev: B <:< A): EqualityConstraint[A, B] = new EqualityConstraint[A, B]
+  implicit override def typeCheckedEqualityConstraint[A, B](implicit equalityOfA: Equality[A], ev: B <:< A): EqualityConstraint[A, B] = new BasicEqualityConstraint[A, B](equalityOfA)
 
   override def lowPriorityConversionCheckedEqualityConstraint[A, B](implicit equalityOfB: Equality[B], cnv: A => B): EqualityConstraint[A, B] = new AToBEqualityConstraint[A, B](equalityOfB, cnv)
-  override def conversionCheckedEqualityConstraint[A, B](implicit cnv: B => A): EqualityConstraint[A, B] = new EqualityConstraint[A, B]
+  override def conversionCheckedEqualityConstraint[A, B](implicit equalityOfA: Equality[A], cnv: B => A): EqualityConstraint[A, B] = new BToAEqualityConstraint[A, B](equalityOfA, cnv)
 }
 
 object TypeCheckedEquality extends TypeCheckedEquality
