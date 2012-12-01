@@ -26,7 +26,7 @@ trait ConversionCheckedEquality extends LowPriorityConversionCheckedEquality {
   override def lowPriorityTypeCheckedEqualityConstraint[A, B](implicit ev: A <:< B): EqualityConstraint[A, B] = new EqualityConstraint[A, B]
   override def typeCheckedEqualityConstraint[A, B](implicit ev: B <:< A): EqualityConstraint[A, B] = new EqualityConstraint[A, B]
 
-  implicit override def conversionCheckedEqualityConstraint[A, B](implicit cnv: B => A): EqualityConstraint[A, B] = new EqualityConstraint[A, B]
+  implicit override def conversionCheckedEqualityConstraint[A, B](implicit cnv: B => A): EqualityConstraint[A, B] = new BToAEqualityConstraint[A, B](cnv)
 }
 
 object ConversionCheckedEquality extends ConversionCheckedEquality
