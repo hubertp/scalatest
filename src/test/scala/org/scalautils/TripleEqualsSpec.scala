@@ -25,6 +25,14 @@ import scala.collection.GenTraversableOnce
 
 class TripleEqualsSpec extends Spec with NonImplicitAssertions {
 
+  case class Super(size: Int)
+  class Sub(sz: Int) extends Super(sz)
+
+  val super1: Super = new Super(1)
+  val sub1: Sub = new Sub(1)
+  val super2: Super = new Super(2)
+  val sub2: Sub = new Sub(2)
+
   object `the custom equality === operator` {
 
     object `with UncheckedEquality` {
@@ -48,6 +56,13 @@ class TripleEqualsSpec extends Spec with NonImplicitAssertions {
 
         assert(1 !== "1")
         assert(!(1 === "1"))
+
+        assert(super1 !== super2)
+        assert(super1 !== sub2)
+        assert(sub2 !== super1)
+        assert(super1 === super1)
+        assert(super1 === sub1)
+        assert(sub1 === super1)
       }
 
       def `should be overridable with TypeCheckedEquality locally when UncheckedEquality imported` {
@@ -73,6 +88,13 @@ class TripleEqualsSpec extends Spec with NonImplicitAssertions {
           assert(ap === cr)
           assert(cr === ap)
 
+          assert(super1 !== super2)
+          assert(super1 !== sub2)
+          assert(sub2 !== super1)
+          assert(super1 === super1)
+          assert(super1 === sub1)
+          assert(sub1 === super1)
+
           // The rest should not compile
           // assert(1 === 1L)
           // assert(1L === 1)
@@ -94,7 +116,7 @@ class TripleEqualsSpec extends Spec with NonImplicitAssertions {
         object O extends TripleEquals with UncheckedEquality {
 
           new TypeCheckedEquality {
-  
+
             class Fruit { override def equals(o: Any) = o.isInstanceOf[Fruit] }
             trait Crunchy
             class Apple extends Fruit with Crunchy
@@ -110,6 +132,13 @@ class TripleEqualsSpec extends Spec with NonImplicitAssertions {
             assert(fr === ap)
             assert(ap === cr)
             assert(cr === ap)
+
+            assert(super1 !== super2)
+            assert(super1 !== sub2)
+            assert(sub2 !== super1)
+            assert(super1 === super1)
+            assert(super1 === sub1)
+            assert(sub1 === super1)
   
             // The rest should not compile
             // assert(1 === 1L)
@@ -151,6 +180,13 @@ class TripleEqualsSpec extends Spec with NonImplicitAssertions {
             assert(ap === cr)
             assert(cr === ap)
 
+            assert(super1 !== super2)
+            assert(super1 !== sub2)
+            assert(sub2 !== super1)
+            assert(super1 === super1)
+            assert(super1 === sub1)
+            assert(sub1 === super1)
+
             // These should work with implicit conversions
             assert(1 === 1L)
             assert(1L === 1)
@@ -188,6 +224,13 @@ class TripleEqualsSpec extends Spec with NonImplicitAssertions {
             assert(fr === ap)
             assert(ap === cr)
             assert(cr === ap)
+
+            assert(super1 !== super2)
+            assert(super1 !== sub2)
+            assert(sub2 !== super1)
+            assert(super1 === super1)
+            assert(super1 === sub1)
+            assert(sub1 === super1)
 
             // These should work with implicit conversions
             assert(1 === 1L)
@@ -231,6 +274,13 @@ class TripleEqualsSpec extends Spec with NonImplicitAssertions {
         assert(ap === cr)
         assert(cr === ap)
 
+        assert(super1 !== super2)
+        assert(super1 !== sub2)
+        assert(sub2 !== super1)
+        assert(super1 === super1)
+        assert(super1 === sub1)
+        assert(sub1 === super1)
+
         // The rest should not compile
         // assert(1 === 1L)
         // assert(1L === 1)
@@ -267,6 +317,13 @@ class TripleEqualsSpec extends Spec with NonImplicitAssertions {
 
           assert(1 !== "1")
           assert(!(1 === "1"))
+
+          assert(super1 !== super2)
+          assert(super1 !== sub2)
+          assert(sub2 !== super1)
+          assert(super1 === super1)
+          assert(super1 === sub1)
+          assert(sub1 === super1)
         }
       }
 
@@ -290,6 +347,13 @@ class TripleEqualsSpec extends Spec with NonImplicitAssertions {
 
             assert(1 !== "1")
             assert(!(1 === "1"))
+
+            assert(super1 !== super2)
+            assert(super1 !== sub2)
+            assert(sub2 !== super1)
+            assert(super1 === super1)
+            assert(super1 === sub1)
+            assert(sub1 === super1)
           }
         }
       }
@@ -316,6 +380,13 @@ class TripleEqualsSpec extends Spec with NonImplicitAssertions {
           assert(fr === ap)
           assert(ap === cr)
           assert(cr === ap)
+
+          assert(super1 !== super2)
+          assert(super1 !== sub2)
+          assert(sub2 !== super1)
+          assert(super1 === super1)
+          assert(super1 === sub1)
+          assert(sub1 === super1)
 
           // These should work with implicit conversions
           assert(1 === 1L)
@@ -355,6 +426,13 @@ class TripleEqualsSpec extends Spec with NonImplicitAssertions {
             assert(fr === ap)
             assert(ap === cr)
             assert(cr === ap)
+
+            assert(super1 !== super2)
+            assert(super1 !== sub2)
+            assert(sub2 !== super1)
+            assert(super1 === super1)
+            assert(super1 === sub1)
+            assert(sub1 === super1)
 
             // These should work with implicit conversions
             assert(1 === 1L)
@@ -398,6 +476,13 @@ class TripleEqualsSpec extends Spec with NonImplicitAssertions {
         assert(ap === cr)
         assert(cr === ap)
 
+        assert(super1 !== super2)
+        assert(super1 !== sub2)
+        assert(sub2 !== super1)
+        assert(super1 === super1)
+        assert(super1 === sub1)
+        assert(sub1 === super1)
+
         // These should work with implicit conversions
         assert(1 === 1L)
         assert(1L === 1)
@@ -413,6 +498,7 @@ class TripleEqualsSpec extends Spec with NonImplicitAssertions {
         // assert(fr === cr)
         // assert(cr === fr)
       }
+
       def `should be overridable with UncheckedEquality locally when ConversionCheckedEquality imported` {
 
         object O extends TripleEquals with ConversionCheckedEquality
@@ -434,6 +520,13 @@ class TripleEqualsSpec extends Spec with NonImplicitAssertions {
 
           assert(1 !== "1")
           assert(!(1 === "1"))
+
+          assert(super1 !== super2)
+          assert(super1 !== sub2)
+          assert(sub2 !== super1)
+          assert(super1 === super1)
+          assert(super1 === sub1)
+          assert(sub1 === super1)
         }
       }
 
@@ -457,6 +550,13 @@ class TripleEqualsSpec extends Spec with NonImplicitAssertions {
 
             assert(1 !== "1")
             assert(!(1 === "1"))
+
+            assert(super1 !== super2)
+            assert(super1 !== sub2)
+            assert(sub2 !== super1)
+            assert(super1 === super1)
+            assert(super1 === sub1)
+            assert(sub1 === super1)
           }
         }
       }
@@ -483,6 +583,13 @@ class TripleEqualsSpec extends Spec with NonImplicitAssertions {
           assert(fr === ap)
           assert(ap === cr)
           assert(cr === ap)
+
+          assert(super1 !== super2)
+          assert(super1 !== sub2)
+          assert(sub2 !== super1)
+          assert(super1 === super1)
+          assert(super1 === sub1)
+          assert(sub1 === super1)
 
           // The rest should not compile
           // assert(1 === 1L)
@@ -521,6 +628,13 @@ class TripleEqualsSpec extends Spec with NonImplicitAssertions {
             assert(fr === ap)
             assert(ap === cr)
             assert(cr === ap)
+
+            assert(super1 !== super2)
+            assert(super1 !== sub2)
+            assert(sub2 !== super1)
+            assert(super1 === super1)
+            assert(super1 === sub1)
+            assert(sub1 === super1)
 
             // The rest should not compile
             // assert(1 === 1L)
