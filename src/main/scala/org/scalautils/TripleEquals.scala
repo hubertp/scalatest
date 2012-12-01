@@ -18,6 +18,8 @@ package org.scalautils
 // Gives you unconstrained equality
 trait TripleEquals extends AnyEquality with EqualityConstraints {
 
+  override def convertToEqualizer(left: Any) = new Equalizer(left)
+
   implicit override def unconstrainedEquality[A, B](implicit equalityOfA: Equality[A]): EqualityConstraint[A, B] = new BasicEqualityConstraint[A, B](equalityOfA)
 
   override def lowPriorityTypeCheckedEqualityConstraint[A, B](implicit equalityOfA: Equality[A], ev: A <:< B): EqualityConstraint[A, B] = new BasicEqualityConstraint[A, B](equalityOfA)

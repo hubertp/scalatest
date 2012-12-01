@@ -21,6 +21,8 @@ trait LowPriorityConversionCheckedConstraint extends EqualityConstraints {
 
 trait ConversionCheckedTripleEquals extends TripleEquals with LowPriorityConversionCheckedConstraint {
 
+  override def convertToEqualizer(left: Any) = new Equalizer(left)
+
   override def unconstrainedEquality[A, B](implicit equalityOfA: Equality[A]): EqualityConstraint[A, B] = new BasicEqualityConstraint[A, B](equalityOfA)
 
   override def lowPriorityTypeCheckedEqualityConstraint[A, B](implicit equalityOfA: Equality[A], ev: A <:< B): EqualityConstraint[A, B] = new BasicEqualityConstraint[A, B](equalityOfA)

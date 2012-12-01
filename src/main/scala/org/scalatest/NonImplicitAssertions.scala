@@ -15,6 +15,8 @@
  */
 package org.scalatest
 
+import org.scalautils.Equalizer
+
 /**
  * Trait that can be mixed into a <code>Suite</code> to disable the lone implicit conversion provided by default in trait
  * <code>Assertions</code>, which trait <code>Suite</code> extends.

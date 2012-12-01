@@ -39,30 +39,30 @@ class TripleEqualsSpec extends Spec with NonImplicitAssertions {
 
       def `should compare anything with anything` {
 
-        object O extends TripleEquals
-        import O._
+        new TripleEquals {
 
-        assert(1 === 1)
-        assert(!(1 !== 1))
+          assert(1 === 1)
+          assert(!(1 !== 1))
 
-        assert(1 === 1L)
-        assert(!(1 !== 1L))
+          assert(1 === 1L)
+          assert(!(1 !== 1L))
 
-        assert(1L === 1)
-        assert(!(1L !== 1))
+          assert(1L === 1)
+          assert(!(1L !== 1))
 
-        assert("1" !== 1)
-        assert(!("1" === 1))
+          assert("1" !== 1)
+          assert(!("1" === 1))
 
-        assert(1 !== "1")
-        assert(!(1 === "1"))
+          assert(1 !== "1")
+          assert(!(1 === "1"))
 
-        assert(super1 !== super2)
-        assert(super1 !== sub2)
-        assert(sub2 !== super1)
-        assert(super1 === super1)
-        assert(super1 === sub1)
-        assert(sub1 === super1)
+          assert(super1 !== super2)
+          assert(super1 !== sub2)
+          assert(sub2 !== super1)
+          assert(super1 === super1)
+          assert(super1 === sub1)
+          assert(sub1 === super1)
+        }
       }
 
       def `should be overridable with TypeCheckedTripleEquals locally when TripleEquals imported` {
@@ -256,45 +256,45 @@ class TripleEqualsSpec extends Spec with NonImplicitAssertions {
 
       def `should compare supertypes with subtypes on either side` {
 
-        object O extends TypeCheckedTripleEquals
-        import O._
+        new TypeCheckedTripleEquals {
 
-        class Fruit { override def equals(o: Any) = o.isInstanceOf[Fruit] }
-        trait Crunchy
-        class Apple extends Fruit with Crunchy
+          class Fruit { override def equals(o: Any) = o.isInstanceOf[Fruit] }
+          trait Crunchy
+          class Apple extends Fruit with Crunchy
 
-        val fr: Fruit = new Apple
-        val cr: Crunchy = new Apple
-        val ap: Apple = new Apple
+          val fr: Fruit = new Apple
+          val cr: Crunchy = new Apple
+          val ap: Apple = new Apple
 
-        assert(1 === 1)
-        assert(!(1 !== 1))
+          assert(1 === 1)
+          assert(!(1 !== 1))
 
-        assert(ap === fr)
-        assert(fr === ap)
-        assert(ap === cr)
-        assert(cr === ap)
+          assert(ap === fr)
+          assert(fr === ap)
+          assert(ap === cr)
+          assert(cr === ap)
 
-        assert(super1 !== super2)
-        assert(super1 !== sub2)
-        assert(sub2 !== super1)
-        assert(super1 === super1)
-        assert(super1 === sub1)
-        assert(sub1 === super1)
+          assert(super1 !== super2)
+          assert(super1 !== sub2)
+          assert(sub2 !== super1)
+          assert(super1 === super1)
+          assert(super1 === sub1)
+          assert(sub1 === super1)
 
-        // The rest should not compile
-        // assert(1 === 1L)
-        // assert(1L === 1)
-        // assert(1 !== 1L)
-        // assert(1L !== 1)
+          // The rest should not compile
+          // assert(1 === 1L)
+          // assert(1L === 1)
+          // assert(1 !== 1L)
+          // assert(1L !== 1)
 
-        // assert("1" === 1)
-        // assert(1 === "1")
-        // assert("1" !== 1)
-        // assert(1 !== "1")
+          // assert("1" === 1)
+          // assert(1 === "1")
+          // assert("1" !== 1)
+          // assert(1 !== "1")
 
-        // assert(fr === cr)
-        // assert(cr === fr)
+          // assert(fr === cr)
+          // assert(cr === fr)
+        }
       }
 
       def `should be overridable with TripleEquals locally when TypeCheckedTripleEquals imported` {
@@ -458,46 +458,46 @@ class TripleEqualsSpec extends Spec with NonImplicitAssertions {
 
       def `should compare supertypes with subtypes on either side as well as types with implicit conversions in either direction` {
 
-        object O extends ConversionCheckedTripleEquals
-        import O._
+        new ConversionCheckedTripleEquals {
 
-        class Fruit { override def equals(o: Any) = o.isInstanceOf[Fruit] }
-        trait Crunchy
-        class Apple extends Fruit with Crunchy
+          class Fruit { override def equals(o: Any) = o.isInstanceOf[Fruit] }
+          trait Crunchy
+          class Apple extends Fruit with Crunchy
 
-        val fr: Fruit = new Apple
-        val cr: Crunchy = new Apple
-        val ap: Apple = new Apple
+          val fr: Fruit = new Apple
+          val cr: Crunchy = new Apple
+          val ap: Apple = new Apple
 
-        assert(1 === 1)
-        assert(!(1 !== 1))
+          assert(1 === 1)
+          assert(!(1 !== 1))
 
-        assert(ap === fr)
-        assert(fr === ap)
-        assert(ap === cr)
-        assert(cr === ap)
+          assert(ap === fr)
+          assert(fr === ap)
+          assert(ap === cr)
+          assert(cr === ap)
 
-        assert(super1 !== super2)
-        assert(super1 !== sub2)
-        assert(sub2 !== super1)
-        assert(super1 === super1)
-        assert(super1 === sub1)
-        assert(sub1 === super1)
+          assert(super1 !== super2)
+          assert(super1 !== sub2)
+          assert(sub2 !== super1)
+          assert(super1 === super1)
+          assert(super1 === sub1)
+          assert(sub1 === super1)
 
-        // These should work with implicit conversions
-        assert(1 === 1L)
-        assert(1L === 1)
-        assert(!(1 !== 1L))
-        assert(!(1L !== 1))
+          // These should work with implicit conversions
+          assert(1 === 1L)
+          assert(1L === 1)
+          assert(!(1 !== 1L))
+          assert(!(1L !== 1))
 
-        // The rest should not compile
-        // assert("1" === 1)
-        // assert(1 === "1")
-        // assert("1" !== 1)
-        // assert(1 !== "1")
+          // The rest should not compile
+          // assert("1" === 1)
+          // assert(1 === "1")
+          // assert("1" !== 1)
+          // assert(1 !== "1")
 
-        // assert(fr === cr)
-        // assert(cr === fr)
+          // assert(fr === cr)
+          // assert(cr === fr)
+        }
       }
 
       def `should be overridable with TripleEquals locally when ConversionCheckedTripleEquals imported` {
