@@ -9,7 +9,7 @@ Bundle-Vendor: Artima, Inc.
 
 Import-Package: org.scalatest.*, scala.*, org.scalautils.*;version="$<range;[==,=+);$<replace;${scala.version};-;.>>", *;resolution:=optional
 
-Export-Package: org.scalatest.*, org.scalatest.*;version="${release}"
+Export-Package: org.scalatest.*, org.scalautils.*;version="${release}"
 
 Include-Resource: images/=target/jar_contents/images/
 
