@@ -157,7 +157,8 @@ final class Equalizer(left: Any) {
       None
     else {
       val (leftee, rightee) = getObjectsForFailureMessage(left, right)
-      Some(leftee + " did not equal " + rightee)
+      Some(FailureMessages("didNotEqual", leftee, rightee))
+      //Some(leftee + " did not equal " + rightee)
     }
   }
 /*
