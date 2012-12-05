@@ -15,6 +15,9 @@
  */
 package org.scalautils
 
+import annotation.implicitNotFound
+
+@implicitNotFound(msg = "types ${A} and ${B} do not adhere to the equality constraint selected for the === and !== operators; they must either be in a subtype/supertype relationship, or, if ConversionCheckedTripleEquals is in force, implicitly convertible in one direction or the other; the missing implicit parameter is of type org.scalautils.EqualityConstraint[${A},${B}]")
 abstract class EqualityConstraint[A, B] {
   def areEqual(left: A, right: B): Boolean
 }
