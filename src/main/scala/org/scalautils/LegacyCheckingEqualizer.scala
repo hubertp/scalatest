@@ -243,15 +243,35 @@ class LegacyCheckingEqualizer[L](left: L) {
     }
 
   def ===(interval: Interval[L]): Option[String] =
-    if (if (interval != null) interval.isWithin(left) else left == interval)
-      None
-    else
-      Some(FailureMessages("wasNotPlusOrMinus", left, interval.right, interval.tolerance))
+    if (interval == null) {
+      if (left == null)
+        None
+      else {
+        val (leftee, rightee) = getObjectsForFailureMessage(left, interval)
+        Some(FailureMessages("equaled", leftee, rightee))
+      }
+    }
+    else {
+      if (interval.isWithin(left))
+        None
+      else
+        Some(FailureMessages("wasNotPlusOrMinus", left, interval.right, interval.tolerance))
+    }
 
   def !==(interval: Interval[L]): Option[String] =
-    if (if (interval != null) !interval.isWithin(left) else left != interval)
-      None
-    else
-      Some(FailureMessages("wasPlusOrMinus", left, interval.right, interval.tolerance))
+    if (interval == null) {
+      if (left != null)
+        None
+      else {
+        val (leftee, rightee) = getObjectsForFailureMessage(left, interval)
+        Some(FailureMessages("equaled", leftee, rightee))
+      }
+    }
+    else {
+      if (if (interval != null) !interval.isWithin(left) else left != interval)
+        None
+      else
+        Some(FailureMessages("wasPlusOrMinus", left, interval.right, interval.tolerance))
+    }
   }
 
