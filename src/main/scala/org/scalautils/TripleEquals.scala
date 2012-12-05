@@ -31,8 +31,8 @@ trait TripleEquals extends AnyEquality with EqualityConstraints {
   class AnyEqualizer[L](left: L) {
     def ===[R](right: R)(implicit constraint: EqualityConstraint[L, R]): Boolean = constraint.areEqual(left, right)
     def !==[R](right: R)(implicit constraint: EqualityConstraint[L, R]): Boolean = !constraint.areEqual(left, right)
-    def ===(interval: Interval[L]): Boolean = interval.isWithin(left)
-    def !==(interval: Interval[L]): Boolean = !interval.isWithin(left)
+    def ===(interval: Interval[L]): Boolean = if (interval != null) interval.isWithin(left) else false // left == interval
+    def !==(interval: Interval[L]): Boolean = if (interval != null) !interval.isWithin(left) else true // left != interval
   }
 
   implicit def convertToAnyEqualizer[T](o: T): AnyEqualizer[T] = new AnyEqualizer(o)
