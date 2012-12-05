@@ -32,6 +32,7 @@ class TripleEqualsSpec extends Spec with NonImplicitAssertions {
   val sub1: Sub = new Sub(1)
   val super2: Super = new Super(2)
   val sub2: Sub = new Sub(2)
+  val nullSuper: Super = null
 
   object `the custom equality === operator` {
 
@@ -65,6 +66,11 @@ class TripleEqualsSpec extends Spec with NonImplicitAssertions {
 
           assert(!(super1 === null))
           assert(super1 !== null)
+
+          assert(nullSuper === null)
+          assert(!(nullSuper !== null))
+          assert(!(nullSuper === super1))
+          assert(nullSuper !== super1)
         }
       }
 
@@ -300,6 +306,11 @@ class TripleEqualsSpec extends Spec with NonImplicitAssertions {
 
           assert(!(super1 === null))
           assert(super1 !== null)
+
+          assert(nullSuper === null)
+          assert(!(nullSuper !== null))
+          assert(!(nullSuper === super1))
+          assert(nullSuper !== super1)
         }
       }
 
@@ -506,6 +517,11 @@ class TripleEqualsSpec extends Spec with NonImplicitAssertions {
 
           assert(!(super1 === null))
           assert(super1 !== null)
+
+          assert(nullSuper === null)
+          assert(!(nullSuper !== null))
+          assert(!(nullSuper === super1))
+          assert(nullSuper !== super1)
         }
       }
 
