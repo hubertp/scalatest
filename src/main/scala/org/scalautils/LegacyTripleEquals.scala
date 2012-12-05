@@ -17,8 +17,8 @@ package org.scalautils
 
 trait LegacyTripleEquals extends AnyEquality with EqualityConstraints {
 
-  // Turn off any and all equality constraint implicits
-  override def unconstrainedEquality[A, B](implicit equalityOfA: Equality[A]): EqualityConstraint[A, B] = new BasicEqualityConstraint[A, B](equalityOfA)
+  // Now I need this one
+  implicit override def unconstrainedEquality[A, B](implicit equalityOfA: Equality[A]): EqualityConstraint[A, B] = new BasicEqualityConstraint[A, B](equalityOfA)
 
   override def lowPriorityTypeCheckedEqualityConstraint[A, B](implicit equalityOfA: Equality[A], ev: A <:< B): EqualityConstraint[A, B] = new BasicEqualityConstraint[A, B](equalityOfA)
   override def typeCheckedEqualityConstraint[A, B](implicit equalityOfA: Equality[A], ev: B <:< A): EqualityConstraint[A, B] = new BasicEqualityConstraint[A, B](equalityOfA)
@@ -57,7 +57,7 @@ trait LegacyTripleEquals extends AnyEquality with EqualityConstraints {
    * @param left the object whose type to convert to <code>Equalizer</code>.
    * @throws NullPointerException if <code>left</code> is <code>null</code>.
    */
-  implicit override def convertToEqualizer(left: Any) = new Equalizer(left)
+  implicit override def convertToEqualizer[T](left: T): Equalizer[T] = new Equalizer(left)
 }
 
 object LegacyTripleEquals extends LegacyTripleEquals
