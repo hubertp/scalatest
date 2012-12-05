@@ -23,7 +23,7 @@ import scala.collection.GenIterable
 import scala.collection.GenTraversable
 import scala.collection.GenTraversableOnce
 
-class TripleEqualsSpec extends Spec with NonImplicitAssertions {
+class CopiedForLegacyTripleEqualsSpec extends Spec with NonImplicitAssertions {
 
   case class Super(size: Int)
   class Sub(sz: Int) extends Super(sz)
@@ -36,26 +36,26 @@ class TripleEqualsSpec extends Spec with NonImplicitAssertions {
 
   object `the custom equality === operator` {
 
-    object `with TripleEquals` {
+    object `with LegacyTripleEquals` {
 
       def `should compare anything with anything` {
 
-        new TripleEquals {
+        new LegacyTripleEquals {
 
           assert(1 === 1)
-          assert(!(1 !== 1))
+          assert((1 !== 1).isDefined)
 
           assert(1 === 1L)
-          assert(!(1 !== 1L))
+          assert((1 !== 1L).isDefined)
 
           assert(1L === 1)
-          assert(!(1L !== 1))
+          assert((1L !== 1).isDefined)
 
           assert("1" !== 1)
-          assert(!("1" === 1))
+          assert(("1" === 1).isDefined)
 
           assert(1 !== "1")
-          assert(!(1 === "1"))
+          assert((1 === "1").isDefined)
 
           assert(super1 !== super2)
           assert(super1 !== sub2)
@@ -64,23 +64,23 @@ class TripleEqualsSpec extends Spec with NonImplicitAssertions {
           assert(super1 === sub1)
           assert(sub1 === super1)
 
-          assert(!(super1 === null))
+          assert((super1 === null).isDefined)
           assert(super1 !== null)
 
           assert(nullSuper === null)
-          assert(!(nullSuper !== null))
-          assert(!(nullSuper === super1))
+          assert((nullSuper !== null).isDefined)
+          assert((nullSuper === super1).isDefined)
           assert(nullSuper !== super1)
         }
       }
 
 /*
-      def `should be overridable with TypeCheckedTripleEquals locally when TripleEquals imported` {
+      def `should be overridable with TypeCheckedLegacyTripleEquals locally when LegacyTripleEquals imported` {
 
-        object O extends TripleEquals
+        object O extends LegacyTripleEquals
         import O._
 
-        new TypeCheckedTripleEquals {
+        new TypeCheckedLegacyTripleEquals {
 
           class Fruit { override def equals(o: Any) = o.isInstanceOf[Fruit] }
           trait Crunchy
@@ -91,7 +91,7 @@ class TripleEqualsSpec extends Spec with NonImplicitAssertions {
           val ap: Apple = new Apple
 
           assert(1 === 1)
-          assert(!(1 !== 1))
+          assert((1 !== 1).isDefined)
 
           assert(ap === fr)
           assert(fr === ap)
@@ -121,11 +121,11 @@ class TripleEqualsSpec extends Spec with NonImplicitAssertions {
         }
       }
 
-      def `should be overridable with TypeCheckedTripleEquals locally when TripleEquals mixed in` {
+      def `should be overridable with TypeCheckedLegacyTripleEquals locally when LegacyTripleEquals mixed in` {
 
-        object O extends TripleEquals {
+        object O extends LegacyTripleEquals {
 
-          new TypeCheckedTripleEquals {
+          new TypeCheckedLegacyTripleEquals {
 
             class Fruit { override def equals(o: Any) = o.isInstanceOf[Fruit] }
             trait Crunchy
@@ -136,7 +136,7 @@ class TripleEqualsSpec extends Spec with NonImplicitAssertions {
             val ap: Apple = new Apple
   
             assert(1 === 1)
-            assert(!(1 !== 1))
+            assert((1 !== 1).isDefined)
   
             assert(ap === fr)
             assert(fr === ap)
@@ -167,12 +167,12 @@ class TripleEqualsSpec extends Spec with NonImplicitAssertions {
         }
       }
 
-      def `should be overridable with ConversionCheckedTripleEquals locally when TripleEquals imported` {
+      def `should be overridable with ConversionCheckedLegacyTripleEquals locally when LegacyTripleEquals imported` {
 
-        object O extends TripleEquals
+        object O extends LegacyTripleEquals
         import O._
 
-        new ConversionCheckedTripleEquals {
+        new ConversionCheckedLegacyTripleEquals {
 
             class Fruit { override def equals(o: Any) = o.isInstanceOf[Fruit] }
             trait Crunchy
@@ -183,7 +183,7 @@ class TripleEqualsSpec extends Spec with NonImplicitAssertions {
             val ap: Apple = new Apple
 
             assert(1 === 1)
-            assert(!(1 !== 1))
+            assert((1 !== 1).isDefined)
 
             assert(ap === fr)
             assert(fr === ap)
@@ -200,8 +200,8 @@ class TripleEqualsSpec extends Spec with NonImplicitAssertions {
             // These should work with implicit conversions
             assert(1 === 1L)
             assert(1L === 1)
-            assert(!(1 !== 1L))
-            assert(!(1L !== 1))
+            assert((1 !== 1L).isDefined)
+            assert((1L !== 1).isDefined)
 
             // The rest should not compile
             // assert("1" === 1)
@@ -214,11 +214,11 @@ class TripleEqualsSpec extends Spec with NonImplicitAssertions {
         }
       }
 
-      def `should be overridable with ConversionCheckedTripleEquals locally when TripleEquals mixed in` {
+      def `should be overridable with ConversionCheckedLegacyTripleEquals locally when LegacyTripleEquals mixed in` {
 
-        object O extends TripleEquals {
+        object O extends LegacyTripleEquals {
 
-          new ConversionCheckedTripleEquals {
+          new ConversionCheckedLegacyTripleEquals {
 
             class Fruit { override def equals(o: Any) = o.isInstanceOf[Fruit] }
             trait Crunchy
@@ -229,7 +229,7 @@ class TripleEqualsSpec extends Spec with NonImplicitAssertions {
             val ap: Apple = new Apple
 
             assert(1 === 1)
-            assert(!(1 !== 1))
+            assert((1 !== 1).isDefined)
 
             assert(ap === fr)
             assert(fr === ap)
@@ -246,8 +246,8 @@ class TripleEqualsSpec extends Spec with NonImplicitAssertions {
             // These should work with implicit conversions
             assert(1 === 1L)
             assert(1L === 1)
-            assert(!(1 !== 1L))
-            assert(!(1L !== 1))
+            assert((1 !== 1L).isDefined)
+            assert((1L !== 1).isDefined)
 
             // The rest should not compile
             // assert("1" === 1)
@@ -263,11 +263,11 @@ class TripleEqualsSpec extends Spec with NonImplicitAssertions {
 */
     }
 
-    object `with TypeCheckedTripleEquals` {
+    object `with TypeCheckedLegacyTripleEquals` {
 
       def `should compare supertypes with subtypes on either side` {
 
-        new TypeCheckedTripleEquals {
+        new TypeCheckedLegacyTripleEquals {
 
           class Fruit { override def equals(o: Any) = o.isInstanceOf[Fruit] }
           trait Crunchy
@@ -278,7 +278,7 @@ class TripleEqualsSpec extends Spec with NonImplicitAssertions {
           val ap: Apple = new Apple
 
           assert(1 === 1)
-          assert(!(1 !== 1))
+          assert((1 !== 1).isDefined)
 
           assert(ap === fr)
           assert(fr === ap)
@@ -306,38 +306,38 @@ class TripleEqualsSpec extends Spec with NonImplicitAssertions {
           // assert(fr === cr)
           // assert(cr === fr)
 
-          assert(!(super1 === null))
+          assert((super1 === null).isDefined)
           assert(super1 !== null)
 
           assert(nullSuper === null)
-          assert(!(nullSuper !== null))
-          assert(!(nullSuper === super1))
+          assert((nullSuper !== null).isDefined)
+          assert((nullSuper === super1).isDefined)
           assert(nullSuper !== super1)
         }
       }
 
 /*
-      def `should be overridable with TripleEquals locally when TypeCheckedTripleEquals imported` {
+      def `should be overridable with LegacyTripleEquals locally when TypeCheckedLegacyTripleEquals imported` {
 
-        object O extends TypeCheckedTripleEquals
+        object O extends TypeCheckedLegacyTripleEquals
         import O._
 
-        new TripleEquals {
+        new LegacyTripleEquals {
 
           assert(1 === 1)
-          assert(!(1 !== 1))
+          assert((1 !== 1).isDefined)
 
           assert(1 === 1L)
-          assert(!(1 !== 1L))
+          assert((1 !== 1L).isDefined)
 
           assert(1L === 1)
-          assert(!(1L !== 1))
+          assert((1L !== 1).isDefined)
 
           assert("1" !== 1)
-          assert(!("1" === 1))
+          assert(("1" === 1).isDefined)
 
           assert(1 !== "1")
-          assert(!(1 === "1"))
+          assert((1 === "1").isDefined)
 
           assert(super1 !== super2)
           assert(super1 !== sub2)
@@ -348,26 +348,26 @@ class TripleEqualsSpec extends Spec with NonImplicitAssertions {
         }
       }
 
-      def `should be overridable with TripleEquals locally when TypeCheckedTripleEquals mixed in` {
+      def `should be overridable with LegacyTripleEquals locally when TypeCheckedLegacyTripleEquals mixed in` {
 
-        object O extends TypeCheckedTripleEquals {
+        object O extends TypeCheckedLegacyTripleEquals {
 
-          new TripleEquals {
+          new LegacyTripleEquals {
 
             assert(1 === 1)
-            assert(!(1 !== 1))
+            assert((1 !== 1).isDefined)
 
             assert(1 === 1L)
-            assert(!(1 !== 1L))
+            assert((1 !== 1L).isDefined)
 
             assert(1L === 1)
-            assert(!(1L !== 1))
+            assert((1L !== 1).isDefined)
 
             assert("1" !== 1)
-            assert(!("1" === 1))
+            assert(("1" === 1).isDefined)
 
             assert(1 !== "1")
-            assert(!(1 === "1"))
+            assert((1 === "1").isDefined)
 
             assert(super1 !== super2)
             assert(super1 !== sub2)
@@ -379,12 +379,12 @@ class TripleEqualsSpec extends Spec with NonImplicitAssertions {
         }
       }
 
-      def `should be overridable with ConversionCheckedTripleEquals locally when TypeCheckedTripleEquals imported` {
+      def `should be overridable with ConversionCheckedLegacyTripleEquals locally when TypeCheckedLegacyTripleEquals imported` {
 
-        object O extends TypeCheckedTripleEquals
+        object O extends TypeCheckedLegacyTripleEquals
         import O._
 
-        new ConversionCheckedTripleEquals {
+        new ConversionCheckedLegacyTripleEquals {
 
           class Fruit { override def equals(o: Any) = o.isInstanceOf[Fruit] }
           trait Crunchy
@@ -395,7 +395,7 @@ class TripleEqualsSpec extends Spec with NonImplicitAssertions {
           val ap: Apple = new Apple
 
           // assert(1 === 1) // compiles on 2.10 but not 2.9
-          // assert(!(1 !== 1)) // compiles on 2.10 but not 2.9
+          // assert((1 !== 1).isDefined) // compiles on 2.10 but not 2.9
 
           // assert(ap === fr) // compiles on 2.10 but not 2.9
           // compiles on 2.10 but not 2.9/ assert(fr === ap) // compiles on 2.10 but not 2.9
@@ -412,8 +412,8 @@ class TripleEqualsSpec extends Spec with NonImplicitAssertions {
           // These should work with implicit conversions
           assert(1 === 1L)
           assert(1L === 1)
-          assert(!(1 !== 1L))
-          assert(!(1L !== 1))
+          assert((1 !== 1L).isDefined)
+          assert((1L !== 1).isDefined)
 
           // The rest should not compile
           // assert("1" === 1)
@@ -426,11 +426,11 @@ class TripleEqualsSpec extends Spec with NonImplicitAssertions {
         }
       }
 
-      def `should be overridable with ConversionCheckedTripleEquals locally when TypeCheckedTripleEquals mixed in` {
+      def `should be overridable with ConversionCheckedLegacyTripleEquals locally when TypeCheckedLegacyTripleEquals mixed in` {
 
-        object O extends TypeCheckedTripleEquals {
+        object O extends TypeCheckedLegacyTripleEquals {
 
-          new ConversionCheckedTripleEquals {
+          new ConversionCheckedLegacyTripleEquals {
 
             class Fruit { override def equals(o: Any) = o.isInstanceOf[Fruit] }
             trait Crunchy
@@ -441,7 +441,7 @@ class TripleEqualsSpec extends Spec with NonImplicitAssertions {
             val ap: Apple = new Apple
 
             // assert(1 === 1) // compiles on 2.10 but not 2.9
-            // assert(!(1 !== 1)) // compiles on 2.10 but not 2.9
+            // assert((1 !== 1).isDefined) // compiles on 2.10 but not 2.9
 
             // assert(ap === fr) // compiles on 2.10 but not 2.9
             // assert(fr === ap) // compiles on 2.10 but not 2.9
@@ -458,8 +458,8 @@ class TripleEqualsSpec extends Spec with NonImplicitAssertions {
             // These should work with implicit conversions
             assert(1 === 1L)
             assert(1L === 1)
-            assert(!(1 !== 1L))
-            assert(!(1L !== 1))
+            assert((1 !== 1L).isDefined)
+            assert((1L !== 1).isDefined)
 
             // The rest should not compile
             // assert("1" === 1)
@@ -475,11 +475,11 @@ class TripleEqualsSpec extends Spec with NonImplicitAssertions {
 */
     }
 
-    object `with ConversionCheckedTripleEquals` {
+    object `with ConversionCheckedLegacyTripleEquals` {
 
       def `should compare supertypes with subtypes on either side as well as types with implicit conversions in either direction` {
 
-        new ConversionCheckedTripleEquals {
+        new ConversionCheckedLegacyTripleEquals {
 
           class Fruit { override def equals(o: Any) = o.isInstanceOf[Fruit] }
           trait Crunchy
@@ -490,7 +490,7 @@ class TripleEqualsSpec extends Spec with NonImplicitAssertions {
           val ap: Apple = new Apple
 
           assert(1 === 1)
-          assert(!(1 !== 1))
+          assert((1 !== 1).isDefined)
 
           assert(ap === fr)
           assert(fr === ap)
@@ -507,17 +507,8 @@ class TripleEqualsSpec extends Spec with NonImplicitAssertions {
           // These should work with implicit conversions
           assert(1 === 1L)
           assert(1L === 1)
-          assert(!(1 !== 1L))
-          assert(!(1L !== 1))
-
-          // Should work sensibly with nulls
-          assert(!(super1 === null)) 
-          assert(super1 !== null)
-
-          assert(nullSuper === null)
-          assert(!(nullSuper !== null))
-          assert(!(nullSuper === super1))
-          assert(nullSuper !== super1)
+          assert((1 !== 1L).isDefined)
+          assert((1L !== 1).isDefined)
 
           // The rest should not compile
           // assert("1" === 1)
@@ -527,31 +518,39 @@ class TripleEqualsSpec extends Spec with NonImplicitAssertions {
 
           // assert(fr === cr)
           // assert(cr === fr)
+
+          assert((super1 === null).isDefined)
+          assert(super1 !== null)
+
+          assert(nullSuper === null)
+          assert((nullSuper !== null).isDefined)
+          assert((nullSuper === super1).isDefined)
+          assert(nullSuper !== super1)
         }
       }
 
 /*
-      def `should be overridable with TripleEquals locally when ConversionCheckedTripleEquals imported` {
+      def `should be overridable with LegacyTripleEquals locally when ConversionCheckedLegacyTripleEquals imported` {
 
-        object O extends ConversionCheckedTripleEquals
+        object O extends ConversionCheckedLegacyTripleEquals
         import O._
 
-        new TripleEquals {
+        new LegacyTripleEquals {
 
           assert(1 === 1)
-          assert(!(1 !== 1))
+          assert((1 !== 1).isDefined)
 
           // assert(1 === 1L) // compiles on 2.10 but not 2.9
-          // assert(!(1 !== 1L)) // compiles on 2.10 but not 2.9
+          // assert((1 !== 1L).isDefined) // compiles on 2.10 but not 2.9
 
           assert(1L === 1)
-          assert(!(1L !== 1))
+          assert((1L !== 1).isDefined)
 
           assert("1" !== 1)
-          assert(!("1" === 1))
+          assert(("1" === 1).isDefined)
 
           assert(1 !== "1")
-          assert(!(1 === "1"))
+          assert((1 === "1").isDefined)
 
           assert(super1 !== super2)
           assert(super1 !== sub2)
@@ -562,26 +561,26 @@ class TripleEqualsSpec extends Spec with NonImplicitAssertions {
         }
       }
 
-      def `should be overridable with TripleEquals locally when ConversionCheckedTripleEquals mixed in` {
+      def `should be overridable with LegacyTripleEquals locally when ConversionCheckedLegacyTripleEquals mixed in` {
 
-        object O extends ConversionCheckedTripleEquals {
+        object O extends ConversionCheckedLegacyTripleEquals {
 
-          new TripleEquals {
+          new LegacyTripleEquals {
 
             assert(1 === 1)
-            assert(!(1 !== 1))
+            assert((1 !== 1).isDefined)
 
             // assert(1 === 1L) // compiles on 2.10 but not 2.9
-            // assert(!(1 !== 1L)) // compiles on 2.10 but not 2.9
+            // assert((1 !== 1L).isDefined) // compiles on 2.10 but not 2.9
 
             assert(1L === 1)
-            assert(!(1L !== 1))
+            assert((1L !== 1).isDefined)
 
             assert("1" !== 1)
-            assert(!("1" === 1))
+            assert(("1" === 1).isDefined)
 
             assert(1 !== "1")
-            assert(!(1 === "1"))
+            assert((1 === "1").isDefined)
 
             assert(super1 !== super2)
             assert(super1 !== sub2)
@@ -593,12 +592,12 @@ class TripleEqualsSpec extends Spec with NonImplicitAssertions {
         }
       }
 
-      def `should be overridable with TypeCheckedTripleEquals locally when ConversionCheckedTripleEquals imported` {
+      def `should be overridable with TypeCheckedLegacyTripleEquals locally when ConversionCheckedLegacyTripleEquals imported` {
 
-        object O extends ConversionCheckedTripleEquals
+        object O extends ConversionCheckedLegacyTripleEquals
         import O._
 
-        new TypeCheckedTripleEquals {
+        new TypeCheckedLegacyTripleEquals {
 
           class Fruit { override def equals(o: Any) = o.isInstanceOf[Fruit] }
           trait Crunchy
@@ -609,7 +608,7 @@ class TripleEqualsSpec extends Spec with NonImplicitAssertions {
           val ap: Apple = new Apple
 
           // assert(1 === 1) // compiles on 2.10 but not 2.9
-          // assert(!(1 !== 1)) // compiles on 2.10 but not 2.9
+          // assert((1 !== 1).isDefined) // compiles on 2.10 but not 2.9
 
           // assert(ap === fr) // compiles on 2.10 but not 2.9
           // assert(fr === ap) // compiles on 2.10 but not 2.9
@@ -639,11 +638,11 @@ class TripleEqualsSpec extends Spec with NonImplicitAssertions {
         }
       }
 
-      def `should be overridable with TypeCheckedTripleEquals locally when ConversionCheckedTripleEquals mixed in` {
+      def `should be overridable with TypeCheckedLegacyTripleEquals locally when ConversionCheckedLegacyTripleEquals mixed in` {
 
-        object O extends ConversionCheckedTripleEquals {
+        object O extends ConversionCheckedLegacyTripleEquals {
 
-          new TypeCheckedTripleEquals {
+          new TypeCheckedLegacyTripleEquals {
 
             class Fruit { override def equals(o: Any) = o.isInstanceOf[Fruit] }
             trait Crunchy
@@ -654,7 +653,7 @@ class TripleEqualsSpec extends Spec with NonImplicitAssertions {
             val ap: Apple = new Apple
 
             // assert(1 === 1) // compiles on 2.10 but not 2.9
-            // assert(!(1 !== 1)) // compiles on 2.10 but not 2.9
+            // assert((1 !== 1).isDefined) // compiles on 2.10 but not 2.9
 
             // assert(ap === fr) // compiles on 2.10 but not 2.9
             // assert(fr === ap) // compiles on 2.10 but not 2.9
