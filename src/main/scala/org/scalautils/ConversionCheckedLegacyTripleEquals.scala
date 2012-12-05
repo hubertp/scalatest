@@ -19,7 +19,9 @@ trait LowPriorityConversionCheckedLegacyConstraint extends EqualityConstraints {
   implicit override def lowPriorityConversionCheckedEqualityConstraint[A, B](implicit equalityOfB: Equality[B], cnv: A => B): EqualityConstraint[A, B] = new AToBEqualityConstraint[A, B](equalityOfB, cnv)
 }
 
-trait ConversionCheckedLegacyTripleEquals extends AnyEquality with LowPriorityConversionCheckedLegacyConstraint {
+trait ConversionCheckedLegacyTripleEquals extends LowPriorityConversionCheckedLegacyConstraint {
+
+  implicit override def defaultEquality[A]: Equality[A] = new DefaultEquality[A]
 
   override def convertToEqualizer[T](left: T): Equalizer[T] = new Equalizer(left)
   override def convertToLegacyEqualizer[T](left: T): LegacyEqualizer[T] = new LegacyEqualizer(left)

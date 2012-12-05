@@ -15,7 +15,9 @@
  */
 package org.scalautils
 
-trait LegacyTripleEquals extends AnyEquality with EqualityConstraints {
+trait LegacyTripleEquals extends EqualityConstraints {
+
+  implicit override def defaultEquality[A]: Equality[A] = new DefaultEquality[A]
 
   override def convertToEqualizer[T](left: T): Equalizer[T] = new Equalizer(left)
   override def convertToCheckingEqualizer[T](left: T): CheckingEqualizer[T] = new CheckingEqualizer(left)

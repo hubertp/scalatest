@@ -41,7 +41,7 @@ class AnyEqualitySpec extends Spec with NonImplicitAssertions {
       val b = new MyObject
       assert(!a.equalsWasCalled)
       assert(!b.equalsWasCalled)
-      AnyEquality.anyEquality[MyObject].areEqual(a, b)
+      (new DefaultEquality[MyObject]).areEqual(a, b)
       assert(a.equalsWasCalled)
       assert(!b.equalsWasCalled)
     }
@@ -50,9 +50,9 @@ class AnyEqualitySpec extends Spec with NonImplicitAssertions {
       val a = Array(1, 2, 3)
       val b = Array(1, 2, 3)
       val v = Vector(1, 2, 3)
-      assert(AnyEquality.anyEquality[Array[Int]].areEqual(a, v))
-      assert(AnyEquality.anyEquality[Vector[Int]].areEqual(v, a))
-      assert(AnyEquality.anyEquality[Array[Int]].areEqual(a, b))
+      assert((new DefaultEquality[Array[Int]]).areEqual(a, v))
+      assert((new DefaultEquality[Vector[Int]]).areEqual(v, a))
+      assert((new DefaultEquality[Array[Int]]).areEqual(a, b))
     }
   }
 }

@@ -17,6 +17,8 @@ package org.scalautils
 
 trait EqualityConstraints {
 
+  def defaultEquality[A]: Equality[A] = new DefaultEquality[A]
+
   def convertToEqualizer[T](left: T): Equalizer[T] = new Equalizer(left)
   def convertToLegacyEqualizer[T](left: T): LegacyEqualizer[T] = new LegacyEqualizer(left)
   def convertToCheckingEqualizer[T](left: T): CheckingEqualizer[T] = new CheckingEqualizer(left)
