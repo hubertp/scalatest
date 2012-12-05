@@ -23,7 +23,7 @@ import scala.collection.GenIterable
 import scala.collection.GenTraversable
 import scala.collection.GenTraversableOnce
 
-class XmlEqualitySpec extends Spec with NonImplicitAssertions with TripleEquals with UncheckedEquality {
+class XmlEqualitySpec extends Spec with TripleEquals {
 
   object `the XmlEquality type class` {
 

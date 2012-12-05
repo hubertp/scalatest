@@ -25,7 +25,7 @@ import scala.collection.GenTraversableOnce
 
 // TODO: Write a test with both A => B and B => A in scope and make sure it
 // still compiles. Should because should pick the higher priority one in each case.
-class ConversionCheckedTripleEqualsSpec extends Spec with NonImplicitAssertions with ConversionCheckedTripleEquals {
+class ConversionCheckedTripleEqualsSpec extends Spec with ConversionCheckedTripleEquals {
 
   object `the ConversionCheckedTripleEquals trait` {
 

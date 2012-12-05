@@ -17,7 +17,7 @@ package org.scalautils
 
 import org.scalatest._
 
-class ToleranceSpec extends Spec with NonImplicitAssertions with TripleEquals with UncheckedEquality with Tolerance {
+class ToleranceSpec extends Spec with TripleEquals with Tolerance {
 
   val sevenDotOh = 7.0
   val minusSevenDotOh = -7.0
