@@ -1,3 +1,8 @@
+This is a git-based clone of the official ScalaTest repo available at:
+https://code.google.com/p/scalatest/source/browse/
+
+
+
 ScalaTest
 
 ScalaTest is a free, open-source testing toolkit for Scala and
