@@ -26,11 +26,30 @@ object ScalatestBuild extends Build {
                               "org.scalatest.tools.SomeApiClassRunner", 
                               "org.scalatest.PackageAccessConstructorSuite")
                               
+   lazy val scalaHomeLoc = (baseDirectory, scalaHome) { (f, sHome) =>  
+     val props = new java.util.Properties()
+     IO.load(props, f / "local.properties")
+     val x = props.getProperty("scala.instrumented.home")
+     if (x == null) {
+       System.err.println("Failed to locate custom scala jars")
+       System.exit(1)
+       null
+     } else {
+       println("Using custom scala jars at " + x)
+       file(x)
+     }
+   }
    lazy val root = Project("scalatest", file(".")) settings(
      organization := "org.scalatest",
      version := "1.9-2.10.0-M6-B2",
      scalaVersion := "2.10.0-M6",
-     libraryDependencies ++= simpledependencies,
+     scalaHome <<= scalaHomeLoc { scalaLocation =>
+       Some(scalaLocation)
+     },
+     unmanagedBase <<= scalaHomeLoc { scalaLocation =>
+       scalaLocation
+     },  
+     libraryDependencies := simpledependencies,
      resolvers += "Sonatype Public" at "https://oss.sonatype.org/content/groups/public",
      sourceGenerators in Compile <+= 
          (baseDirectory, sourceManaged in Compile) map genFiles("gen-main", "GenGen.scala")(GenGen.genMain),
